@@ -65,3 +65,4 @@ if [[ ${?} -eq 0 ]]
 		echo -e "${GREEN}Your files and git repository has been updated successfully !${RESET_COLOR}\e[0m"
 	else
 		echo -e "${RED}Something went wrong...${RESET_COLOR}\e[0m"
+fi
