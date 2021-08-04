@@ -39,8 +39,6 @@ if [[ ${?} -eq 0 ]]
 				git push -v
 				# Make symbolic link
 				ln -vf * /bin
-				ln -vf .* /home/$USER
-				ln -vf .* /root
 				cd dot-files
 				# Pull change
 				git pull
