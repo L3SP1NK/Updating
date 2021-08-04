@@ -1,0 +1,67 @@
+#!/bin/bash
+# Update my git repository.
+clear
+
+# Set color
+GREEN="\e[32m"
+RED="\e[31m"
+RESET_COLOR="\e[0m"
+
+# Check if root
+if [ "$EUID" -ne 0 ]
+	then
+		echo -e "${RED}This script must be runned as root${RESET_COLOR}"
+		exit
+fi
+
+CWD=$(pwd)
+USER="lespink"
+REPO_LOCATION="/opt/My-Repo"
+
+ls ~/.git-credentials > /dev/null
+if [[ ${?} -eq 0 ]]
+	then
+		cd ${REPO_LOCATION}
+		# Search for GIT repos and pull/commit them.
+		for GIT_PATH in $(find ${REPO_LOCATION} -type d -name ".git" 2>/dev/null)
+			do
+				cd ${GIT_PATH}
+				echo -e "\n${BLUE}${BOLD}${GIT_LOCATION}${RESET_COLOR}"
+				cd ..
+				git config pull.rebase false
+				# Pull change
+				git pull
+				# Add files to the repo
+				git add -v .*
+				git add -v *
+				# Commit change
+				git commit -a
+				git push -v
+				# Make symbolic link
+				ln -vf * /bin
+				ln -vf .* /home/$USER
+				ln -vf .* /root
+				cd dot-files
+				# Pull change
+				git pull
+				# Add files to the repo
+				git add -v .*
+				# Commit change
+				git commit -a
+				git push -v
+				# Make symbolic link
+				ln -vf * /bin
+				ln -vf .* /home/$USER
+				ln -vf .* /root
+				cd ${CWD}
+			done
+
+	else
+		echo -e "${RED}Git credentials not found !${RESET_COLOR}"
+fi
+
+if [[ ${?} -eq 0 ]]
+	then
+		echo -e "${GREEN}Your files and git repository has been updated successfully !${RESET_COLOR}\e[0m"
+	else
+		echo -e "${RED}Something went wrong...${RESET_COLOR}\e[0m"
