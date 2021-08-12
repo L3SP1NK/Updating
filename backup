@@ -1,6 +1,14 @@
 #!/bin/bash
-# Backup system and VMs with rsync.
-clear
+# Backup the system and virtual machines using rsync
+
+# thinkpad
+# rsync -av --exclude-from=/root/.exclude_from_backup / /mnt/Backup-thinkpad/Kali-July-27 --delete-after --progress
+
+# ideapad system
+# rsync -av --exclude-from=/root/.exclude_from_backup / root@thinkpad:/mnt/Backup-ideapad --delete-after --progress
+
+# ideapad VMs
+# rsync -av  /home/lespink/VirtualBox-VMs/ /mnt/VirtualBox-VMs/ --delete-after --progress
 
 # Set color
 RESET_COLOR="\e[0m"
@@ -10,89 +18,115 @@ RED="\e[31m"
 GREEN="\e[32m"
 CYAN="\e[36m"
 
-echo -e "You are on ${HOSTNAME}"
-echo -e "We are the $(date '+%A, %e %B %Y')"
-echo -e "It's $(date '+%H:%M:%S')"
-
-# Check if root
-if [ "$EUID" -ne 0 ]
+# Check if root.
+if [ ${EUID} -ne 0 ]
     then
-        echo -e "${RED}This script must be runned as root${RESET_COLOR}"
+        echo -e "\n${RED}This script must be runned as root${RESET_COLOR}"
         exit
 fi
 
-# Requirements:
-# - Check if veracrypt-console is installed.
+# Directory variables.
+THINKPAD_SYSTEM_BACKUP_DIR="/mnt/Backup-Thinkpad"
+IDEAPAD_SYSTEM_BACKUP_DIR="/mnt/Backup-Ideapad"
+IDEAPAD_VMS_DIR="${HOME}/VirtualBox-VMs/"
+IDEAPAD_VMS_BACKUP_DIR="/mnt/VirtualBox-VMs/"
+DIR_TO_EXCLUDE="/root/.exclude_from_backup"
 
-# No VMs folder present in home -> check for system backup folder.
-# Vms folder present in home -> check for VMs folder backup.
-
-# Ask for disk (system & VMs) password and store it in a variable.
-# Mount VMs backup disk to ideapad.
-# Mount system backup disk to thinkpad.
-
-# Set path
-VMS_DIR="/home/lespink/VirtualBox-VMs"
-SYSTEM_DIR="/"
-
-if [[ ${HOSTNAME} == "thinkpad" ]]
+# Check if Veracrypt is installed
+which veracrypt > /dev/null
+if [[ ${?} -eq 0 ]]
 	then
-		echo -e "${YELLOW}Is the SSH server enabled ?${RESET_COLOR}"
-		read SSH_SERVER_ENABLED
-			if [[ ${SSH_SERVER_ENABLED} == n ]]
-				then
-					service ssh start
-			fi
+		echo -e "\n${YELLOW}Veracrypt is present on this system.${RESET_COLOR}"
+	else
+		echo -e "\n${RED}Veracrypt is not present on this system, exiting...${RESET_COLOR}"
+		exit 1
 fi
 
-if [[ -n "$(ls -A ${VMS_DIR} 2>/dev/null)" ]]
-	then
-		echo -e "\n${YELLOW}VMs is located at ${BOLD}${VMS_DIR}.${RESET_COLOR}"
-		echo -e "${YELLOW}System is mounted on ${BOLD}${SYSTEM_DIR}.${RESET_COLOR}"
-		echo -e "${YELLOW}Is this information correct ? (Y/n)${RESET_COLOR}"
-		read -s CORRECT_INFO
-			if [[ ${CORRECT_INFO} == "n" ]]
-				then
-					echo -e "\n${YELLOW}Exiting...${RESET_COLOR}"
-					exit 0
-				else
-					echo -e "${YELLOW}The following directory will be excluded from backup :${RESET_COLOR}"
-					echo -e "${CYAN}$(cat $HOME/.exclude_from_backup)${RESET_COLOR}"
-					echo -e "\n${YELLOW}Are you okay with that ?${RESET_COLOR}"
-					read -s CORRECT_INFO
-						if [[ ${CORRECT_INFO} == "n" ]]
-							then
-								exit 0
-							else
-								echo -e "\n${GREEN}Well, starting virtual machines backup...${RESET_COLOR}"
-								rsync -av  /home/lespink/VirtualBox-VMs/ /mnt/VirtualBox-VMs/ --delete-after --progress
-								echo -e "\n${GREEN}Starting system backup...${RESET_COLOR}"
-								# Is root login needed ?
-								rsync -av --exclude-from=/root/.exclude_from_backup / lespink@thinkpad:/mnt/Backup-Ideapad --delete-after --progress
+# List the current drive/partition and select which one to mount.
+function MOUNT_VERA_PART()
+{
+	# Unmount already mounted Veracrypt partition.
+	veracrypt -d
+	# Create a mount point.
+	if [[ $HOSTNAME == "thinkpad" ]]
+		then
+			mkdir -p ${THINKPAD_SYSTEM_BACKUP_DIR} ${IDEAPAD_SYSTEM_BACKUP_DIR}
+		elif [[ ${HOSTNAME} == "ideapad" ]]
+			then
+				mkdir -p ${IDEAPAD_VMS_BACKUP_DIR}
+		else
+			echo -e "\n${RED}System unknown, exiting...${RESET_COLOR}"
+			exit 1
+	fi
+	lsblk
+	echo -e "\n${YELLOW}Select a Veracrypt partition to mount:${RESET_COLOR}"
+	read VERA_PART
+	echo -e "\n${YELLOW}Specify a mount point for ${VERA_PART}:${RESET_COLOR}"
+	echo -e "\n${YELLOW}${BOLD}$(ls /mnt)${RESET_COLOR}"
+	read VERA_PART_MOUNT_POINT
+	echo -e "\n${YELLOW}Specify a password for ${VERA_PART}:${RESET_COLOR}"
+	read -s VERA_PART_PASS
+	echo -e "\n${YELLOW}Mounting the Veracrypt partition ${BOLD}${VERA_PART}...${RESET_COLOR}"
+	veracrypt --mount /dev/${VERA_PART} /mnt/${VERA_PART_MOUNT_POINT} -p ${VERA_PART_PASS}
+}
 
+# Backup the selected path using rsync (archive+verbose mode) and delete the previous files once the backup is completed.
+function BACKUP_THINKPAD()
+{
+	echo -e "\n${GREEN}Starting the system backup...${RESET_COLOR}"
+	rsync -av --exclude-from=${DIR_TO_EXCLUDE} / ${THINKPAD_SYSTEM_BACKUP_DIR} --delete-after --progress
+}
+
+function BACKUP_IDEAPAD()
+{
+	echo -e "\n${GREEN}Starting the system backup...${RESET_COLOR}"
+	rsync -av --exclude-from=${DIR_TO_EXCLUDE} / root@thinkpad:${IDEAPAD_SYSTEM_BACKUP_DIR} --delete-after --progress
+}
+
+function BACKUP_IDEAPAD_VMS()
+{
+	echo -e "\n${GREEN}Starting the system backup...${RESET_COLOR}"
+	rsync -av ${IDEAPAD_VMS_DIR} ${IDEAPAD_VMS_BACKUP_DIR} --delete-after --progress
+}
+
+echo -e "\n${YELLOW}You are on ${BOLD}${HOSTNAME}${RESET_COLOR}"
+if [[ ${HOSTNAME} == "thinkpad" ]]
+	then
+		echo -e "\n${YELLOW}Starting the SSH server for rsync...${RESET_COLOR}"
+		service ssh start
+		MOUNT_VERA_PART
+		echo -e "\n${GREEN}Mounting the Veracrypt partition...${RESET_COLOR}"
+		echo -e "\n${YELLOW}Do you want to mount another Veracrypt partition ? (Y/n)${RESET_COLOR}"
+		read MOUNT_ANOTHER_VERA_PART
+			if [[ ${MOUNT_ANOTHER_VERA_PART} == "n" ]]
+				then
+					BACKUP_THINKPAD
+				else
+					MOUNT_VERA_PART
+					BACKUP_THINKPAD
+			fi
+elif [[ ${HOSTNAME} == "ideapad" ]]
+	then
+		BACKUP_IDEAPAD
+			if [[ -d ${IDEAPAD_VMS_DIR} ]]
+				then
+					echo -e "\n${YELLOW}Mounting the Veracrypt partition...${RESET_COLOR}"
+					MOUNT_VERA_PART
+					echo -e "\n${GREEN}Mounting the Veracrypt partition...${RESET_COLOR}"
+					echo -e "\n${YELLOW}Do you want to mount another Veracrypt partition ? (Y/n)${RESET_COLOR}"
+					read MOUNT_ANOTHER_VERA_PART
+						if [[ ${MOUNT_ANOTHER_VERA_PART} == "n" ]]
+							then
+								BACKUP_THINKPAD
+							else
+								MOUNT_VERA_PART
+								BACKUP_THINKPAD
 						fi
+				else
+					echo -e "\n${RED}Virtual machines folder not found, exiting...${RESET_COLOR}"
+					exit 1
 			fi
 	else
-		echo -e "\n${RED}Virtual Machines directory not found on this system !${RESET_COLOR}"
-		echo -e "\n${YELLOW}System is mounted on ${BOLD}${SYSTEM_DIR}.${RESET_COLOR}"
-		echo -e "${YELLOW}Is this information correct ? (Y/n)${RESET_COLOR}"
-		read -s CORRECT_INFO
-			if [[ ${CORRECT_INFO} == "n" ]]
-				then
-					echo -e "\n${YELLOW}Exiting...${RESET_COLOR}"
-					exit 0
-				else
-					echo -e "${YELLOW}The following directory will be excluded from backup :${RESET_COLOR}"
-					echo -e "${CYAN}$(cat $HOME/.exclude_from_backup)${RESET_COLOR}"
-					echo -e "\n${YELLOW}Are you okay with that ?${RESET_COLOR}"
-					read -s CORRECT_INFO
-						if [[ ${CORRECT_INFO} == "n" ]]
-							then
-								exit 0
-							else
-								echo -e "\n${GREEN}Well, starting system backup...${RESET_COLOR}"
-								rsync -av --exclude-from=/root/.exclude_from_backup / /mnt/Backup-Thinkpad --delete-after --progress
-						fi
-			fi
-
+		echo -e "\n${RED}System unknown, exiting...${RESET_COLOR}"
+		exit 1
 fi
