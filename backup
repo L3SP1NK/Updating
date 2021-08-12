@@ -9,6 +9,7 @@
 
 # ideapad VMs
 # rsync -av  /home/lespink/VirtualBox-VMs/ /mnt/VirtualBox-VMs/ --delete-after --progress
+reset
 
 # Set color
 RESET_COLOR="\e[0m"
@@ -42,11 +43,12 @@ if [[ ${?} -eq 0 ]]
 		exit 1
 fi
 
+# Unmount already mounted Veracrypt partition.
+veracrypt -d
+
 # List the current drive/partition and select which one to mount.
 function MOUNT_VERA_PART()
 {
-	# Unmount already mounted Veracrypt partition.
-	veracrypt -d
 	# Create a mount point.
 	if [[ $HOSTNAME == "thinkpad" ]]
 		then
