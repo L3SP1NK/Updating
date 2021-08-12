@@ -38,7 +38,7 @@ if [[ ${?} -eq 0 ]]
 				git commit -a
 				git push -v
 				# Make symbolic link
-				ln -vf * /bin
+				ln -vf * /bin 2>/dev/null
 				cd dot-files
 				# Pull change
 				git pull
@@ -48,9 +48,9 @@ if [[ ${?} -eq 0 ]]
 				git commit -a
 				git push -v
 				# Make symbolic link
-				ln -vf * /bin
-				ln -vf .* /home/$USER
-				ln -vf .* /root
+				ln -vf * /bin 2>/dev/null
+				ln -vf .* /home/$USER 2>/dev/null
+				ln -vf .* /root 2>/dev/null
 				cd ${CWD}
 			done
 
