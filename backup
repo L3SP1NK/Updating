@@ -36,7 +36,7 @@ DIR_TO_EXCLUDE="/root/.exclude_from_backup"
 which veracrypt > /dev/null
 if [[ ${?} -eq 0 ]]
 	then
-		echo -e "\n${YELLOW}Veracrypt is present on this system.${RESET_COLOR}"
+		echo -e "\n${GREEN}Veracrypt is present on this system, continuing...${RESET_COLOR}"
 	else
 		echo -e "\n${RED}Veracrypt is not present on this system, exiting...${RESET_COLOR}"
 		exit 1
