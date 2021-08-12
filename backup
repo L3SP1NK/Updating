@@ -110,10 +110,10 @@ elif [[ ${HOSTNAME} == "ideapad" ]]
 					read MOUNT_ANOTHER_VERA_PART
 						if [[ ${MOUNT_ANOTHER_VERA_PART} == "n" ]]
 							then
-								BACKUP_THINKPAD
+								BACKUP_IDEAPAD
 							else
 								MOUNT_VERA_PART
-								BACKUP_THINKPAD
+								BACKUP_IDEAPAD
 						fi
 				else
 					echo -e "\n${RED}Virtual machines folder not found, exiting...${RESET_COLOR}"
