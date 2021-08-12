@@ -1,14 +1,5 @@
 #!/bin/bash
 # Backup the system and virtual machines using rsync
-
-# thinkpad
-# rsync -av --exclude-from=/root/.exclude_from_backup / /mnt/Backup-thinkpad/Kali-July-27 --delete-after --progress
-
-# ideapad system
-# rsync -av --exclude-from=/root/.exclude_from_backup / root@thinkpad:/mnt/Backup-ideapad --delete-after --progress
-
-# ideapad VMs
-# rsync -av  /home/lespink/VirtualBox-VMs/ /mnt/VirtualBox-VMs/ --delete-after --progress
 reset
 
 # Set color
@@ -27,9 +18,9 @@ if [ ${EUID} -ne 0 ]
 fi
 
 # Directory variables.
-THINKPAD_SYSTEM_BACKUP_DIR="/mnt/Backup-Thinkpad"
-IDEAPAD_SYSTEM_BACKUP_DIR="/mnt/Backup-Ideapad"
-IDEAPAD_VMS_DIR="${HOME}/VirtualBox-VMs/"
+THINKPAD_SYSTEM_BACKUP_DIR="/mnt/Backup-Thinkpad/"
+IDEAPAD_SYSTEM_BACKUP_DIR="/mnt/Backup-Ideapad/"
+IDEAPAD_VMS_DIR="/home/lespink/VirtualBox-VMs/"
 IDEAPAD_VMS_BACKUP_DIR="/mnt/VirtualBox-VMs/"
 DIR_TO_EXCLUDE="/root/.exclude_from_backup"
 
