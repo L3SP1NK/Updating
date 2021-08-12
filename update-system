@@ -1,5 +1,6 @@
 #!/bin/bash
 # Update the system.
+reset
 
 # Set color
 RESET_COLOR="\e[0m"
@@ -152,8 +153,6 @@ function UPDATE_KERNEL()
 						echo -e "\n${YELLOW}Stop the X sessions and run 'X -configure'.${RESET_COLOR}"
 			fi
 }
-
-clear
 
 which apt-get > /dev/null
 if [[ ${?} -eq 0 ]]
