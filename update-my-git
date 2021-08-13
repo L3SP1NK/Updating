@@ -1,6 +1,5 @@
 #!/bin/bash
 # Update my git repository.
-clear
 
 # Set color
 GREEN="\e[32m"
@@ -21,7 +20,7 @@ REPO_LOCATION="/opt/My-Repo"
 if [[ -f ~/.git-credentials ]]
 	then
 		cd ${REPO_LOCATION}
-		# Search for GIT repos and pull/commit them.
+		# Search for GIT repos.
 		for GIT_PATH in $(find ${REPO_LOCATION} -type d -name ".git" 2>/dev/null)
 			do
 				cd ${GIT_PATH}
@@ -55,11 +54,4 @@ if [[ -f ~/.git-credentials ]]
 
 	else
 		echo -e "${RED}Git credentials not found !${RESET_COLOR}"
-fi
-
-if [[ ${?} -eq 0 ]]
-	then
-		echo -e "${GREEN}Your files and git repository has been updated successfully !${RESET_COLOR}\e[0m"
-	else
-		echo -e "${RED}Something went wrong...${RESET_COLOR}\e[0m"
 fi

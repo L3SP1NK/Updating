@@ -78,7 +78,7 @@ function BACKUP_IDEAPAD()
 
 function BACKUP_IDEAPAD_VMS()
 {
-	echo -e "\n${GREEN}Starting the system backup...${RESET_COLOR}"
+	echo -e "\n${GREEN}Starting the virtual machines backup...${RESET_COLOR}"
 	rsync -av ${IDEAPAD_VMS_DIR} ${IDEAPAD_VMS_BACKUP_DIR} --delete-after --progress
 }
 
