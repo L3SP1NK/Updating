@@ -37,7 +37,7 @@ if [[ -f ~/.git-credentials ]]
 				git push -v
 				# Make symbolic link
 				ln -vf * /bin 2>/dev/null
-				cd dot-files
+				cd ${REPO_LOCATION}/Configs/dot-files
 				# Pull change
 				git pull
 				# Add files to the repo
