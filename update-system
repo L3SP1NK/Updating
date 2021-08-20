@@ -2,7 +2,6 @@
 # Update the system.
 reset
 
-# Set color
 RESET_COLOR="\e[0m"
 BOLD="\e[1m"
 BLUE="\e[34m"
@@ -21,7 +20,7 @@ fi
 CWD=$(pwd)
 
 which neofetch>/dev/null
-if [[ ${?} -eq 0 ]]
+if [[ ${?} -eq "0" ]]
 	then
 		neofetch
 	else
@@ -104,7 +103,7 @@ function UPDATE_KERNEL()
 		if  [[ -f /etc/X11/xorg.conf ]]
 			then
 				cat /etc/X11/xorg.conf  | grep -e "amdgpu" > /dev/null
-					if [[ ${?} -eq 0 ]]
+					if [[ ${?} -eq "0" ]]
 						then
 							echo -e "\n${YELLOW}Your X server is configured to use the amdgpu driver.${RESET_COLOR}"
 							echo -e "\n${YELLOW}Cloning the linux firmware (+ the unofficial AMD) repositories...${RESET_COLOR}"
@@ -115,7 +114,7 @@ function UPDATE_KERNEL()
 							update-initramfs -duv
 						else
 							cat /etc/X11/xorg.conf  | grep -e "intel" > /dev/null
-								if [[ ${?} -eq 0 ]]
+								if [[ ${?} -eq "0" ]]
 									then
 										echo -e "\n${YELLOW}Your X server is configured to use the intel driver.${RESET_COLOR}"
 										echo -e "\n${YELLOW}Cloning the linux firmware repositories...${RESET_COLOR}"
@@ -131,7 +130,7 @@ function UPDATE_KERNEL()
 }
 
 which apt-get > /dev/null
-if [[ ${?} -eq 0 ]]
+if [[ ${?} -eq "0" ]]
 	then
 		echo -e "\n${GREY}$(date +%H:%M:%S)${RESET_COLOR}"
 		echo -e "\n${YELLOW}${BOLD}$(apt list --installed | wc -l)${RESET_COLOR}${YELLOW} Packages currently installed.${RESET_COLOR}"
@@ -143,7 +142,7 @@ if [[ ${?} -eq 0 ]]
 fi
 
 which flatpak > /dev/null
-if [[ ${?} -eq 0 ]]
+if [[ ${?} -eq "0" ]]
 	then
 		echo -e "\n${GREY}$(date +%H:%M:%S)${RESET_COLOR}"
 		echo -e "\n${YELLOW}${BOLD}Flatpak${RESET_COLOR}${YELLOW} is located at $(which flatpak).${RESET_COLOR}"
@@ -155,7 +154,7 @@ if [[ ${?} -eq 0 ]]
 fi
 
 which npm>/dev/null
-if [[ ${?} -eq 0 ]]
+if [[ ${?} -eq "0" ]]
 	then
 		echo -e "\n${GREY}$(date +%H:%M:%S)${RESET_COLOR}"
 		echo -e "\n${YELLOW}${BOLD}NPM${RESET_COLOR}${YELLOW} is located at $(which npm).${RESET_COLOR}"
@@ -167,7 +166,7 @@ if [[ ${?} -eq 0 ]]
 fi
 
 which git>/dev/null
-if [[ ${?} -eq 0 ]]
+if [[ ${?} -eq "0" ]]
 	then
 		echo -e "\n${GREY}$(date +%H:%M:%S)${RESET_COLOR}"
 		echo -e "\n${YELLOW}${BOLD}Git${RESET_COLOR}${YELLOW} is located at $(which git).${RESET_COLOR}"

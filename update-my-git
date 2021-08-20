@@ -1,7 +1,6 @@
 #!/bin/bash
 # Update my git repository.
 
-# Set color
 GREEN="\e[32m"
 RED="\e[31m"
 RESET_COLOR="\e[0m"
