@@ -183,4 +183,4 @@ echo -e "\n${YELLOW}Updating${BOLD} kernel${RESET_COLOR}${YELLOW} ...${RESET_COL
 UPDATE_KERNEL
 echo -e "\n${GREEN}Done ! ${RESET_COLOR}"
 
-echo -e "\n${GREEN}Update finished ! ${RESET_COLOR}"
+notify-send 'Update Done ✅'

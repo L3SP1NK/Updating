@@ -51,7 +51,6 @@ if [[ -f ~/.git-credentials ]]
 				ln -vf .* /root 2>/dev/null
 				cd ${CWD}
 			done
-
 	else
 		echo -e "${RED}Git credentials not found !${RESET_COLOR}"
 fi
