@@ -1,5 +1,5 @@
 #!/bin/bash
-# Update the system.
+## Update the system.
 reset
 
 RESET_COLOR="\e[0m"
@@ -9,23 +9,6 @@ RED="\e[31m"
 GREEN="\e[32m"
 YELLOW="\e[33m"
 GREY="\e[37m"
-
-# Check if root
-if [ "$EUID" -ne 0 ]
-    then
-        echo -e "${RED}This script must be runned as root${RESET_COLOR}"
-        exit
-fi
-
-CWD=$(pwd)
-
-which neofetch>/dev/null
-if [[ ${?} -eq "0" ]]
-	then
-		neofetch
-	else
-		cat /etc/os-release
-fi
 
 function UPDATE_APT()
 {
@@ -42,7 +25,7 @@ function UPDATE_APT()
 	apt-get update
 
 	echo -e "\n${YELLOW}Installing packages upgrades...${RESET_COLOR}"
-	apt-get upgrade -y --with-new-pkgs
+	apt-get upgrade --with-new-pkgs
 	apt-get dist-upgrade -y
 	apt-get full-upgrade -y
 
@@ -81,7 +64,7 @@ GIT_REPO_LOCATION="/"
 function UPDATE_GIT()
 {
 	cd ${GIT_REPO_LOCATION}
-	# Search for GIT repos and pull them.
+	## Search for GIT repos and pull them.
 	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null)
 		do
 			cd ${GIT_PATH};
@@ -129,57 +112,103 @@ function UPDATE_KERNEL()
 		fi
 }
 
-which apt-get > /dev/null
-if [[ ${?} -eq "0" ]]
-	then
-		echo -e "\n${GREY}$(date +%H:%M:%S)${RESET_COLOR}"
-		echo -e "\n${YELLOW}${BOLD}$(apt list --installed | wc -l)${RESET_COLOR}${YELLOW} Packages currently installed.${RESET_COLOR}"
-		echo -e "\n${YELLOW}Updating${BOLD} APT${RESET_COLOR}${YELLOW} packages...${RESET_COLOR}"
-		UPDATE_APT 2>/dev/null
-		echo -e "\n${GREEN}Done ! ${RESET_COLOR}"
+## Check if root
+if [ "$EUID" -ne 0 ]
+    then
+        echo -e "${RED}This script must be runned as root !${RESET_COLOR}"
+        exit 1
 	else
-		echo -e "\n${RED}The${BOLD}APT${RESET_COLOR}${RED} package manager is not installed on this system.${RESET_COLOR}"
-fi
+		which neofetch > /dev/null
+		if [[ ${?} -eq "0" ]]
+			then
+				neofetch
+			else
+				## Check on which distro i am
+				DISTRO=$(cat /etc/os-release | grep PRETTY | cut -d "=" -f 2)
 
-which flatpak > /dev/null
-if [[ ${?} -eq "0" ]]
-	then
-		echo -e "\n${GREY}$(date +%H:%M:%S)${RESET_COLOR}"
-		echo -e "\n${YELLOW}${BOLD}Flatpak${RESET_COLOR}${YELLOW} is located at $(which flatpak).${RESET_COLOR}"
-		echo -e "\n${YELLOW}You are using${BOLD} $(flatpak --version).${RESET_COLOR}"
-		UPDATE_FLATPAK
+				if [[ ${DISTRO} == '"Kali GNU/Linux Rolling"' ]]
+					then
+						HOSTNAME_COLOR=cyan
+				elif [[ ${DISTRO} == '"Debian GNU/Linux 11 (bullseye)"' ]]
+					then
+						HOSTNAME_COLOR=magenta
+					else
+						HOSTNAME_COLOR=white
+				fi
+				## Change color info based on the distro
+				if [[ ${DISTRO} == '"Kali GNU/Linux Rolling"' ]]
+					then
+						echo -e "${BOLD}${BLUE}$(cat /etc/os-release | grep PRETTY_NAME | cut -d "=" -f 2 | sed 's/"//g')" ; echo -e "${GREY}${BOLD}$(free -h --si)" ; echo -e "\n\e[33m$(apt list --installed 2>/dev/null| wc -l) packages currently installed"
+				elif [[ ${DISTRO} == '"Debian GNU/Linux 11 (bullseye)"' ]]
+					then
+						echo -e "${BOLD}${RED}$(cat /etc/os-release | grep PRETTY_NAME | cut -d "=" -f 2 | sed 's/"//g')" ; echo -e "${GREY}${BOLD}$(free -h --si)" ; echo -e "\n\e[33m$(apt list --installed 2>/dev/null| wc -l) packages currently installed"
+					else
+						echo -e "${BOLD}$(cat /etc/os-release | grep PRETTY_NAME | cut -d "=" -f 2 | sed 's/"//g')" ; echo -e "${GREY}${BOLD}$(free -h --si)" ; echo -e "\n\e[33m$(apt list --installed 2>/dev/null| wc -l) packages currently installed"
+				fi
+		fi
+
+		which apt-get > /dev/null
+		if [[ ${?} -eq "0" ]]
+			then
+				SECONDS="0"
+				echo -e "\n${GREY}${BOLD}$(date +%H:%M:%S)${RESET_COLOR}"
+				echo -e "\n${YELLOW}${BOLD}$(apt list --installed | wc -l)${RESET_COLOR}${YELLOW} Packages currently installed.${RESET_COLOR}"
+				echo -e "\n${YELLOW}Updating${BOLD} APT${RESET_COLOR}${YELLOW} packages...${RESET_COLOR}"
+				UPDATE_APT 2>/dev/null
+				echo -e "\n${GREEN}${BOLD}$(apt list --installed 2>/dev/null | wc -l) APT ${RESET_COLOR}${GREEN}packages updated in ${SECONDS}${RESET_COLOR}"
+				echo -e "\n${GREEN}Done ! ${RESET_COLOR}"
+			else
+				echo -e "\n${RED}The${BOLD}APT${RESET_COLOR}${RED} package manager is not installed on this system.${RESET_COLOR}"
+		fi
+
+		which flatpak > /dev/null
+		if [[ ${?} -eq "0" ]]
+			then
+				SECONDS="0"
+				echo -e "\n${GREY}${BOLD}$(date +%H:%M:%S)${RESET_COLOR}"
+				echo -e "\n${YELLOW}${BOLD}Flatpak${RESET_COLOR}${YELLOW} is located at $(which flatpak).${RESET_COLOR}"
+				echo -e "\n${YELLOW}You are using${BOLD} $(flatpak --version).${RESET_COLOR}"
+				UPDATE_FLATPAK 2>/dev/null
+				echo -e "\n${GREEN}${BOLD}Flatpak${RESET_COLOR}${GREEN} updated in ${SECONDS}${RESET_COLOR}"
+				echo -e "\n${GREEN}Done ! ${RESET_COLOR}"
+			else
+				echo -e "\n${RED}${BOLD}Flatpak${RESET_COLOR}${RED} is not installed on this system.${RESET_COLOR}"
+		fi
+
+		which npm>/dev/null
+		if [[ ${?} -eq "0" ]]
+			then
+				SECONDS="0"
+				echo -e "\n${GREY}${BOLD}$(date +%H:%M:%S)${RESET_COLOR}"
+				echo -e "\n${YELLOW}${BOLD}NPM${RESET_COLOR}${YELLOW} is located at $(which npm).${RESET_COLOR}"
+				echo -e "\n${YELLOW}Updating${BOLD}NPM${RESET_COLOR}${YELLOW} packages...${RESET_COLOR}"
+				UPDATE_NPM 2>/dev/null
+				echo -e "\n${GREEN}${BOLD}NPM${RESET_COLOR}${GREEN} updated in ${SECONDS}${RESET_COLOR}"
+				echo -e "\n${GREEN}Done ! ${RESET_COLOR}"
+			else
+				echo -e "\n${RED}${BOLD}NPM${RESET_COLOR}${RED} is not installed on this system.${RESET_COLOR}"
+		fi
+
+		which git>/dev/null
+		if [[ ${?} -eq "0" ]]
+			then
+				SECONDS="0"
+				echo -e "\n${GREY}${BOLD}$(date +%H:%M:%S)${RESET_COLOR}"
+				echo -e "\n${YELLOW}${BOLD}Git${RESET_COLOR}${YELLOW} is located at $(which git).${RESET_COLOR}"
+				echo -e "\n${YELLOW}Updating${BOLD} Git${RESET_COLOR}${YELLOW} repositories...${RESET_COLOR}"
+				UPDATE_GIT 2>/dev/null
+				echo -e "\n${GREEN}Git repositories updated in ${SECONDS}${RESET_COLOR}"
+				echo -e "\n${GREEN}Done ! ${RESET_COLOR}"
+			else
+				echo -e "\n${RED}${BOLD}Git${RESET_COLOR}${RED} is not installed on this system.${RESET_COLOR}"
+		fi
+
+		SECONDS="0"
+		echo -e "\n${GREY}${BOLD}$(date +%H:%M:%S)${RESET_COLOR}"
+		echo -e "\n${YELLOW}Updating${BOLD} kernel${RESET_COLOR}${YELLOW} ...${RESET_COLOR}"
+		UPDATE_KERNEL
+		echo -e "\n${GREEN}The${BOLD} Linux${RESET_COLOR}${GREEN} kernel has been updated in ${SECONDS}${RESET_COLOR}"
 		echo -e "\n${GREEN}Done ! ${RESET_COLOR}"
-	else
-		echo -e "\n${RED}${BOLD}Flatpak${RESET_COLOR}${RED} is not installed on this system.${RESET_COLOR}"
+
+		notify-send 'Update Done ✅'
 fi
-
-which npm>/dev/null
-if [[ ${?} -eq "0" ]]
-	then
-		echo -e "\n${GREY}$(date +%H:%M:%S)${RESET_COLOR}"
-		echo -e "\n${YELLOW}${BOLD}NPM${RESET_COLOR}${YELLOW} is located at $(which npm).${RESET_COLOR}"
-		echo -e "\n${YELLOW}Updating${BOLD}NPM${RESET_COLOR}${YELLOW} packages...${RESET_COLOR}"
-		UPDATE_NPM
-		echo -e "\n${GREEN}Done ! ${RESET_COLOR}"
-	else
-		echo -e "\n${RED}${BOLD}NPM${RESET_COLOR}${RED} is not installed on this system.${RESET_COLOR}"
-fi
-
-which git>/dev/null
-if [[ ${?} -eq "0" ]]
-	then
-		echo -e "\n${GREY}$(date +%H:%M:%S)${RESET_COLOR}"
-		echo -e "\n${YELLOW}${BOLD}Git${RESET_COLOR}${YELLOW} is located at $(which git).${RESET_COLOR}"
-		echo -e "\n${YELLOW}Updating${BOLD} Git${RESET_COLOR}${YELLOW} repositories...${RESET_COLOR}"
-		UPDATE_GIT
-		echo -e "\n${GREEN}Done ! ${RESET_COLOR}"
-	else
-		echo -e "\n${RED}${BOLD}Git${RESET_COLOR}${RED} is not installed on this system.${RESET_COLOR}"
-fi
-
-echo -e "\n${GREY}$(date +%H:%M:%S)${RESET_COLOR}"
-echo -e "\n${YELLOW}Updating${BOLD} kernel${RESET_COLOR}${YELLOW} ...${RESET_COLOR}"
-UPDATE_KERNEL
-echo -e "\n${GREEN}Done ! ${RESET_COLOR}"
-
-notify-send 'Update Done ✅'

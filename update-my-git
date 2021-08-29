@@ -1,55 +1,55 @@
 #!/bin/bash
-# Update my git repository.
+## Update my git repository.
 
 GREEN="\e[32m"
 RED="\e[31m"
 RESET_COLOR="\e[0m"
 
-# Check if root
-if [ "$EUID" -ne 0 ]
-	then
-		echo -e "${RED}This script must be runned as root${RESET_COLOR}"
-		exit
-fi
-
 CWD=$(pwd)
-USER="lespink"
+USER_HOME="/home/lespink"
 REPO_LOCATION="/opt/My-Repo"
 
-if [[ -f ~/.git-credentials ]]
+## Check if root
+if [ "$EUID" -ne 0 ]
 	then
-		cd ${REPO_LOCATION}
-		# Search for GIT repos.
-		for GIT_PATH in $(find ${REPO_LOCATION} -type d -name ".git" 2>/dev/null)
-			do
-				cd ${GIT_PATH}
-				echo -e "\n${BLUE}${BOLD}${GIT_LOCATION}${RESET_COLOR}"
-				cd ..
-				git config pull.rebase false
-				# Pull change
-				git pull
-				# Add files to the repo
-				git add -v .*
-				git add -v *
-				# Commit change
-				git commit -a
-				git push -v
-				# Make symbolic link
-				ln -vf * /bin 2>/dev/null
-				cd ${REPO_LOCATION}/Configs/dot-files
-				# Pull change
-				git pull
-				# Add files to the repo
-				git add -v .*
-				# Commit change
-				git commit -a
-				git push -v
-				# Make symbolic link
-				ln -vf * /bin 2>/dev/null
-				ln -vf .* /home/$USER 2>/dev/null
-				ln -vf .* /root 2>/dev/null
-				cd ${CWD}
-			done
+		echo -e "${RED}This script must be runned as root !${RESET_COLOR}"
+		exit 1
 	else
-		echo -e "${RED}Git credentials not found !${RESET_COLOR}"
+		if [[ -f /home/$USER/.git-credentials ]]
+			then
+				cd ${REPO_LOCATION}
+				## Search for GIT repos.
+				for GIT_PATH in $(find ${REPO_LOCATION} -type d -name ".git" 2>/dev/null)
+					do
+						cd ${GIT_PATH}
+						echo -e "\n${BLUE}${BOLD}${GIT_LOCATION}${RESET_COLOR}"
+						cd ..
+						git config pull.rebase false
+						## Pull change
+						git pull
+						## Add files to the repo
+						git add -v .*
+						git add -v *
+						## Commit change
+						git commit -a
+						git push -v
+						## Make symbolic link
+						ln -vf * /bin 2>/dev/null
+						cd ${REPO_LOCATION}/Configs/dot-files
+						## Pull change
+						git pull
+						## Add files to the repo
+						git add -v .*
+						## Commit change
+						git commit -a
+						git push -v
+						## Make symbolic link
+						ln -vf * /bin 2>/dev/null
+						ln -vf .* ${USER_HOME} 2>/dev/null
+						ln -vf .* /root 2>/dev/null
+						cd ${CWD}
+					done
+			else
+				echo -e "${RED}Git credentials not found !${RESET_COLOR}"
+		fi
 fi
