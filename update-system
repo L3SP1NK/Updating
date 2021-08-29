@@ -112,13 +112,9 @@ function UPDATE_KERNEL()
 		fi
 }
 
-## Check if root ?
-if [ "$EUID" -ne 0 ]
-    then
-        echo -e "${RED}This script must be runned as root !${RESET_COLOR}"
-        exit 1
-	else
-		which neofetch > /dev/null
+function RUN()
+{
+	which neofetch > /dev/null
 		if [[ ${?} -eq "0" ]]
 			then
 				neofetch
@@ -164,7 +160,7 @@ if [ "$EUID" -ne 0 ]
 				echo -e "\n${GREEN}Done ! ${RESET_COLOR}"
 			else
 				echo -e "\n${RED}${BOLD}Flatpak${RESET_COLOR}${RED} is not installed on this system.${RESET_COLOR}"
-		fi
+			fi
 
 		which npm>/dev/null
 		if [[ ${?} -eq "0" ]]
@@ -179,8 +175,7 @@ if [ "$EUID" -ne 0 ]
 			else
 				echo -e "\n${RED}${BOLD}NPM${RESET_COLOR}${RED} is not installed on this system.${RESET_COLOR}"
 		fi
-
-		which git>/dev/null
+			which git>/dev/null
 		if [[ ${?} -eq "0" ]]
 			then
 				SECONDS="0"
@@ -193,13 +188,20 @@ if [ "$EUID" -ne 0 ]
 			else
 				echo -e "\n${RED}${BOLD}Git${RESET_COLOR}${RED} is not installed on this system.${RESET_COLOR}"
 		fi
-
-		SECONDS="0"
+			SECONDS="0"
 		echo -e "\n${GREY}${BOLD}$(date +%H:%M:%S)${RESET_COLOR}"
 		echo -e "\n${YELLOW}Updating the${BOLD} Linux kernel${RESET_COLOR}${YELLOW} ...${RESET_COLOR}"
 		UPDATE_KERNEL
 		echo -e "\n${GREEN}The${BOLD} Linux kernel${RESET_COLOR}${GREEN} has been updated in ${SECONDS} seconds.${RESET_COLOR}"
 		echo -e "\n${GREEN}Done ! ${RESET_COLOR}"
+			notify-send 'Update Done ✅'
+}
 
-		notify-send 'Update Done ✅'
+## Check if root ?
+if [ "$EUID" -ne 0 ]
+	then
+		echo -e "${RED}This script must be runned as root !${RESET_COLOR}"
+	    exit 1
+	else
+		RUN>>/var/log/update.log&tail -f /var/log/update.log
 fi
