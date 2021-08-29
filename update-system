@@ -146,7 +146,7 @@ if [ "$EUID" -ne 0 ]
 				echo -e "\n${YELLOW}${BOLD}$(apt list --installed | wc -l)${RESET_COLOR}${YELLOW} Packages currently installed.${RESET_COLOR}"
 				echo -e "\n${YELLOW}Updating${BOLD} APT${RESET_COLOR}${YELLOW} packages...${RESET_COLOR}"
 				UPDATE_APT 2>/dev/null
-				echo -e "\n${GREEN}${BOLD}$(apt list --installed 2>/dev/null | wc -l) APT ${RESET_COLOR}${GREEN}packages updated in ${SECONDS}seconds.${RESET_COLOR}"
+				echo -e "\n${GREEN}${BOLD}$(apt list --installed 2>/dev/null | wc -l) APT ${RESET_COLOR}${GREEN}packages updated in ${SECONDS} seconds.${RESET_COLOR}"
 				echo -e "\n${GREEN}Done ! ${RESET_COLOR}"
 			else
 				echo -e "\n${RED}The${BOLD}APT${RESET_COLOR}${RED} package manager is not installed on this system.${RESET_COLOR}"
@@ -160,7 +160,7 @@ if [ "$EUID" -ne 0 ]
 				echo -e "\n${YELLOW}${BOLD}Flatpak${RESET_COLOR}${YELLOW} is located at $(which flatpak).${RESET_COLOR}"
 				echo -e "\n${YELLOW}You are using${BOLD} $(flatpak --version).${RESET_COLOR}"
 				UPDATE_FLATPAK 2>/dev/null
-				echo -e "\n${GREEN}${BOLD}Flatpak${RESET_COLOR}${GREEN} updated in ${SECONDS}seconds.${RESET_COLOR}"
+				echo -e "\n${GREEN}${BOLD}Flatpak${RESET_COLOR}${GREEN} updated in ${SECONDS} seconds.${RESET_COLOR}"
 				echo -e "\n${GREEN}Done ! ${RESET_COLOR}"
 			else
 				echo -e "\n${RED}${BOLD}Flatpak${RESET_COLOR}${RED} is not installed on this system.${RESET_COLOR}"
@@ -174,7 +174,7 @@ if [ "$EUID" -ne 0 ]
 				echo -e "\n${YELLOW}${BOLD}NPM${RESET_COLOR}${YELLOW} is located at $(which npm).${RESET_COLOR}"
 				echo -e "\n${YELLOW}Updating${BOLD}NPM${RESET_COLOR}${YELLOW} packages...${RESET_COLOR}"
 				UPDATE_NPM 2>/dev/null
-				echo -e "\n${GREEN}${BOLD}NPM${RESET_COLOR}${GREEN} updated in ${SECONDS}seconds.${RESET_COLOR}"
+				echo -e "\n${GREEN}${BOLD}NPM${RESET_COLOR}${GREEN} updated in ${SECONDS} seconds.${RESET_COLOR}"
 				echo -e "\n${GREEN}Done ! ${RESET_COLOR}"
 			else
 				echo -e "\n${RED}${BOLD}NPM${RESET_COLOR}${RED} is not installed on this system.${RESET_COLOR}"
@@ -188,7 +188,7 @@ if [ "$EUID" -ne 0 ]
 				echo -e "\n${YELLOW}${BOLD}Git${RESET_COLOR}${YELLOW} is located at $(which git).${RESET_COLOR}"
 				echo -e "\n${YELLOW}Updating${BOLD} Git${RESET_COLOR}${YELLOW} repositories...${RESET_COLOR}"
 				UPDATE_GIT 2>/dev/null
-				echo -e "\n${GREEN}Git repositories updated in ${SECONDS}seconds.${RESET_COLOR}"
+				echo -e "\n${GREEN}Git repositories updated in ${SECONDS} seconds.${RESET_COLOR}"
 				echo -e "\n${GREEN}Done ! ${RESET_COLOR}"
 			else
 				echo -e "\n${RED}${BOLD}Git${RESET_COLOR}${RED} is not installed on this system.${RESET_COLOR}"
@@ -196,9 +196,9 @@ if [ "$EUID" -ne 0 ]
 
 		SECONDS="0"
 		echo -e "\n${GREY}${BOLD}$(date +%H:%M:%S)${RESET_COLOR}"
-		echo -e "\n${YELLOW}Updating${BOLD} kernel${RESET_COLOR}${YELLOW} ...${RESET_COLOR}"
+		echo -e "\n${YELLOW}Updating the${BOLD} Linux kernel${RESET_COLOR}${YELLOW} ...${RESET_COLOR}"
 		UPDATE_KERNEL
-		echo -e "\n${GREEN}The${BOLD} Linux${RESET_COLOR}${GREEN} kernel has been updated in ${SECONDS}${RESET_COLOR}"
+		echo -e "\n${GREEN}The${BOLD} Linux kernel${RESET_COLOR}${GREEN} has been updated in ${SECONDS} seconds.${RESET_COLOR}"
 		echo -e "\n${GREEN}Done ! ${RESET_COLOR}"
 
 		notify-send 'Update Done ✅'
