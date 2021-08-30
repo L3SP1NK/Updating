@@ -1,6 +1,10 @@
 #!/bin/bash
 ## Update my git repository.
 
+## TODO:
+## - Check if git is installed.
+## - Clean this mess.
+
 GREEN="\e[32m"
 RED="\e[31m"
 RESET_COLOR="\e[0m"

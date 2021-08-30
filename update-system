@@ -1,5 +1,13 @@
 #!/bin/bash
-## Update the system.
+## This script is only made for Debian based distros, it will update:
+## - APT packages
+## - Git repositories
+## - Flatpak applications
+## - NPM applications
+## - The Linux firmware
+## Comming soon (or not):
+## - Snap
+
 reset
 
 RESET_COLOR="\e[0m"
