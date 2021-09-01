@@ -211,5 +211,5 @@ if [ "$EUID" -ne 0 ]
 		echo -e "${RED}This script must be runned as root !${RESET_COLOR}"
 	    exit 1
 	else
-		RUN>>/var/log/update.log&tail -f /var/log/update.log
+		RUN>>/var/log/update.log
 fi
