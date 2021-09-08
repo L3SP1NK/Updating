@@ -11,7 +11,7 @@ RESET_COLOR="\e[0m"
 
 CWD=$(pwd)
 USER_HOME="/home/lespink"
-REPO_LOCATION="/opt/My-Repo"
+REPO_LOCATION="/opt/My-Repo/To-link"
 
 ## Check if root
 if [ "$EUID" -ne 0 ]
