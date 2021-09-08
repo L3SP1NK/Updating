@@ -20,7 +20,7 @@ GREY="\e[37m"
 
 function UPDATE_APT()
 {
-	echo -e "\n${YELLOW}Removing downloaded archive files and unused packages...${RESET_COLOR}"
+	echo -e "\n${YELLOW}Resynchronizing the package index files from their sources...${RESET_COLOR}"
 	apt-get clean -y
 	apt-get autoclean -y
 	apt-get --autoremove --purge -y
