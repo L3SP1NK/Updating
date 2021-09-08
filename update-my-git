@@ -11,7 +11,7 @@ RESET_COLOR="\e[0m"
 
 CWD=$(pwd)
 USER_HOME="/home/lespink"
-REPO_LOCATION="/opt/My-Repo/To-link"
+REPOS_LOCATION="/opt/My-Repo/"
 
 ## Check if root
 if [ "$EUID" -ne 0 ]
@@ -19,41 +19,52 @@ if [ "$EUID" -ne 0 ]
 		echo -e "${RED}This script must be runned as root !${RESET_COLOR}"
 		exit 1
 	else
-		if [[ -f ${USER_HOME}/.git-credentials ]]
+		if [[ ${1} == "link" ]]
 			then
-				cd ${REPO_LOCATION}
-				## Search for GIT repos.
-				for GIT_PATH in $(find ${REPO_LOCATION} -type d -name ".git" 2>/dev/null)
-					do
-						cd ${GIT_PATH}
-						echo -e "\n${BLUE}${BOLD}${GIT_LOCATION}${RESET_COLOR}"
-						cd ..
-						git config pull.rebase false
-						## Pull change
-						git pull
-						## Add files to the repo
-						git add -v .*
-						git add -v *
-						## Commit change
-						git commit -a
-						git push -v
-						## Make symbolic link
-						ln -vf * /bin 2>/dev/null
-						cd ${REPO_LOCATION}/Configs/dot-files
-						## Pull change
-						git pull
-						## Add files to the repo
-						git add -v .*
-						## Commit change
-						git commit -a
-						git push -v
-						## Make symbolic link
-						ln -vf * /bin 2>/dev/null
-						ln -vf .* ${USER_HOME} 2>/dev/null
-						ln -vf .* /root 2>/dev/null
-						cd ${CWD}
-					done
+				## User link
+				rm -r ${USER_HOME}/.config/bpytop
+				ln -svf /opt/My-Repo/Configs/bpytop ${USER_HOME}/.config/
+				rm -r ${USER_HOME}/.config/htop
+				ln -svf /opt/My-Repo/Configs/htop ${USER_HOME}/.config/
+				ln -svf /opt/My-Repo/Configs/dot-files/.* ${USER_HOME} 2>/dev/null
+				## Root link
+				rm -r ${HOME}/.config/bpytop
+				ln -svf /opt/My-Repo/Configs/bpytop ${HOME}/.config/
+				rm -r ${HOME}/.config/htop
+				ln -svf /opt/My-Repo/Configs/htop ${HOME}/.config/
+				ln -svf /opt/My-Repo/Configs/dot-files/.* ${HOME} 2>/dev/null
+				## Global link
+				ln -svf /opt/My-Repo/Updating/update-* /bin/
 			else
-				echo -e "${RED}Git credentials not found !${RESET_COLOR}"
+				if [[ -f ${USER_HOME}/.git-credentials ]]
+					then
+						cd ${REPOS_LOCATION}
+						## Search for GIT repos.
+						for GIT_PATH in $(find ${REPOS_LOCATION} -type d -name ".git" 2>/dev/null)
+							do
+								cd ${GIT_PATH}
+								echo -e "\n${BLUE}${BOLD}${GIT_LOCATION}${RESET_COLOR}"
+								cd ..
+								git config pull.rebase false
+								## Pull change
+								git pull
+								## Add files to the repo
+								git add -v .*
+								git add -v *
+								## Commit change
+								git commit -a
+								git push -v
+								## Pull change
+								git pull
+								## Add files to the repo
+								git add -v .*
+								## Commit change
+								git commit -a
+								git push -v
+								cd ${CWD}
+						done
+					else
+						echo -e "${RED}Git credentials not found !${RESET_COLOR}"
+				fi
 		fi
 fi
