@@ -202,7 +202,6 @@ function RUN()
 		UPDATE_KERNEL
 		echo -e "\n${GREEN}The${BOLD} Linux kernel${RESET_COLOR}${GREEN} has been updated in ${SECONDS} seconds.${RESET_COLOR}"
 		echo -e "\n${GREEN}Done ! ${RESET_COLOR}"
-			notify-send 'Update Done ✅'
 }
 
 ## Check if root ?
@@ -211,5 +210,5 @@ if [ "$EUID" -ne 0 ]
 		echo -e "${RED}This script must be runned as root !${RESET_COLOR}"
 	    exit 1
 	else
-		RUN
+		RUN && notify-send 'Update Done ✅' || notify-send 'Something went wrong during update...📛'
 fi
