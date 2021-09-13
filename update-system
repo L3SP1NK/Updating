@@ -8,8 +8,6 @@
 ## Comming soon (or not):
 ## - Snap
 
-reset
-
 RESET_COLOR="\e[0m"
 BOLD="\e[1m"
 BLUE="\e[34m"
@@ -21,31 +19,31 @@ GREY="\e[37m"
 function UPDATE_APT()
 {
 	echo -e "\n${YELLOW}Resynchronizing the package index files from their sources...${RESET_COLOR}"
-	apt-get clean -y
-	apt-get autoclean -y
-	apt-get --autoremove --purge -y
+	apt-get -y -f clean
+	apt-get -y -f autoclean
+	apt-get -y -f --autoremove --purge
 
 	echo -e "\n${YELLOW}Configuring/fixing possibly broken packages...${RESET_COLOR}"
 	dpkg --configure -a
-	apt-get --fix-broken install
+	apt-get -y -f install
 
 	echo -e "\n${YELLOW}Retrieving new lists of packages...${RESET_COLOR}"
-	apt-get update
+	apt-get -y -f update
 
 	echo -e "\n${YELLOW}Installing packages upgrades...${RESET_COLOR}"
-	apt-get upgrade --with-new-pkgs
-	apt-get dist-upgrade -y
-	apt-get full-upgrade -y
+	apt-get -y -f upgrade --with-new-pkgs
+	apt-get -y -f dist-upgrade
+	apt-get -y -f full-upgrade
 
 	echo -e "\n${YELLOW}Configuring possibly broken packages...${RESET_COLOR}"
 	dpkg --configure -a
-	apt-get --fix-broken install
+	apt-get -y -f install
 
 	echo -e "\n${YELLOW}Removing downloaded archive files and unused packages...${RESET_COLOR}"
-	apt-get clean -y
+	apt-get -y -f clean
 
-	apt-get autoclean -y
-	apt-get autoremove --purge -y
+	apt-get -y -f autoclean
+	apt-get -y -f autoremove --purge
 
 }
 
@@ -89,22 +87,23 @@ function UPDATE_KERNEL()
 {
 	FIRMWARE_PATH="/opt/FIRMWARE"
 	echo -e "\n${YELLOW}Installing the linux firmware packages...${RESET_COLOR}"
-	apt-get install -y firmware-linux firmware-linux-free firmware-linux-nonfree 2>/dev/null
+	apt-get -y -f install firmware-linux firmware-linux-free firmware-linux-nonfree 2>/dev/null
 	mkdir -p ${FIRMWARE_PATH}
 		if  [[ -f /etc/X11/xorg.conf ]]
 			then
-				cat /etc/X11/xorg.conf  | grep -e "amdgpu" > /dev/null
+				grep -e "amdgpu" /etc/X11/xorg.conf > /dev/null
 					if [[ ${?} -eq "0" ]]
 						then
 							echo -e "\n${YELLOW}Your X server is configured to use the amdgpu driver.${RESET_COLOR}"
 							echo -e "\n${YELLOW}Cloning the linux firmware (+ the unofficial AMD) repositories...${RESET_COLOR}"
 							cd ${FIRMWARE_PATH}
+							git clone https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git 2>/dev/null
 							git clone https://github.com/Umio-Yasuno/unofficial-amdgpu-firmware-repo.git 2>/dev/null
 							cp -vur ${FIRMWARE_PATH}/unofficial-amdgpu-firmware-repo/amdgpu/* /lib/firmware/amdgpu
 							cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware
 							update-initramfs -u
 						else
-							cat /etc/X11/xorg.conf  | grep -e "intel" > /dev/null
+							grep -e "intel" /etc/X11/xorg.conf > /dev/null
 								if [[ ${?} -eq "0" ]]
 									then
 										echo -e "\n${YELLOW}Your X server is configured to use the intel driver.${RESET_COLOR}"
@@ -210,5 +209,5 @@ if [ "$EUID" -ne 0 ]
 		echo -e "${RED}This script must be runned as root !${RESET_COLOR}"
 	    exit 1
 	else
-		RUN && notify-send 'Update Done ✅' || notify-send 'Something went wrong during update...📛'
+		reset && RUN && notify-send 'Update Done ✅' || notify-send 'Something went wrong during update...📛'
 fi
