@@ -154,7 +154,7 @@ function RUN()
 				echo -e "\n${YELLOW}${BOLD}$(apt list --installed | wc -l)${RESET_COLOR}${YELLOW} Packages currently installed.${RESET_COLOR}"
 				echo -e "\n${YELLOW}Updating${BOLD} APT${RESET_COLOR}${YELLOW} packages...${RESET_COLOR}"
 				UPDATE_APT 2>/dev/null
-				echo -e "\n${GREEN}${BOLD}$(apt list --installed 2>/dev/null | wc -l) APT ${RESET_COLOR}${GREEN}packages updated in ${SECONDS} seconds.${RESET_COLOR}"
+				echo -e "\n${GREEN}${BOLD}APT ${RESET_COLOR}${GREEN}packages updated in ${SECONDS} seconds.${RESET_COLOR}"
 				echo -e "\n${GREEN}Done! ${RESET_COLOR}"
 			else
 				echo -e "\n${RED}The${BOLD}APT${RESET_COLOR}${RED} package manager is not installed on this system.${RESET_COLOR}"
