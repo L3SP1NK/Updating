@@ -216,5 +216,5 @@ if [ "$EUID" -ne 0 ]
 		echo -e "${RED}This script must be runned as root!${RESET_COLOR}"
 	    exit 1
 	else
-		reset && RUN && notify-send 'Update Done ✅' || notify-send 'Something went wrong during update...📛'
+		reset && RUN && notify-send ' ✅ Update Done! ' || notify-send ' ❌ Something went wrong during update... '
 fi
