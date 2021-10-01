@@ -22,16 +22,27 @@ if [ "$EUID" -ne 0 ]
 		if [[ ${1} == "link" ]]
 			then
 				## User config link
+				## User bpytop config
 				rm -r ${USER_HOME}/.config/bpytop
 				ln -svf /opt/My-Repo/Configs/bpytop ${USER_HOME}/.config/
+				## User btop config
+				rm -r ${USER_HOME}/.config/btop
+				ln -svf /opt/My-Repo/Configs/btop ${USER_HOME}/.config/
+				## User htop config
 				rm -r ${USER_HOME}/.config/htop
 				ln -svf /opt/My-Repo/Configs/htop ${USER_HOME}/.config/
+				## User dot-files
 				ln -svf /opt/My-Repo/Configs/dot-files/.* ${USER_HOME} 2>/dev/null
-				## Root config link
+				## Root bpytop config
 				rm -r ${HOME}/.config/bpytop
 				ln -svf /opt/My-Repo/Configs/bpytop ${HOME}/.config/
+				## Root Btop config
+				rm -r ${USER_HOME}/.config/btop
+				ln -svf /opt/My-Repo/Configs/btop ${USER_HOME}/.config/
+				## Root htop config
 				rm -r ${HOME}/.config/htop
 				ln -svf /opt/My-Repo/Configs/htop ${HOME}/.config/
+				## Root dot-files
 				ln -svf /opt/My-Repo/Configs/dot-files/.* ${HOME} 2>/dev/null
 				## Script link
 				ln -svf /opt/My-Repo/Updating/update-* /bin/
