@@ -19,45 +19,43 @@ if [ "$EUID" -ne 0 ]
 		echo -e "${RED}This script must be runned as root!${RESET_COLOR}"
 		exit 1
 	else
-		if [[ ${1} == "link" ]]
+		if [[ -f ${USER_HOME}/.git-credentials ]]
 			then
-				## User dot-files
-				ln -svf /opt/My-Repo/Configs/dot-files/.* ${USER_HOME} 2>/dev/null
-				## Root dot-files
-				ln -svf /opt/My-Repo/Configs/dot-files/.* ${HOME} 2>/dev/null
-				## Script link
-				ln -svf /opt/My-Repo/Updating/update-* /bin/
-				ln -svf /opt/My-Repo/Utilities/* /bin/
+				cd ${REPOS_LOCATION}
+				## Search for GIT repos.
+				for GIT_PATH in $(find ${REPOS_LOCATION} -type d -name ".git" 2>/dev/null)
+					do
+						cd ${GIT_PATH}
+						echo -e "\n${BLUE}${BOLD}${GIT_LOCATION}${RESET_COLOR}"
+						cd ..
+						git config pull.rebase false
+						## Pull change
+						git pull
+						## Add files to the repo
+						git add -v .*
+						git add -v *
+						## Commit change
+						git commit -a
+						git push -v
+						## Pull change
+						git pull
+						## Add files to the repo
+						git add -v .*
+						## Commit change
+						git commit -a
+						git push -v
+						cd ${CWD}
+						## Make link
+						## User dot-files
+						ln -svf /opt/My-Repo/Configs/dot-files/.* ${USER_HOME} 2>/dev/null
+						## Root dot-files
+						ln -svf /opt/My-Repo/Configs/dot-files/.* ${HOME} 2>/dev/null
+						## Script link
+						ln -svf /opt/My-Repo/Updating/update-* /bin/
+						ln -svf /opt/My-Repo/Utilities/* /bin/
+				done
 			else
-				if [[ -f ${USER_HOME}/.git-credentials ]]
-					then
-						cd ${REPOS_LOCATION}
-						## Search for GIT repos.
-						for GIT_PATH in $(find ${REPOS_LOCATION} -type d -name ".git" 2>/dev/null)
-							do
-								cd ${GIT_PATH}
-								echo -e "\n${BLUE}${BOLD}${GIT_LOCATION}${RESET_COLOR}"
-								cd ..
-								git config pull.rebase false
-								## Pull change
-								git pull
-								## Add files to the repo
-								git add -v .*
-								git add -v *
-								## Commit change
-								git commit -a
-								git push -v
-								## Pull change
-								git pull
-								## Add files to the repo
-								git add -v .*
-								## Commit change
-								git commit -a
-								git push -v
-								cd ${CWD}
-						done
-					else
-						echo -e "${RED}Git credentials not found!${RESET_COLOR}"
-				fi
+				echo -e "${RED}Git credentials not found!${RESET_COLOR}"
 		fi
 fi
+
