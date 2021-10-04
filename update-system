@@ -213,7 +213,7 @@ function RUN()
 ## Check if root?
 if [ "$EUID" -ne 0 ]
 	then
-		echo -e "${RED}This script must be runned as root!${RESET_COLOR}"
+		echo -e "${RED}This script must be run as root!\nExiting...${RESET_COLOR}"
 	    exit 1
 	else
 		reset && RUN && notify-send ' ✅ Update Done! ' || notify-send ' ❌ Something went wrong during update... '
