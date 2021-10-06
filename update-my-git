@@ -47,6 +47,7 @@ function UPDATE_GIT()
 						ln -svf /opt/My-Repo/Updating/* /bin/
 						ln -svf /opt/My-Repo/Utilities/* /bin/
 						ln -svf /opt/My-Repo/Wallpapers-Management/* /bin/
+						ln -svf /opt/My-Repo/Telebash/* /bin/
 				done
 }
 
