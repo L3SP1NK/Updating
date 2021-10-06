@@ -38,17 +38,7 @@ function UPDATE_GIT()
 						git commit -a
 						git push -v
 						cd ${CWD}
-						## Make link
-						## User dot-files
-						ln -svf /opt/My-Repo/Configs/dot-files/.* ${USER_HOME} 2>/dev/null
-						## Root dot-files
-						ln -svf /opt/My-Repo/Configs/dot-files/.* ${HOME} 2>/dev/null
-						## Script link
-						ln -svf /opt/My-Repo/Updating/* /bin/
-						ln -svf /opt/My-Repo/Utilities/* /bin/
-						ln -svf /opt/My-Repo/Wallpapers-Management/* /bin/
-						ln -svf /opt/My-Repo/Telebash/* /bin/
-				done
+						done
 }
 
 which git >/dev/null
@@ -64,6 +54,17 @@ if [[ ${?} -eq "0" ]]
 					then
 						cd ${REPOS_LOCATION}
 						UPDATE_GIT
+    					## Make link
+						## User dot-files
+						ln -svf /opt/My-Repo/Configs/dot-files/.* ${USER_HOME} 2>/dev/null
+						## Root dot-files
+						ln -svf /opt/My-Repo/Configs/dot-files/.* ${HOME} 2>/dev/null
+						## Script link
+						ln -svf /opt/My-Repo/Updating/* /bin/
+						ln -svf /opt/My-Repo/Utilities/* /bin/
+						ln -svf /opt/My-Repo/Wallpapers-Management/* /bin/
+						ln -svf /opt/My-Repo/Telebash/* /bin/
+
 					else
 						echo -e "${RED}Git credentials not found!\nExiting...${RESET_COLOR}"
 						exit 1
