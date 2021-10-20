@@ -41,7 +41,6 @@ function UPDATE_APT()
 
 	echo -e "\n${YELLOW}Removing downloaded archive files and unused packages...${RESET_COLOR}"
 	apt-get -y -f clean
-
 	apt-get -y -f autoclean
 	apt-get -y -f autoremove --purge
 
