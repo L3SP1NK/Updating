@@ -20,6 +20,9 @@ function BACKUP()
 	which calcurse > /dev/null
 	[ ${?} -eq "0" ] && calcurse -x > ${HOME}/.bak/cal.bak
 
+	## Maltego config
+	which zip maltego > /dev/null
+	[ ${?} -eq "0" ] && zip -9 -r ${HOME}/.bak/maltego-config ${HOME}/.maltego
 }
 
 BACKUP && notify-send -u critical " ✅ Backup done! " || " ❌ Backup failed! "
