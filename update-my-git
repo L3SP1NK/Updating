@@ -57,7 +57,7 @@ if [[ ${?} -eq "0" ]]
     					## Make link
 						## User dot-files
 						ln -svf /opt/My-Repo/Configs/dot-files/.* ${USER_HOME} 2>/dev/null
-						ln -svf /opt/My-Repo/Configs/rofi /home/lespink/.config/rofi/
+						ln -svf /opt/My-Repo/Configs/rofi/* /home/lespink/.config/rofi/
 						## Root dot-files
 						ln -svf /opt/My-Repo/Configs/dot-files/.* ${HOME} 2>/dev/null
 						## Script link
