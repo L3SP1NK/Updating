@@ -86,7 +86,7 @@ function UPDATE_KERNEL()
 {
 	FIRMWARE_PATH="/opt/FIRMWARE"
 	echo -e "\n${YELLOW}Installing the linux firmware packages...${RESET_COLOR}"
-	apt-get -f -y --show-progress install firmware-linux firmware-linux-free firmware-linux-nonfree firmware-misc-nonfree 2>/dev/null
+	apt-get -f -y --show-progress install firmware-linux firmware-linux-free firmware-linux-nonfree firmware-misc-nonfree firmware-misc-nonfree 2>/dev/null
 	mkdir -p ${FIRMWARE_PATH}
 		if  [[ -f /etc/X11/xorg.conf ]]
 			then
@@ -96,6 +96,7 @@ function UPDATE_KERNEL()
 							echo -e "\n${YELLOW}Your X server is configured to use the amdgpu driver.${RESET_COLOR}"
 							echo -e "\n${YELLOW}Cloning the linux firmware (+ the unofficial AMD) repositories...${RESET_COLOR}"
 							cd ${FIRMWARE_PATH}
+							apt install firmware-amd-graphics
 							git clone https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git 2>/dev/null
 							git clone https://github.com/Umio-Yasuno/unofficial-amdgpu-firmware-repo.git 2>/dev/null
 							cp -vur ${FIRMWARE_PATH}/unofficial-amdgpu-firmware-repo/amdgpu/* /lib/firmware/amdgpu
