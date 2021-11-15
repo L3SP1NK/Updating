@@ -19,30 +19,30 @@ GREY="\e[37m"
 function UPDATE_APT()
 {
 	echo -e "\n${YELLOW}Clearing out the local repository of retrieved package files...${RESET_COLOR}"
-	apt-get -f -y --show-progress clean
-	apt-get -f -y --show-progress autoclean
-	apt-get -f -y --show-progress autoremove --purge
+	apt-get -f -y clean
+	apt-get -f -y autoclean
+	apt-get -f -y autoremove --purge
 
 	echo -e "\n${YELLOW}Configuring/fixing possibly broken packages...${RESET_COLOR}"
 	dpkg --configure -a
-	apt-get -f -y --show-progress install
+	apt-get -f -y install
 
 	echo -e "\n${YELLOW}Retrieving new lists of packages...${RESET_COLOR}"
-	apt-get -f -y --show-progress update
+	apt-get -f -y update
 
 	echo -e "\n${YELLOW}Installing packages upgrades...${RESET_COLOR}"
-	apt-get -f -y --show-progress upgrade --with-new-pkgs
-	apt-get -f -y --show-progress dist-upgrade
-	apt-get -f -y --show-progress full-upgrade
+	apt-get -f -y upgrade --with-new-pkgs
+	apt-get -f -y dist-upgrade
+	apt-get -f -y full-upgrade
 
 	echo -e "\n${YELLOW}Configuring possibly broken packages...${RESET_COLOR}"
 	dpkg --configure -a
-	apt-get -f -y --show-progress install
+	apt-get -f -y install
 
 	echo -e "\n${YELLOW}Removing downloaded archive files and unused packages...${RESET_COLOR}"
-	apt-get -f -y --show-progress clean
-	apt-get -f -y --show-progress autoclean
-	apt-get -f -y --show-progress autoremove --purge
+	apt-get -f -y clean
+	apt-get -f -y autoclean
+	apt-get -f -y autoremove --purge
 
 }
 
@@ -86,7 +86,7 @@ function UPDATE_KERNEL()
 {
 	FIRMWARE_PATH="/opt/FIRMWARE"
 	echo -e "\n${YELLOW}Installing the linux firmware packages...${RESET_COLOR}"
-	apt-get -f -y --show-progress install firmware-linux firmware-linux-free firmware-linux-nonfree firmware-misc-nonfree firmware-misc-nonfree 2>/dev/null
+	apt-get -f -y install firmware-linux firmware-linux-free firmware-linux-nonfree firmware-misc-nonfree firmware-misc-nonfree 2>/dev/null
 	mkdir -p ${FIRMWARE_PATH}
 		if  [[ -f /etc/X11/xorg.conf ]]
 			then
