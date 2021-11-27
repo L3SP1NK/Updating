@@ -47,7 +47,7 @@ function UPDATE_APT()
 	dpkg --configure -a
 
 	echo -e "\n${YELLOW}Retrieving new lists of packages...${RESET_COLOR}"
-	apt-get -f -y update
+	apt-get update
 
 	echo -e "\n${YELLOW}Installing packages upgrades...${RESET_COLOR}"
 	apt-get -f -y upgrade
