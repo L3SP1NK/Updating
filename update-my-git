@@ -7,19 +7,19 @@
 
 GREEN="\e[32m"
 RED="\e[31m"
-RESET_COLOR="\e[0m"
+RC="\e[0m"
 
 CWD=$(pwd)
 USER_HOME="/home/lespink"
 REPOS_LOCATION="/opt/My-Repo/"
 
-function UPDATE_GIT()
+UPDATE_GIT()
 {
 				## Search for GIT repos.
 				for GIT_PATH in $(find ${REPOS_LOCATION} -type d -name ".git" 2>/dev/null)
 					do
 						cd ${GIT_PATH}
-						echo -e "\n${BLUE}${BOLD}${GIT_LOCATION}${RESET_COLOR}"
+						echo -e "\n${BLUE}${BOLD}${GIT_LOCATION}${RC}"
 						cd ..
 						git config pull.rebase false
 						## Pull change
@@ -47,7 +47,7 @@ if [[ ${?} -eq "0" ]]
 	then
 		if [ "$EUID" -ne 0 ]
 			then
-				echo -e "${RED}This script must be run as root!\nExiting...${RESET_COLOR}"
+				echo -e "${RED}This script must be run as root!\nExiting...${RC}"
 				exit 1
 			else
 				if [[ -f ${USER_HOME}/.git-credentials ]]
@@ -67,11 +67,11 @@ if [[ ${?} -eq "0" ]]
 						ln -svf /opt/My-Repo/Telebash/* /usr/local/bin
 
 					else
-						echo -e "${RED}Git credentials not found!\nExiting...${RESET_COLOR}"
+						echo -e "${RED}Git credentials not found!\nExiting...${RC}"
 						exit 1
 				fi
 		fi
 	else
-		echo -e "${RED}Git isn't installed on this system!\nExiting...${RESET_COLOR}"
+		echo -e "${RED}Git isn't installed on this system!\nExiting...${RC}"
 		exit 1
 fi

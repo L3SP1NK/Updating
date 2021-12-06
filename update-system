@@ -35,7 +35,7 @@ case ${DISTRO} in
 		;;
 esac
 
-function UPDATE_APT()
+UPDATE_APT()
 {
 	echo -e "\n${YELLOW}Removing downloaded archive files and unused packages...${RC}"
 	apt-get -f -y clean
@@ -65,7 +65,7 @@ function UPDATE_APT()
 
 }
 
-function UPDATE_NPM()
+UPDATE_NPM()
 {
 	echo -e "\n${YELLOW}Checking NPM installation...${RC}"
 	npm doctor
@@ -76,7 +76,7 @@ function UPDATE_NPM()
 	cat /root/.npm/_logs/*
 }
 
-function UPDATE_FLATPAK()
+UPDATE_FLATPAK()
 {
 	echo -e "\n${YELLOW}Flatpak applications installed:${RC}"
 	flatpak list
@@ -84,7 +84,7 @@ function UPDATE_FLATPAK()
 	flatpak update
 }
 
-function UPDATE_GIT()
+UPDATE_GIT()
 {
 	GIT_REPO_LOCATION="/"
 	cd ${GIT_REPO_LOCATION}
@@ -101,7 +101,7 @@ function UPDATE_GIT()
 		done
 }
 
-function UPDATE_KERNEL()
+UPDATE_KERNEL()
 {
 	## Update the firmware with the official packages, the linux firmware and unoficial AMD firmware repositories.
 	## Then update the kernel.
@@ -142,7 +142,7 @@ function UPDATE_KERNEL()
 		fi
 }
 
-function SYSINFO()
+SYSINFO()
 {
 	which neofetch > /dev/null
 		if [[ ${?} -eq "0" ]]
@@ -155,7 +155,7 @@ function SYSINFO()
 		fi
 }
 
-function RUN()
+RUN()
 {
 	echo -e "\n${GREY}${BOLD}$(date '+ %T - %A %d %B %Y')${RC}\n"
 

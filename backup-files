@@ -2,7 +2,7 @@
 ## Backup important files.
 ## Typically you will run this script using cron.
 
-function BACKUP()
+BACKUP()
 {
 	## Personal files.
 	[ -f ${HOME}/.pass.gpg ] && mkdir -p ${HOME}/.bak && cp ${HOME}/.pass.gpg ${HOME}/.bak/.pass.gpg.bak
@@ -25,4 +25,4 @@ function BACKUP()
 	[ ${?} -eq "0" ] && zip -9 -r ${HOME}/.bak/maltego-config ${HOME}/.maltego
 }
 
-BACKUP && notify-send -u critical " ✅ Backup done! " || " ❌ Backup failed! "
+BACKUP && echo "Backup done!" || echo "Something went wrong..."
