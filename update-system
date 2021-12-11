@@ -89,7 +89,7 @@ UPDATE_GIT()
 	GIT_REPO_LOCATION="/"
 	cd ${GIT_REPO_LOCATION}
 	## Search for GIT repos and update them.
-	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null)
+	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null|grep -v /mnt/)
 		do
 			cd ${GIT_PATH};
 			echo -e "\n${BLUE}${BOLD}${GIT_PATH}${RC}"
