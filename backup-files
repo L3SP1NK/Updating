@@ -19,10 +19,6 @@ BACKUP()
 	## Calendar events.
 	which calcurse > /dev/null
 	[ ${?} -eq "0" ] && calcurse -x > ${HOME}/.bak/cal.bak
-
-	## Maltego config
-	which zip maltego > /dev/null
-	[ ${?} -eq "0" ] && zip -9 -r ${HOME}/.bak/maltego-config ${HOME}/.maltego
 }
 
-BACKUP && echo "Backup done!" || echo "Something went wrong..."
+BACKUP && echo -e "\e[32mBackup done!\e[0m" || echo -e "\e[31mSomething went wrong...\e[0m"
