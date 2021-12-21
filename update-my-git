@@ -65,6 +65,7 @@ if [[ ${?} -eq "0" ]]
 						ln -svf /opt/My-Repo/Passwords/* /usr/local/bin
 						ln -svf /opt/My-Repo/Utilities/* /usr/local/bin
 						ln -svf /opt/My-Repo/Telebash/* /usr/local/bin
+						ln -svf /opt/My-Repo/Crypto/* /usr/local/bin
 
 					else
 						echo -e "${RED}Git credentials not found!\nExiting...${RC}"
