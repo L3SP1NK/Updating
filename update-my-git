@@ -58,6 +58,11 @@ if [[ ${?} -eq "0" ]]
 						## User dot-files.
 						ln -svf /opt/My-Repo/Configs/dot-files/.* ${USER_HOME} 2>/dev/null
 						ln -svf /opt/My-Repo/Configs/rofi/* /home/lespink/.config/rofi/
+
+                        ## Custom GTK CSS.
+						ln -svf /opt/My-Repo/Configs/gtk.css /home/lespink/.config/gtk-2.0/
+						ln -svf /opt/My-Repo/Configs/gtk.css /home/lespink/.config/gtk-3.0/
+						ln -svf /opt/My-Repo/Configs/gtk.css /home/lespink/.config/gtk-4.0/
 						## Root dot-files.
 						ln -svf /opt/My-Repo/Configs/dot-files/.* ${HOME} 2>/dev/null
 						## Link scripts.
