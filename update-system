@@ -224,5 +224,5 @@ if [[ "${EUID}" -ne 0 ]]
 	    exit 1
 	else
 		reset
-		RUN && echo -e "${BOLD}${GREEN}Update Done!${RC}" || echo -e "${BOLD}${RED}Something went wrong during update...${RC}"
+		RUN && echo -e "${BOLD}${GREEN}Update finished!${RC}" || echo -e "${BOLD}${RED}Something went wrong during update...${RC}"
 fi
