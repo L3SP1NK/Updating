@@ -1,8 +1,7 @@
 #!/bin/bash
-## Restart components of the xfce4 desktop environment
+## Restart components of the xfce4 desktop environment.
 
-pidof xfce4-panel > /dev/null && xfce4-panel -r
+#pidof xfce4-panel > /dev/null && xfce4-panel -r
 pidof xfwm4 > /dev/null && xfwm4 -r
-#pidof xfwm4 > /dev/null && killall xfwm4
 
 
