@@ -6,7 +6,7 @@ BACKUP()
 {
 	## Personal files.
 	[ -f ${HOME}/.pass.gpg ] && mkdir -p ${HOME}/.bak && cp ${HOME}/.pass.gpg ${HOME}/.bak/.pass.gpg.bak
-	[ -f ${HOME}/.note ] && mkdir -p ${HOME}/.bak && cp ${HOME}/.note ${HOME}/.bak/.note.bak
+	[ -f ${HOME}/.diary.gpg ] && mkdir -p ${HOME}/.bak && cp ${HOME}/.diary.gpg ${HOME}/.bak/.diary.gpg.bak
 
 	## Config files.
 	[ -f ${HOME}/.zshrc ] && mkdir -p ${HOME}/.bak && cp ${HOME}/.zshrc ${HOME}/.bak/.zshrc.bak
