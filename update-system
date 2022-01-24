@@ -81,7 +81,7 @@ UPDATE_FLATPAK()
 	echo -e "\n${YELLOW}Flatpak applications installed:${RC}"
 	flatpak list
 	echo -e "\n${YELLOW}Updating flatpak...${RC}"
-	flatpak update
+	flatpak update -y
 }
 
 UPDATE_GIT()
