@@ -6,11 +6,6 @@
 ## - NPM packages
 ## - Linux firmware and kernel.
 
-## To do:
-## - Support the nvidia driver? (ask if the nouveau or propietary driver should be used)
-## - Add support for others debian based distribution. (Ubuntu, Mint, Zorin...)
-
-
 RC="\e[0m"
 BOLD="\e[1m"
 GREY="\e[37m"
