@@ -54,6 +54,7 @@ UPDATE_APT()
 	dpkg --configure -a
 
 	echo -e "\n${YELLOW}Removing downloaded archive files and unused packages...${RC}"
+	apt-get -f -y install
 	apt-get -f -y clean
 	apt-get -f -y autoclean
 	apt-get -f -y autoremove --purge
