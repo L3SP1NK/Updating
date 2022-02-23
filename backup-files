@@ -5,20 +5,20 @@
 BACKUP()
 {
 	## Personal files.
-	[ -f ${HOME}/.pass.gpg ] && mkdir -p ${HOME}/.bak && cp ${HOME}/.pass.gpg ${HOME}/.bak/.pass.gpg.bak
-	[ -f ${HOME}/.diary.gpg ] && mkdir -p ${HOME}/.bak && cp ${HOME}/.diary.gpg ${HOME}/.bak/.diary.gpg.bak
+	[[ -f ${HOME}/.pass.gpg ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.pass.gpg ${HOME}/.bak/.pass.gpg.bak
+	[[ -f ${HOME}/.diary.gpg ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.diary.gpg ${HOME}/.bak/.diary.gpg.bak
+	[[ -f ${HOME}/.todo ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.todo ${HOME}/.bak/.todo.bak
+	[[ -f ${HOME}/.note ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.note ${HOME}/.bak/.note.bak
 
 	## Config files.
-	[ -f ${HOME}/.zshrc ] && mkdir -p ${HOME}/.bak && cp ${HOME}/.zshrc ${HOME}/.bak/.zshrc.bak
-	[ -f ${HOME}/.bashrc ] && mkdir -p ${HOME}/.bak && cp ${HOME}/.bashrc ${HOME}/.bak/.bashrc.bak
+	[[ -f ${HOME}/.zshrc ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.zshrc ${HOME}/.bak/.zshrc.bak
+	[[ -f ${HOME}/.bashrc ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.bashrc ${HOME}/.bak/.bashrc.bak
 
 	## Monero keys.
-	[ -f ${HOME}/Documents/Monero/lespink/lespink.keys ] && mkdir -p ${HOME}/.bak && cp ${HOME}/Documents/Monero/lespink/lespink.keys ${HOME}/.bak/lespink.keys.bak
-	[ -f ${HOME}/Documents/Monero/lespink/lespink ] && mkdir -p ${HOME}/.bak && cp ${HOME}/Documents/Monero/lespink/lespink ${HOME}/.bak/lespink.bak
+	[[ -f ${HOME}/Documents/Monero/lespink/lespink.keys ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/Documents/Monero/lespink/lespink.keys ${HOME}/.bak/lespink.keys.bak
+	[[ -f ${HOME}/Documents/Monero/lespink/lespink ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/Documents/Monero/lespink/lespink ${HOME}/.bak/lespink.bak
 
-	## Calendar events.
-	which calcurse > /dev/null
-	[ ${?} -eq "0" ] && calcurse -x > ${HOME}/.bak/cal.bak
+	[[ -f ${HOME}/Documents/Monero/lespink/lespink.keys ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/Documents/Monero/lespink/lespink.keys ${HOME}/.bak/lespink.keys.bak
+	[[ -f ${HOME}/Documents/Monero/lespink/lespink ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/Documents/Monero/lespink/lespink ${HOME}/.bak/lespink.bak
 }
-
 BACKUP && echo -e "\e[32mBackup done!\e[0m" || echo -e "\e[31mSomething went wrong...\e[0m"
