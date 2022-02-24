@@ -58,12 +58,17 @@ if [[ ${?} -eq "0" ]]
 						ln -svf /opt/My-Repo/Configs/dot-files/.* ${USER_HOME} 2>/dev/null
 						ln -svf /opt/My-Repo/Configs/dot-files/.* ${HOME} 2>/dev/null
 
+						## Rofi config
+						ln -svf /opt/My-Repo/Configs/rofi/config.rasi ${USER_HOME}/.config/rofi/
+
                         ## Custom GTK CSS.
 						ln -svf /opt/My-Repo/Configs/gtk.css ${USER_HOME}/.config/gtk-2.0/
 						ln -svf /opt/My-Repo/Configs/gtk.css ${USER_HOME}/.config/gtk-2.0/
 						ln -svf /opt/My-Repo/Configs/gtk.css ${USER_HOME}/.config/gtk-3.0/
+
 						## Tilix themes.
 						ln -svf /opt/My-Repo/Configs/Pure.json ${USER_HOME}/.config/tilix/schemes/Pure.json
+
 						## Link scripts.
 						ln -svf /opt/My-Repo/Updating/* /usr/local/bin
 						ln -svf /opt/My-Repo/Passwords/* /usr/local/bin
