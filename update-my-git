@@ -6,10 +6,12 @@
 ## - Clean this mess.
 
 ## Set colors.
+RC="\e[0m"
 BOLD="\e[1m"
 GREEN="\e[32m"
 RED="\e[31m"
 BLUE="\e[34m"
+
 
 WARN="${RED}${BOLD} [-]${RC}"
 INFO="${BLUE}${BOLD} [*]${RC}"
