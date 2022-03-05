@@ -98,30 +98,33 @@ UPDATE_KERNEL()
 	apt-get -f -y install firmware-linux firmware-linux-free firmware-linux-nonfree firmware-misc-nonfree firmware-misc-nonfree 2>/dev/null
 	mkdir -p ${FIRMWARE_PATH}
 	## Proceed only if the X server is configured.
-		if [[ -f /etc/X11/xorg.conf ]]
-			then
-				## Install the needed firmware according to the graphic card used in the Xorg configuration file.
-				if ! grep -e "amdgpu" /etc/X11/xorg.conf > /dev/null
-					then
-						if ! grep -e "intel" /etc/X11/xorg.conf > /dev/null
-							then
-						echo -e "${INFO}Your X server is configured to use the intel driver."
-							else
-							echo -e "${INFO}Cloning the linux firmware repositories..."
-							cd ${FIRMWARE_PATH}
-							git clone https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git 2>/dev/null
-							cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware
-							update-initramfs -u
-					else
-						echo -e "${INFO}Your X server is configured to use the amdgpu driver."
-						echo -e "${INFO}Cloning the linux firmware (+ the unofficial AMD) repositories..."
+	if [[ -f /etc/X11/xorg.conf ]]
+		then
+			## Install the needed firmware according to the graphic card used in the Xorg configuration file.
+			if ! grep -e "amdgpu" /etc/X11/xorg.conf > /dev/null
+				then
+					if ! grep -e "intel" /etc/X11/xorg.conf > /dev/null
+						then
+					echo -e "${INFO}Your X server is configured to use the intel driver."
+						else
+						echo -e "${INFO}Cloning the linux firmware repositories..."
 						cd ${FIRMWARE_PATH}
-						apt install firmware-amd-graphics
-						git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" 2>/dev/null
-						git clone "https://github.com/Umio-Yasuno/unofficial-amdgpu-firmware-repo.git" 2>/dev/null
-						cp -vur ${FIRMWARE_PATH}/unofficial-amdgpu-firmware-repo/amdgpu/* /lib/firmware/amdgpu
+						git clone https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git 2>/dev/null
 						cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware
 						update-initramfs -u
+					fi
+				else
+					echo -e "${INFO}Your X server is configured to use the amdgpu driver."
+					echo -e "${INFO}Cloning the linux firmware (+ the unofficial AMD) repositories..."
+					cd ${FIRMWARE_PATH}
+					apt install firmware-amd-graphics
+					git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" 2>/dev/null
+					git clone "https://github.com/Umio-Yasuno/unofficial-amdgpu-firmware-repo.git" 2>/dev/null
+					cp -vur ${FIRMWARE_PATH}/unofficial-amdgpu-firmware-repo/amdgpu/* /lib/firmware/amdgpu
+					cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware
+					update-initramfs -u
+		fi
+	fi
 }
 
 SYSINFO()
@@ -166,7 +169,6 @@ RUN()
 			echo -e "${INFO}\nUpdating APT packages..."
 			UPDATE_APT 2>/dev/null
 			echo -e "${GOOD} \nAPT packages updated in ${SECONDS} seconds."
-		else
 	fi
 
 	if ! which flatpak > /dev/null
