@@ -61,7 +61,7 @@ if ! which ${REQUIREMENTS} > /dev/null
 				if [[ -f ${USER_HOME}/.git-credentials ]]
 					then
 						cd ${REPOS_LOCATION}
-						UPDATE_GIT
+						UPDATE_GIT 2>/dev/null
 						## Dot-files.
 						ln -svf /opt/My-Repo/Configs/dot-files/.* ${USER_HOME} 2>/dev/null
 						ln -svf /opt/My-Repo/Configs/dot-files/.* ${HOME} 2>/dev/null
