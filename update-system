@@ -16,21 +16,24 @@ RED="\e[31m"
 CYAN="\e[36m"
 BLUE="\e[34m"
 MAGENTA="\e[35m"
+GREY="\e[37m"
 
-WARN="${RED}${BOLD} [-]${RC}"
-INFO="${BLUE}${BOLD} [*]${RC}"
-GOOD="${GREEN}${BOLD} [+]${RC}"
+WARN="${RED}${BOLD} [-] ${RC}"
+INFO="${BLUE}${BOLD} [*] ${RC}"
+GOOD="${GREEN}${BOLD} [+] ${RC}"
 
 UPDATE_APT()
 {
-	echo -e "${INFO}Removing downloaded archive files and unused packages..."
-	apt-get -f -y clean
-	apt-get -f -y autoclean
-	apt-get -f -y autoremove --purge
-
 	echo -e "${INFO}Configuring/fixing possibly broken packages..."
 	apt-get -f -y install
 	dpkg --configure -a
+
+	echo -e "${INFO}Removing downloaded archive files and unused packages..."
+	apt-get -f -y install
+	dpkg --configure -a
+	apt-get -f -y clean
+	apt-get -f -y autoclean
+	apt-get -f -y autoremove --purge
 
 	echo -e "${INFO}Retrieving new lists of packages..."
 	apt-get update
@@ -40,12 +43,11 @@ UPDATE_APT()
 	apt-get -f -y dist-upgrade
 	apt-get -f -y full-upgrade
 
-	echo -e "${INFO}Configuring possibly broken packages..."
+	echo -e "${INFO}Configuring/fixing possibly broken packages..."
 	apt-get -f -y install
 	dpkg --configure -a
 
 	echo -e "${INFO}Removing downloaded archive files and unused packages..."
-	apt-get -f -y install
 	apt-get -f -y clean
 	apt-get -f -y autoclean
 	apt-get -f -y autoremove --purge
@@ -80,7 +82,7 @@ UPDATE_GIT()
 	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null | grep -v /mnt/)
 		do
 			cd ${GIT_PATH};
-			echo -e "${INFO}\nUpdating ${GIT_PATH}..."
+			echo -e "${INFO}Updating ${GIT_PATH}..."
 			cd ..
 			git config pull.rebase true
 			git stash
@@ -94,7 +96,7 @@ UPDATE_KERNEL()
 	## Update the firmware with the official packages, the linux firmware and unoficial AMD firmware repositories.
 	## Then update the kernel.
 	FIRMWARE_PATH="/opt/FIRMWARE"
-	echo -e "${INFO}\nInstalling the linux firmware packages..."
+	echo -e "${INFO}Installing the linux firmware packages..."
 	apt-get -f -y install firmware-linux firmware-linux-free firmware-linux-nonfree firmware-misc-nonfree firmware-misc-nonfree 2>/dev/null
 	mkdir -p ${FIRMWARE_PATH}
 	## Proceed only if the X server is configured.
@@ -156,63 +158,64 @@ SYSINFO()
 
 RUN()
 {
-	echo -e "\n$(date '+ %T - %A %d %B %Y')\n"
+	echo -e "$(date '+ %T - %A %d %B %Y')"
 	SYSINFO
 
 	## Update apt packages.
 	if ! which apt-get > /dev/null
 		then
-			echo -e "${WARN} \nTheAPT package manager is not installed on this system."
+			echo -e "${WARN} TheAPT package manager is not installed on this system."
 		else
 			SECONDS="0"
-			echo -e "${INFO}\n$(dpkg-query -f '.\n' -W | wc -l) Packages currently installed."
-			echo -e "${INFO}\nUpdating APT packages..."
+			PKG_NUM=$(dpkg-query -W | wc -l)
+			echo -e "${INFO}${PKG_NUM} Packages currently installed."
+			echo -e "${INFO}Updating APT packages..."
 			UPDATE_APT 2>/dev/null
-			echo -e "${GOOD} \nAPT packages updated in ${SECONDS} seconds."
+			echo -e "${GOOD} APT packages updated in ${SECONDS} seconds."
 	fi
 
 	if ! which flatpak > /dev/null
 		then
-				echo -e "${WARN} \nFlatpak is not installed on this system."
+				echo -e "${WARN} Flatpak is not installed on this system."
 			else
 				SECONDS="0"
-				echo -e "${INFO}\nYou are using $(flatpak --version)."
+				echo -e "${INFO}You are using $(flatpak --version)."
 				UPDATE_FLATPAK 2>/dev/null
-				echo -e "${GOOD} \nFlatpak updated in ${SECONDS} seconds."
+				echo -e "${GOOD} Flatpak updated in ${SECONDS} seconds."
 			fi
 
 		if ! which npm > /dev/null
 			then
-				echo -e "${WARN} \nNPM is not installed on this system."
+				echo -e "${WARN} NPM is not installed on this system."
 			else
 				SECONDS="0"
-				echo -e "${INFO}\nUpdatingNPM packages..."
+				echo -e "${INFO}UpdatingNPM packages..."
 				UPDATE_NPM 2>/dev/null
-				echo -e "${GOOD} \nNPM updated in ${SECONDS} seconds."
+				echo -e "${GOOD} NPM updated in ${SECONDS} seconds."
 		fi
 
 		if ! which git > /dev/null
 			then
-				echo -e "${WARN} \nGit is not installed on this system."
+				echo -e "${WARN} Git is not installed on this system."
 			else
 				SECONDS="0"
-				echo -e "${INFO}\nUpdating Git repositories..."
+				echo -e "${INFO}Updating Git repositories..."
 				UPDATE_GIT 2>/dev/null
-				echo -e "${GOOD} \nGit repositories updated in ${SECONDS} seconds."
+				echo -e "${GOOD} Git repositories updated in ${SECONDS} seconds."
 		fi
 
 		SECONDS="0"
-		echo -e "${INFO}\nUpdating the Linux kernel..."
+		echo -e "${INFO}Updating the Linux kernel..."
 		UPDATE_KERNEL
-		echo -e "${GOOD} \nThe Linux kernel has been updated in ${SECONDS} seconds."
+		echo -e "${GOOD} The Linux kernel has been updated in ${SECONDS} seconds."
 }
 
 ## Check privileges and proceed.
 if [[ ${EUID} -ne 0 ]]
 	then
-		echo -e "This script must be run as root!\nExiting..."
+		echo -e "This script must be run as root!Exiting..."
 	    exit 1
 	else
 		reset
-		RUN && echo -e "${GOOD}\n Update finished!" || echo -e "${WARN} \nSomething went wrong during update..."
+		RUN && echo -e "${GOOD} Update finished!" || echo -e "${WARN} Something went wrong during update..."
 fi
