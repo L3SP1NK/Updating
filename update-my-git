@@ -25,7 +25,7 @@ UPDATE_GIT()
 				for GIT_PATH in $(find ${REPOS_LOCATION} -type d -name ".git" 2>/dev/null)
 					do
 						cd ${GIT_PATH}
-						echo -e "\n${INFO} ${GIT_PATH}"
+						echo -e "\n${INFO} ${GIT_PATH}${RC}"
 						cd ..
 						git config pull.rebase true
 						## Pull change
@@ -43,6 +43,7 @@ UPDATE_GIT()
 						## Commit change
 						git commit -a
 						git push -v
+						echo -e "\n${GOOD} ${GIT_PATH} Updated.${RC}"
 						cd ${CWD}
 						done
 }
@@ -83,6 +84,7 @@ if ! which ${REQUIREMENTS} > /dev/null
 						ln -svf /opt/My-Repo/Utilities/* /usr/local/bin
 						ln -svf /opt/My-Repo/Telebash/* /usr/local/bin
 						ln -svf /opt/My-Repo/Crypto/* /usr/local/bin
+						echo -e "\n${GOOD} Symbolics links has been made.${RC}"
 
 					else
 						echo -e "${WARN} Git credentials not found!\n${WARN} Exiting..."
