@@ -107,13 +107,14 @@ UPDATE_KERNEL()
 				then
 					if ! grep -e "intel" /etc/X11/xorg.conf > /dev/null
 						then
-					echo -e "${INFO}Your X server is configured to use the intel driver."
+							echo -e "${INFO}Your X server is configured to use the intel driver."
 						else
-						echo -e "${INFO}Cloning the linux firmware repositories..."
-						cd ${FIRMWARE_PATH}
-						git clone https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git 2>/dev/null
-						cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware
-						update-initramfs -u
+							echo -e "${INFO}Your X server is configured to use the intel driver."
+							echo -e "${INFO}Cloning the linux firmware repositories..."
+							cd ${FIRMWARE_PATH}
+							git clone https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git 2>/dev/null
+							cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware
+							update-initramfs -u
 					fi
 				else
 					echo -e "${INFO}Your X server is configured to use the amdgpu driver."
@@ -125,8 +126,10 @@ UPDATE_KERNEL()
 					cp -vur ${FIRMWARE_PATH}/unofficial-amdgpu-firmware-repo/amdgpu/* /lib/firmware/amdgpu
 					cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware
 					update-initramfs -u
-		fi
-	fi
+			fi
+		else
+			echo -e "${INFO}Your X server is not configured yet, run X -configure as root! to use the intel driver."
+fi
 }
 
 SYSINFO()
