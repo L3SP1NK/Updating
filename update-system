@@ -167,58 +167,58 @@ RUN()
 	## Update apt packages.
 	if ! which apt-get > /dev/null
 		then
-			echo -e "${WARN} TheAPT package manager is not installed on this system."
+			echo -e "${WARN}TheAPT package manager is not installed on this system."
 		else
 			SECONDS="0"
 			PKG_NUM=$(dpkg-query -W | wc -l)
 			echo -e "${INFO}${PKG_NUM} Packages currently installed."
 			echo -e "${INFO}Updating APT packages..."
 			UPDATE_APT 2>/dev/null
-			echo -e "${GOOD} APT packages updated in ${SECONDS} seconds."
+			echo -e "${GOOD}APT packages updated in ${SECONDS} seconds."
 	fi
 
 	if ! which flatpak > /dev/null
 		then
-				echo -e "${WARN} Flatpak is not installed on this system."
+				echo -e "${WARN}Flatpak is not installed on this system."
 			else
 				SECONDS="0"
 				echo -e "${INFO}You are using $(flatpak --version)."
 				UPDATE_FLATPAK 2>/dev/null
-				echo -e "${GOOD} Flatpak updated in ${SECONDS} seconds."
+				echo -e "${GOOD}Flatpak updated in ${SECONDS} seconds."
 			fi
 
 		if ! which npm > /dev/null
 			then
-				echo -e "${WARN} NPM is not installed on this system."
+				echo -e "${WARN}NPM is not installed on this system."
 			else
 				SECONDS="0"
 				echo -e "${INFO}UpdatingNPM packages..."
 				UPDATE_NPM 2>/dev/null
-				echo -e "${GOOD} NPM updated in ${SECONDS} seconds."
+				echo -e "${GOOD}NPM updated in ${SECONDS} seconds."
 		fi
 
 		if ! which git > /dev/null
 			then
-				echo -e "${WARN} Git is not installed on this system."
+				echo -e "${WARN}Git is not installed on this system."
 			else
 				SECONDS="0"
 				echo -e "${INFO}Updating Git repositories..."
 				UPDATE_GIT 2>/dev/null
-				echo -e "${GOOD} Git repositories updated in ${SECONDS} seconds."
+				echo -e "${GOOD}Git repositories updated in ${SECONDS} seconds."
 		fi
 
 		SECONDS="0"
 		echo -e "${INFO}Updating the Linux kernel..."
 		UPDATE_KERNEL
-		echo -e "${GOOD} The Linux kernel has been updated in ${SECONDS} seconds."
+		echo -e "${GOOD}The Linux kernel has been updated in ${SECONDS} seconds."
 }
 
 ## Check privileges and proceed.
 if [[ ${EUID} -ne 0 ]]
 	then
-		echo -e "This script must be run as root!Exiting..."
+		echo -e "${WARN}This script must be run as root!\nExiting..."
 	    exit 1
 	else
 		reset
-		RUN && echo -e "${GOOD} Update finished!" || echo -e "${WARN} Something went wrong during update..."
+		RUN && echo -e "${GOOD}Update finished!" || echo -e "${WARN}Something went wrong during update..."
 fi
