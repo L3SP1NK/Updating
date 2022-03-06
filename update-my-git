@@ -1,10 +1,6 @@
 #!/bin/bash
 ## Update my git repository.
 
-## TODO:
-## - Check if git is installed.
-## - Clean this mess.
-
 ## Set colors.
 RC="\e[0m"
 BOLD="\e[1m"
@@ -12,10 +8,9 @@ GREEN="\e[32m"
 RED="\e[31m"
 BLUE="\e[34m"
 
-
-WARN="${RED}${BOLD} [-]${RC}"
-INFO="${BLUE}${BOLD} [*]${RC}"
-GOOD="${GREEN}${BOLD} [+]${RC}"
+WARN="${RED}${BOLD} [-] ${RC}"
+INFO="${BLUE}${BOLD} [*] ${RC}"
+GOOD="${GREEN}${BOLD} [+] ${RC}"
 
 CWD=$(pwd)
 USER_HOME="/home/lespink"
