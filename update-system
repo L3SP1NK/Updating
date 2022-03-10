@@ -9,14 +9,11 @@
 ## Set colors.
 RC="\e[0m"
 BOLD="\e[1m"
-GREY="\e[37m"
-YELLOW="\e[33m"
 GREEN="\e[32m"
 RED="\e[31m"
 CYAN="\e[36m"
 BLUE="\e[34m"
 MAGENTA="\e[35m"
-GREY="\e[37m"
 
 WARN="${RED}${BOLD} [-] ${RC}"
 INFO="${BLUE}${BOLD} [*] ${RC}"
@@ -29,11 +26,10 @@ UPDATE_APT()
 	dpkg --configure -a
 
 	echo -e "${INFO}Removing downloaded archive files and unused packages..."
-	apt-get -f -y install
-	dpkg --configure -a
 	apt-get -f -y clean
 	apt-get -f -y autoclean
 	apt-get -f -y autoremove --purge
+	apt-get -f -y purge --autoremove
 
 	echo -e "${INFO}Retrieving new lists of packages..."
 	apt-get update
@@ -76,66 +72,60 @@ UPDATE_FLATPAK()
 UPDATE_GIT()
 {
 	GIT_REPO_LOCATION="/"
-	cd ${GIT_REPO_LOCATION}
+	cd ${GIT_REPO_LOCATION} || exit 1
 	## Search for GIT repos and update them.
-	## (i need to find a better way to exclude /mnt)
+	## (Need to find a better way to exclude /mnt)
 	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null | grep -v /mnt/)
 		do
-			cd ${GIT_PATH};
+			cd "${GIT_PATH}" || exit 1
 			echo -e "${INFO}Updating ${GIT_PATH}..."
-			cd ..
+			cd .. || exit 1
 			git config pull.rebase true
 			git stash
 			git pull
-			cd ${GIT_REPO_LOCATION}
+			cd ${GIT_REPO_LOCATION} || exit 1
 		done
 }
 
-UPDATE_KERNEL()
+FIRMWARE_PATH="/opt/FIRMWARE"
+mkdir -p ${FIRMWARE_PATH}
+
+INSTALL_INTEL_FIRMWARE()
 {
-	## Update the firmware with the official packages, the linux firmware and unoficial AMD firmware repositories.
-	## Then update the kernel.
-	FIRMWARE_PATH="/opt/FIRMWARE"
+	echo -e "${INFO}Your X server is configured to use the intel driver."
+	echo -e "${INFO}Installing the intel firmware packages..."
+	apt-get -f -y install "firmware-intel*" intel-gpu-tools intel-microcode
+}
+
+INSTALL_AMD_FIRMWARE()
+{
+	echo -e "${INFO}Your X server is configured to use the amdgpu driver."
+	echo -e "${INFO}Installing the AMD firmware packages..."
+	apt install firmware-amd-graphics
+
+	echo -e "${INFO}Cloning the linux firmware (+ the unofficial AMD) repositories..."
+	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" 2>/dev/null
+	git clone "https://github.com/Umio-Yasuno/unofficial-amdgpu-firmware-repo.git" 2>/dev/null
+	cp -vur ${FIRMWARE_PATH}/unofficial-amdgpu-firmware-repo/amdgpu/* /lib/firmware/amdgpu
+	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware
+
+}
+
+INSTALL_OTHER_FIRMWARE()
+{
 	echo -e "${INFO}Installing the linux firmware packages..."
 	apt-get -f -y install firmware-linux firmware-linux-free firmware-linux-nonfree firmware-misc-nonfree firmware-misc-nonfree 2>/dev/null
-	mkdir -p ${FIRMWARE_PATH}
-	## Proceed only if the X server is configured.
-	if [[ -f /etc/X11/xorg.conf ]]
-		then
-			## Install the needed firmware according to the graphic card used in the Xorg configuration file.
-			if ! grep -e "amdgpu" /etc/X11/xorg.conf > /dev/null
-				then
-					if ! grep -e "intel" /etc/X11/xorg.conf > /dev/null
-						then
-							echo -e "${INFO}Your X server is configured to use the intel driver."
-						else
-							echo -e "${INFO}Your X server is configured to use the intel driver."
-							echo -e "${INFO}Cloning the linux firmware repositories..."
-							cd ${FIRMWARE_PATH}
-							git clone https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git 2>/dev/null
-							cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware
-							update-initramfs -u
-					fi
-				else
-					echo -e "${INFO}Your X server is configured to use the amdgpu driver."
-					echo -e "${INFO}Cloning the linux firmware (+ the unofficial AMD) repositories..."
-					cd ${FIRMWARE_PATH}
-					apt install firmware-amd-graphics
-					git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" 2>/dev/null
-					git clone "https://github.com/Umio-Yasuno/unofficial-amdgpu-firmware-repo.git" 2>/dev/null
-					cp -vur ${FIRMWARE_PATH}/unofficial-amdgpu-firmware-repo/amdgpu/* /lib/firmware/amdgpu
-					cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware
-					update-initramfs -u
-			fi
-		else
-			echo -e "${INFO}Your X server is not configured yet, run X -configure as root! to use the intel driver."
-fi
+
+	echo -e "${INFO}Cloning the linux firmware repository..."
+	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" 2>/dev/null
+	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware
 }
+
 
 SYSINFO()
 {
 	## Set the main color based on the distribution.
-	DISTRO=$(cat /etc/os-release | grep PRETTY | cut -d "=" -f 2 | sed 's/"//g' | awk '{print $1}')
+	DISTRO=$(grep "PRETTY" /etc/os-release | cut -d "=" -f 2 | sed 's/"//g' | awk '{print $1}')
 	case ${DISTRO} in
 		Kali)
 			HOSTNAME_COLOR=${CYAN}
@@ -152,7 +142,7 @@ SYSINFO()
 	if ! which ${REQUIREMENTS} > /dev/null
 		then
 			## Print basic system information if neofetch is not available.
-			echo -e "${HOSTNAME_COLOR}$(cat /etc/os-release | grep --color=never -iE '^name=')"
+			echo -e "${HOSTNAME_COLOR}$(grep --color=never -iE "^name=" /etc/os-release | sed -e 's/NAME=//g' -e 's/"//g')"
 			free -h
 		else
 			neofetch
@@ -167,7 +157,8 @@ RUN()
 	## Update apt packages.
 	if ! which apt-get > /dev/null
 		then
-			echo -e "${WARN}TheAPT package manager is not installed on this system."
+			echo -e "${INFO}The APT package manager is not installed on this system."
+			exit 1
 		else
 			SECONDS="0"
 			PKG_NUM=$(dpkg-query -W | wc -l)
@@ -177,9 +168,10 @@ RUN()
 			echo -e "${GOOD}APT packages updated in ${SECONDS} seconds."
 	fi
 
+	## Update flatpak applications.
 	if ! which flatpak > /dev/null
 		then
-				echo -e "${WARN}Flatpak is not installed on this system."
+				echo -e "${INFO}Flatpak is not installed on this system."
 			else
 				SECONDS="0"
 				echo -e "${INFO}You are using $(flatpak --version)."
@@ -187,9 +179,10 @@ RUN()
 				echo -e "${GOOD}Flatpak updated in ${SECONDS} seconds."
 			fi
 
+		## Update NPM applications.
 		if ! which npm > /dev/null
 			then
-				echo -e "${WARN}NPM is not installed on this system."
+				echo -e "${INFO}NPM is not installed on this system."
 			else
 				SECONDS="0"
 				echo -e "${INFO}UpdatingNPM packages..."
@@ -197,9 +190,10 @@ RUN()
 				echo -e "${GOOD}NPM updated in ${SECONDS} seconds."
 		fi
 
+		## Pull git repos.
 		if ! which git > /dev/null
 			then
-				echo -e "${WARN}Git is not installed on this system."
+				echo -e "${INFO}Git is not installed on this system."
 			else
 				SECONDS="0"
 				echo -e "${INFO}Updating Git repositories..."
@@ -207,16 +201,39 @@ RUN()
 				echo -e "${GOOD}Git repositories updated in ${SECONDS} seconds."
 		fi
 
+		## Update the Linux kernel.
 		SECONDS="0"
 		echo -e "${INFO}Updating the Linux kernel..."
-		UPDATE_KERNEL
+		## Check which driver Xorg use.
+		if [[ -f /etc/X11/xorg.conf ]]
+			then
+				grep "intel" /etc/X11/xorg.conf > /dev/null && FIRMWARE_TO_INSTALL="intel" || FIRMWARE_TO_INSTALL="other"
+				grep "amdgpu" /etc/X11/xorg.conf > /dev/null && FIRMWARE_TO_INSTALL="amd" || FIRMWARE_TO_INSTALL="other"
+			else
+				echo -e "${WARN}Your X server is not configured yet, run X -configure as root!."
+		fi
+
+		## Get the according firmware.
+		case ${FIRMWARE_TO_INSTALL} in
+			amd)
+				INSTALL_AMD_FIRMWARE
+				INSTALL_OTHER_FIRMWARE
+				;;
+			intel)
+				INSTALL_INTEL_FIRMWARE
+				INSTALL_OTHER_FIRMWARE
+				;;
+			other)
+				INSTALL_OTHER_FIRMWARE
+				;;
+		esac
 		echo -e "${GOOD}The Linux kernel has been updated in ${SECONDS} seconds."
 }
 
 ## Check privileges and proceed.
 if [[ ${EUID} -ne 0 ]]
 	then
-		echo -e "${WARN}This script must be run as root!\nExiting..."
+		echo -e "${WARN}This script must be run as root!"
 	    exit 1
 	else
 		reset
