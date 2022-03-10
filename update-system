@@ -218,15 +218,33 @@ RUN()
 			amd)
 				INSTALL_AMD_FIRMWARE
 				INSTALL_OTHER_FIRMWARE
+				echo -e "${INFO}Generating a new initramfs images..."
+				update-initramfs -u
+				echo -e "${GOOD}Done!"
 				;;
+
 			intel)
 				INSTALL_INTEL_FIRMWARE
 				INSTALL_OTHER_FIRMWARE
+				echo -e "${INFO}Generating a new initramfs images..."
+				update-initramfs -u
+				echo -e "${GOOD}Done!"
 				;;
+
 			other)
 				INSTALL_OTHER_FIRMWARE
+				echo -e "${INFO}Generating a new initramfs images..."
+				update-initramfs -u
+				echo -e "${GOOD}Done!"
 				;;
+
+			*)
+				echo -e "${WARN}Something went wrong during the kernel udpate!"
+				exit 1
+				;;
+
 		esac
+
 		echo -e "${GOOD}The Linux kernel has been updated in ${SECONDS} seconds."
 }
 
