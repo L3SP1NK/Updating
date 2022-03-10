@@ -48,12 +48,12 @@ UPDATE_GIT()
 REQUIREMENTS="git"
 if ! which ${REQUIREMENTS} > /dev/null
 	then
- 		echo -e "${WARN} To run this program, you need the following packages installed: ${REQUIREMENTS}\n${WARN} Exiting..."
+ 		echo -e "${WARN}To run this program, you need the following packages installed: ${REQUIREMENTS}\n${WARN}Exiting..."
 		exit 1
 	else
-		if [[ "$EUID" -ne 0 ]]
+		if [[ ${EUID} -ne 0 ]]
 			then
-				echo -e "${WARN} This script must be run as root!\n${WARN} Exiting..."
+				echo -e "${WARN}This script must be run as root!\n${WARN}Exiting..."
 				exit 1
 			else
 				if [[ -f ${USER_HOME}/.git-credentials ]]
@@ -84,7 +84,7 @@ if ! which ${REQUIREMENTS} > /dev/null
 						echo -e "\n${GOOD} Symbolics links has been made.${RC}"
 
 					else
-						echo -e "${WARN} Git credentials not found!\n${WARN} Exiting..."
+						echo -e "${WARN}Git credentials not found!\n${WARN}Exiting..."
 						exit 1
 				fi
 		fi
