@@ -237,12 +237,6 @@ RUN()
 				update-initramfs -u
 				echo -e "${GOOD}Done!"
 				;;
-
-			*)
-				echo -e "${WARN}Something went wrong during the kernel udpate!"
-				exit 1
-				;;
-
 		esac
 
 		echo -e "${GOOD}The Linux kernel has been updated in ${SECONDS} seconds."
