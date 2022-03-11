@@ -95,6 +95,9 @@ INSTALL_INTEL_FIRMWARE()
 	echo -e "${INFO}Your X server is configured to use the intel driver."
 	echo -e "${INFO}Installing the intel firmware packages..."
 	apt-get -f -y install "firmware-intel*" intel-gpu-tools intel-microcode
+	echo -e "${INFO}Cloning the linux firmware repository..."
+	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" 2>/dev/null
+	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware
 }
 
 INSTALL_AMD_FIRMWARE()
@@ -216,23 +219,29 @@ RUN()
 		## Get the according firmware.
 		case ${FIRMWARE_TO_INSTALL} in
 			amd)
+				cd ${FIRMWARE_PATH}
 				INSTALL_AMD_FIRMWARE
 				INSTALL_OTHER_FIRMWARE
+				cd
 				echo -e "${INFO}Generating a new initramfs images..."
 				update-initramfs -u
 				echo -e "${GOOD}Done!"
 				;;
 
 			intel)
+				cd ${FIRMWARE_PATH}
 				INSTALL_INTEL_FIRMWARE
 				INSTALL_OTHER_FIRMWARE
+				cd
 				echo -e "${INFO}Generating a new initramfs images..."
 				update-initramfs -u
 				echo -e "${GOOD}Done!"
 				;;
 
 			other)
+				cd ${FIRMWARE_PATH}
 				INSTALL_OTHER_FIRMWARE
+				cd
 				echo -e "${INFO}Generating a new initramfs images..."
 				update-initramfs -u
 				echo -e "${GOOD}Done!"
