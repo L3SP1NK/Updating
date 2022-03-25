@@ -1,14 +1,13 @@
 #!/bin/bash
 ## Backup important files.
-## Typically you will run this script using cron.
 
 BACKUP()
 {
 	## Personal files.
 	[[ -f ${HOME}/.pass.gpg ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.pass.gpg ${HOME}/.bak/.pass.gpg.bak
 	[[ -f ${HOME}/.diary.gpg ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.diary.gpg ${HOME}/.bak/.diary.gpg.bak
-	[[ -f ${HOME}/.todo ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.todo ${HOME}/.bak/.todo.bak
-	[[ -f ${HOME}/.note ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.note ${HOME}/.bak/.note.bak
+	[[ -f ${HOME}/.todo.gpg ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.todo.gpg ${HOME}/.bak/.todo.gpg.bak
+	[[ -f ${HOME}/.note.gpg ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.note.gpg ${HOME}/.bak/.note.gpg.bak
 
 	## Config files.
 	[[ -f ${HOME}/.zshrc ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.zshrc ${HOME}/.bak/.zshrc.bak
