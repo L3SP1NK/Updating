@@ -12,80 +12,58 @@ WARN="${RED}${BOLD} [-] ${RC}"
 INFO="${BLUE}${BOLD} [*] ${RC}"
 GOOD="${GREEN}${BOLD} [+] ${RC}"
 
-BACKUP()
+BACKUP_FILES()
 {
-	if [[ -f ${HOME}/.pass.gpg ]]
-		then
-			mkdir -pv ${HOME}/.bak
-			cp -Lrv ${HOME}/.pass.gpg ${HOME}/.bak/.pass.gpg.bak
-			[[ ${?} -eq "0" ]] && echo -e "${INFO}-> Password"
-	fi
+	mkdir -pv ${HOME}/.bak
+	[ -f ${HOME}/.pass.gpg ] && cp -Lrv ${HOME}/.pass.gpg ${HOME}/.bak/.pass.gpg.bak
+	[ ${?} -eq "0" ] && echo -e "${INFO}-> Password"
 
-	if [[ -f ${HOME}/.diary.gpg ]]
-		then
-			mkdir -pv ${HOME}/.bak
-			cp -Lrv ${HOME}/.diary.gpg ${HOME}/.bak/.diary.gpg.bak
-			[[ ${?} -eq "0" ]] && echo -e "${INFO}-> Diary"
-	fi
+	mkdir -pv ${HOME}/.bak
+	[ -f ${HOME}/.diary.gpg ] && cp -Lrv ${HOME}/.diary.gpg ${HOME}/.bak/.diary.gpg.bak
+	[ ${?} -eq "0" ] && echo -e "${INFO}-> Diary"
 
-	if [[ -f ${HOME}/.todo.gpg ]]
-		then
-			mkdir -pv ${HOME}/.bak
-			cp -Lrv ${HOME}/.todo.gpg ${HOME}/.bak/.todo.gpg.bak
-			[[ ${?} -eq "0" ]] && echo -e "${INFO}-> Todo"
-	fi
+	mkdir -pv ${HOME}/.bak
+	[ -f ${HOME}/.todo.gpg ] && cp -Lrv ${HOME}/.todo.gpg ${HOME}/.bak/.todo.gpg.bak
+	[ ${?} -eq "0" ] && echo -e "${INFO}-> Todo"
 
-	if [[ -f ${HOME}/.note.gpg ]]
-		then
-			mkdir -pv ${HOME}/.bak
-			cp -Lrv ${HOME}/.note.gpg ${HOME}/.bak/.note.gpg.bak
-			[[ ${?} -eq "0" ]] && echo -e "${INFO}-> Note"
-	fi
+	mkdir -pv ${HOME}/.bak
+	[ -f ${HOME}/.note.gpg ] && cp -Lrv ${HOME}/.note.gpg ${HOME}/.bak/.note.gpg.bak
+	[ ${?} -eq "0" ] && echo -e "${INFO}-> Note"
 
-	if [[ -f ${HOME}/.zshrc ]]
-		then
-			mkdir -pv ${HOME}/.bak
-			cp -Lrv ${HOME}/.zshrc ${HOME}/.bak/.zshrc.bak
-			[[ ${?} -eq "0" ]] && echo -e "${INFO}-> Zshrc"
-	fi
+	mkdir -pv ${HOME}/.bak
+	[ -f ${HOME}/.zshrc ] && cp -Lrv ${HOME}/.zshrc ${HOME}/.bak/.zshrc.bak
+	[ ${?} -eq "0" ] && echo -e "${INFO}-> Zshrc"
 
-	if [[ -f ${HOME}/.bashrc ]]
-		then
-			mkdir -pv ${HOME}/.bak
-			cp -Lrv ${HOME}/.bashrc ${HOME}/.bak/.bashrc.bak
-			[[ ${?} -eq "0" ]] && echo -e "${INFO}-> Bashrc"
-	fi
+	mkdir -pv ${HOME}/.bak
+	[ -f ${HOME}/.bashrc ] && cp -Lrv ${HOME}/.bashrc ${HOME}/.bak/.bashrc.bak
+	[ ${?} -eq "0" ] && echo -e "${INFO}-> Bashrc"
 
-	if [[ -f ${HOME}/.nanorc ]]
-		then
-			mkdir -pv ${HOME}/.bak
-			cp -Lrv ${HOME}/.nanorc ${HOME}/.bak/.nanorc.bak
-			[[ ${?} -eq "0" ]] && echo -e "${INFO}-> Nanorc"
-	fi
+	mkdir -pv ${HOME}/.bak
+	[ -f ${HOME}/.nanorc ] && cp -Lrv ${HOME}/.nanorc ${HOME}/.bak/.nanorc.bak
+	[ ${?} -eq "0" ] && echo -e "${INFO}-> Nanorc"
 
-	if [[ -f ${HOME}/Documents/Monero/lespink/lespink.keys ]]
-		then
-			mkdir -pv ${HOME}/.bak
-			cp -Lrv ${HOME}/Documents/Monero/lespink/lespink.keys ${HOME}/.bak/lespink.keys.bak
-			[[ ${?} -eq "0" ]] && echo -e "${INFO}-> XMR keys"
-	fi
+	mkdir -pv ${HOME}/.bak
+	[ -f ${HOME}/Documents/Monero/${USER}/${USER}.keys ] && cp -Lrv ${HOME}/Documents/Monero/${USER}/${USER}.keys ${HOME}/.bak/${USER}.keys.bak
+	[ ${?} -eq "0" ] && echo -e "${INFO}-> XMR keys"
 
-	if [[ -f ${HOME}/Documents/Monero/lespink/lespink ]]
-		then
-			mkdir -pv ${HOME}/.bak
-			cp -Lrv ${HOME}/Documents/Monero/lespink/lespink ${HOME}/.bak/lespink.bak
-			[[ ${?} -eq "0" ]] && echo -e "${INFO}-> XMR data"
-	fi
+	mkdir -pv ${HOME}/.bak
+	[ -f ${HOME}/Documents/Monero/${USER}/${USER} ] && cp -Lrv ${HOME}/Documents/Monero/${USER}/${USER} ${HOME}/.bak/${USER}.bak
+	[ ${?} -eq "0" ] && echo -e "${INFO}-> XMR data"
 }
 
-echo -e "\n${INFO}Starting backup...\n"
+BACKUP_HOME()
+{
+	which zip > /dev/null
+	[ ${?} -ne "0" ] && exit 1
+	rm -r ${HOME}/.bak/${USER}_home.zip
+	zip -9 -r /tmp/${USER}_home /home/${USER}
+	mv /tmp/${USER}_home..zip /home/${USER}/.bak/
+}
 
-BACKUP
+#echo -e "\n${INFO}Starting files backup...\n"
+#BACKUP_FILES
+#[ ${?} -eq "0" ] && echo -e "\n${GOOD}Files backup done!\n" || echo -e "\n${WARN}Something went wrong!\n"
 
-if [[ ${?} -eq "0" ]]
-	then
-		echo -e "\n${GOOD}Backup done!\n"
-	else
-		echo -e "\n${WARN}Something went wrong!\n"
-		exit 1
-fi
+echo -e "\n${INFO}Starting home backup...\n"
+BACKUP_HOME
+[ ${?} -eq "0" ] && echo -e "\n${GOOD}Home backup done!\n" ||  echo -e "\n${WARN}Something went wrong!\n"
