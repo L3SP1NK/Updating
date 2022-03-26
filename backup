@@ -11,26 +11,25 @@ if [[ ${EUID} -ne '0' ]]
 				if [[ -f ${FILE} ]]
 					then
 						rsync \
-							-4 \ ## prefer IPv4.
-							--acls \ ## preserve ACLs (implies --perms).
-							--archive \ ## archive mode is -rlptgoD (no -A,-X,-U,-N,-H).
-							--atimes \ ## preserve access (use) times.
-							--compress \ ## compress file data during the transfer.
-							--compress-choice=tar \ ## choose the compression algorithm (aka --zc).
-							--compress-level=9 \ ## explicitly set compression level (aka --zl).
-							--delete-delay \ ## find deletions during, delete after.
-							--devices \ ## preserve device files.
-							--exclude-from=/root/.exclude_from_backup \ ## read exclude patterns from FILE.
-							--force \ ## force deletion of dirs even if not empty.
-							--group \ ## preserve group.
-							--ignore-errors \ ## Tells --delete to go ahead and delete files even when there are I/O errors.
-							--owner  \ ## preserve owner.
-							--progress \ ## show progress during transfer.
-							--specials \ ## preserve special files.
-							--times \ ## preserve modification times.
-							--update \ ## skip files that are newer on the receiver.
-							--verbose \ ## increase verbosity.
-							--xattrs \ ## preserve extended attributes.
+							-4 \
+							--acls \
+							--archive \
+							--atimes \
+							--compress \
+							--compress-choice=zstd \
+							--compress-level=9 \
+							--delete-delay \
+							--devices \
+							--exclude-from=/root/.exclude_from_backup \
+							--force \
+							--group \
+							--ignore-errors \
+							--owner  \
+							--progress \
+							--specials \
+							--times \
+							--update \
+							--verbose \
 							/ root@192.168.1.4:/mnt/$(hostname)/
 					else
 						echo "${FILE} not found!"
