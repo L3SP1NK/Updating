@@ -1,22 +1,91 @@
 #!/bin/bash
 ## Backup important files.
 
+## Set colors.
+RC="\e[0m"
+BOLD="\e[1m"
+GREEN="\e[32m"
+RED="\e[31m"
+BLUE="\e[34m"
+
+WARN="${RED}${BOLD} [-] ${RC}"
+INFO="${BLUE}${BOLD} [*] ${RC}"
+GOOD="${GREEN}${BOLD} [+] ${RC}"
+
 BACKUP()
 {
-	## Personal files.
-	[[ -f ${HOME}/.pass.gpg ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.pass.gpg ${HOME}/.bak/.pass.gpg.bak
-	[[ -f ${HOME}/.diary.gpg ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.diary.gpg ${HOME}/.bak/.diary.gpg.bak
-	[[ -f ${HOME}/.todo.gpg ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.todo.gpg ${HOME}/.bak/.todo.gpg.bak
-	[[ -f ${HOME}/.note.gpg ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.note.gpg ${HOME}/.bak/.note.gpg.bak
+	if [[ -f ${HOME}/.pass.gpg ]]
+		then
+			mkdir -pv ${HOME}/.bak
+			cp -Lrv ${HOME}/.pass.gpg ${HOME}/.bak/.pass.gpg.bak
+			[[ ${?} -eq "0" ]] && echo -e "${INFO}-> Password"
+	fi
 
-	## Config files.
-	[[ -f ${HOME}/.zshrc ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.zshrc ${HOME}/.bak/.zshrc.bak
-	[[ -f ${HOME}/.bashrc ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.bashrc ${HOME}/.bak/.bashrc.bak
-	[[ -f ${HOME}/.nanorc ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/.nanorc ${HOME}/.bak/.nanorc.bak
+	if [[ -f ${HOME}/.diary.gpg ]]
+		then
+			mkdir -pv ${HOME}/.bak
+			cp -Lrv ${HOME}/.diary.gpg ${HOME}/.bak/.diary.gpg.bak
+			[[ ${?} -eq "0" ]] && echo -e "${INFO}-> Diary"
+	fi
 
-	## Monero keys.
-	[[ -f ${HOME}/Documents/Monero/lespink/lespink.keys ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/Documents/Monero/lespink/lespink.keys ${HOME}/.bak/lespink.keys.bak
-	[[ -f ${HOME}/Documents/Monero/lespink/lespink ]] && mkdir -p ${HOME}/.bak && cp ${HOME}/Documents/Monero/lespink/lespink ${HOME}/.bak/lespink.bak
+	if [[ -f ${HOME}/.todo.gpg ]]
+		then
+			mkdir -pv ${HOME}/.bak
+			cp -Lrv ${HOME}/.todo.gpg ${HOME}/.bak/.todo.gpg.bak
+			[[ ${?} -eq "0" ]] && echo -e "${INFO}-> Todo"
+	fi
+
+	if [[ -f ${HOME}/.note.gpg ]]
+		then
+			mkdir -pv ${HOME}/.bak
+			cp -Lrv ${HOME}/.note.gpg ${HOME}/.bak/.note.gpg.bak
+			[[ ${?} -eq "0" ]] && echo -e "${INFO}-> Note"
+	fi
+
+	if [[ -f ${HOME}/.zshrc ]]
+		then
+			mkdir -pv ${HOME}/.bak
+			cp -Lrv ${HOME}/.zshrc ${HOME}/.bak/.zshrc.bak
+			[[ ${?} -eq "0" ]] && echo -e "${INFO}-> Zshrc"
+	fi
+
+	if [[ -f ${HOME}/.bashrc ]]
+		then
+			mkdir -pv ${HOME}/.bak
+			cp -Lrv ${HOME}/.bashrc ${HOME}/.bak/.bashrc.bak
+			[[ ${?} -eq "0" ]] && echo -e "${INFO}-> Bashrc"
+	fi
+
+	if [[ -f ${HOME}/.nanorc ]]
+		then
+			mkdir -pv ${HOME}/.bak
+			cp -Lrv ${HOME}/.nanorc ${HOME}/.bak/.nanorc.bak
+			[[ ${?} -eq "0" ]] && echo -e "${INFO}-> Nanorc"
+	fi
+
+	if [[ -f ${HOME}/Documents/Monero/lespink/lespink.keys ]]
+		then
+			mkdir -pv ${HOME}/.bak
+			cp -Lrv ${HOME}/Documents/Monero/lespink/lespink.keys ${HOME}/.bak/lespink.keys.bak
+			[[ ${?} -eq "0" ]] && echo -e "${INFO}-> XMR keys"
+	fi
+
+	if [[ -f ${HOME}/Documents/Monero/lespink/lespink ]]
+		then
+			mkdir -pv ${HOME}/.bak
+			cp -Lrv ${HOME}/Documents/Monero/lespink/lespink ${HOME}/.bak/lespink.bak
+			[[ ${?} -eq "0" ]] && echo -e "${INFO}-> XMR data"
+	fi
 }
 
-BACKUP && echo -e "\e[32mBackup done!\e[0m" || echo -e "\e[31mSomething went wrong...\e[0m"
+echo -e "\n${INFO}Starting backup...\n"
+
+BACKUP
+
+if [[ ${?} -eq "0" ]]
+	then
+		echo -e "\n${GOOD}Backup done!\n"
+	else
+		echo -e "\n${WARN}Something went wrong!\n"
+		exit 1
+fi
