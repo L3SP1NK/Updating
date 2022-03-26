@@ -1,11 +1,9 @@
 #!/bin/bash
 BACKUP_HOME()
 {
-	which zip > /dev/null
-	[ ${?} -ne "0" ] && exit 1
-	rm -r ${HOME}/.bak/${USER}_home.zip
-	zip -9 -r /tmp/${USER}_home /home/${USER}
-	mv /tmp/${USER}_home..zip /home/${USER}/.bak/
+	rm -r ${HOME}/.bak/${USER}.tar
+	tar -caf /tmp/${USER}.tar /home/lespink
+	mv /tmp/${USER}.tar /home/${USER}/.bak/
 }
 
 if [[ ${EUID} -eq "0" ]]
