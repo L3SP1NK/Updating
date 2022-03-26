@@ -12,14 +12,10 @@ if [[ ${EUID} -ne '0' ]]
 					then
 						rsync \
 							-4 \
-							--acls \
 							--archive \
-							--atimes \
 							--compress \
 							--compress-choice=zstd \
 							--compress-level=9 \
-							--delete-delay \
-							--devices \
 							--exclude-from=/root/.exclude_from_backup \
 							--force \
 							--group \
