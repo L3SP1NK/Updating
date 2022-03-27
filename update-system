@@ -65,6 +65,7 @@ UPDATE_FLATPAK()
 {
 	echo -e "${INFO}Flatpak applications installed:"
 	flatpak list
+	flatpak repair
 	echo -e "${INFO}Updating flatpak..."
 	flatpak update -y
 }
