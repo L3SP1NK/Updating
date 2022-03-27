@@ -49,10 +49,6 @@ BACKUP_FILES()
 	mkdir -pv ${HOME}/.bak
 	[ -f ${HOME}/Documents/Monero/${USER}/${USER} ] && cp -Lrv ${HOME}/Documents/Monero/${USER}/${USER} ${HOME}/.bak/${USER}.bak
 	[ ${?} -eq "0" ] && echo -e "${INFO}-> XMR data"
-
-	mkdir -pv ${HOME}/.bak
-	[ -f ${HOME}/Documents/Monero/${USER}/seed.gpg ] && cp -Lrv ${HOME}/Documents/Monero/${USER}/seed.gpg ${HOME}/.bak/${USER}.bak
-	[ ${?} -eq "0" ] && echo -e "${INFO}-> XMR data"
 }
 
 echo -e "\n${INFO}Starting files backup...\n"
