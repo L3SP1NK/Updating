@@ -15,6 +15,10 @@ GOOD="${GREEN}${BOLD} [+] ${RC}"
 BACKUP_FILES()
 {
 	mkdir -pv ${HOME}/.bak
+	[ -f ${HOME}/Documents/KPXC/pswd ] && cp -Lrv ${HOME}/Documents/KPXC/pswd ${HOME}/.bak/${USER}.bak
+	[ ${?} -eq "0" ] && echo -e "${INFO}-> KeepassXC database"
+
+	mkdir -pv ${HOME}/.bak
 	[ -f ${HOME}/.pass.gpg ] && cp -Lrv ${HOME}/.pass.gpg ${HOME}/.bak/.pass.gpg.bak
 	[ ${?} -eq "0" ] && echo -e "${INFO}-> Password"
 
