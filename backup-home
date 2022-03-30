@@ -2,7 +2,7 @@
 BACKUP_HOME()
 {
 	rm -r ${HOME}/.bak/${USER}.tar
-	tar -caf /tmp/${USER}.tar /home/lespink
+	tar --ignore-command-error -caf /tmp/${USER}.tar /home/lespink
 	mv /tmp/${USER}.tar /home/${USER}/.bak/
 }
 
