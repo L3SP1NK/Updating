@@ -1,9 +1,10 @@
 #!/bin/bash
 BACKUP_HOME()
 {
-	rm -r ${HOME}/.bak/${USER}.tar
-	tar --ignore-command-error -caf /tmp/${USER}.tar /home/lespink
-	mv /tmp/${USER}.tar /home/${USER}/.bak/
+	FILENAME="${USER}-home.tar"
+	rm -r ${HOME}/.bak/${FILENAME}
+	tar --ignore-command-error -caf /tmp/${FILENAME} /home/lespink
+	mv /tmp/${FILENAME} /home/${USER}/.bak/
 }
 
 if [[ ${EUID} -eq "0" ]]

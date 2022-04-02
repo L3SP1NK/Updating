@@ -1,4 +1,6 @@
 #!/bin/bash
+BACKUP_SERVER="ideapad"
+
 if [[ ${EUID} -ne '0' ]]
 	then
 		echo "Run me as root!"
@@ -26,7 +28,7 @@ if [[ ${EUID} -ne '0' ]]
 							--times \
 							--update \
 							--verbose \
-							/ root@192.168.1.4:/mnt/$(hostname)/
+							/ root@${BACKUP_SERVER}:/mnt/$(hostname)/
 					else
 						echo "${FILE} not found!"
 						exit 1
