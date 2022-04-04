@@ -1,16 +1,4 @@
 #!/bin/bash
-BACKUP_HOME()
-{
-	FILENAME="${USER}-home.tar"
-	rm -r ${HOME}/.bak/${FILENAME} 2>/dev/null
-	tar --ignore-command-error -caf /tmp/${FILENAME} /home/lespink
-	mv /tmp/${FILENAME} /home/${USER}/.bak/
-}
-
-if [[ ${EUID} -eq "0" ]]
-	then
-		echo "Run me as user!"
-		exit 1
-	else
-		BACKUP_HOME
-fi
+##		compress	->	stdout	->	split	->	stdin	->	compress	-.
+##		^																 |
+##		\<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-/
