@@ -1,4 +1,13 @@
 #!/bin/bash
+
+## Method:
+
 ##		compress	->	stdout	->	split	->	stdin	->	compress	-.
 ##		^																 |
 ##		\<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-/
+
+## Compression:
+## level + update + fresh + link
+
+## Split:
+## XX bytes
