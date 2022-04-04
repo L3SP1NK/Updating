@@ -1,7 +1,8 @@
 #!/bin/bash
+## Backup /home with zip.
 
 TO_BACKUP="/home/${USER}"
-BACKUP_DIR="/tmp/backup"
+BACKUP_DIR="/var/backups"
 BACKUP_FILE="${BACKUP_DIR}/home-${USER}.zip"
 
 CREATE_BACKUP()
