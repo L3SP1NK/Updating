@@ -1,5 +1,6 @@
 #!/bin/bash
 ## Backup /home with zip.
+## See zip -h2 (-s -sv)
 
 TO_BACKUP="/home/${USER}"
 BACKUP_DIR="/var/backups"
