@@ -16,43 +16,35 @@ BACKUP_FILES()
 {
 	mkdir -pv ${HOME}/.bak
 	[ -f ${HOME}/Documents/KPXC/pswd ] && \
-	echo -e "${INFO}-> KeepassXC database"
-	cp -Lurv ${HOME}/Documents/KPXC/pswd ${HOME}/.bak/${USER}.bak
+	echo -e "${INFO}-> KeepassXC database" && cp -Lurv ${HOME}/Documents/KPXC/pswd ${HOME}/.bak/${USER}.bak
 
 	mkdir -pv ${HOME}/.bak
 	[ -f ${HOME}/.pass.gpg ] && \
-	echo -e "${INFO}-> Password"
-	cp -Lurv ${HOME}/.pass.gpg ${HOME}/.bak/.pass.gpg.bak
+	echo -e "${INFO}-> Password" && cp -Lurv ${HOME}/.pass.gpg ${HOME}/.bak/.pass.gpg.bak
 
 	mkdir -pv ${HOME}/.bak
 	[ -f ${HOME}/.diary.gpg ] && \
-	echo -e "${INFO}-> Diary"
-	cp -Lurv ${HOME}/.diary.gpg ${HOME}/.bak/.diary.gpg.bak
+	echo -e "${INFO}-> Diary" && cp -Lurv ${HOME}/.diary.gpg ${HOME}/.bak/.diary.gpg.bak
 
 	mkdir -pv ${HOME}/.bak
 	[ -f ${HOME}/.todo.gpg ] && \
-	echo -e "${INFO}-> Todo"
-	cp -Lurv ${HOME}/.todo.gpg ${HOME}/.bak/.todo.gpg.bak
+	echo -e "${INFO}-> Todo" && cp -Lurv ${HOME}/.todo.gpg ${HOME}/.bak/.todo.gpg.bak
 
 	mkdir -pv ${HOME}/.bak
 	[ -f ${HOME}/.note.gpg ] && \
-	echo -e "${INFO}-> Note"
-	cp -Lurv ${HOME}/.note.gpg ${HOME}/.bak/.note.gpg.bak
+	echo -e "${INFO}-> Note" && cp -Lurv ${HOME}/.note.gpg ${HOME}/.bak/.note.gpg.bak
 
 	mkdir -pv ${HOME}/.bak
 	[ -f ${HOME}/.zshrc ] && \
-	echo -e "${INFO}-> Zshrc"
-	cp -Lurv ${HOME}/.zshrc ${HOME}/.bak/.zshrc.bak
+	echo -e "${INFO}-> Zshrc" && cp -Lurv ${HOME}/.zshrc ${HOME}/.bak/.zshrc.bak
 
 	mkdir -pv ${HOME}/.bak
 	[ -f ${HOME}/.bashrc ] && \
-	echo -e "${INFO}-> Bashrc"
-	cp -Lurv ${HOME}/.bashrc ${HOME}/.bak/.bashrc.bak
+	echo -e "${INFO}-> Bashrc" && cp -Lurv ${HOME}/.bashrc ${HOME}/.bak/.bashrc.bak
 
 	mkdir -pv ${HOME}/.bak
 	[ -f ${HOME}/.nanorc ] && \
-	echo -e "${INFO}-> Nanorc"
-	cp -Lurv ${HOME}/.nanorc ${HOME}/.bak/.nanorc.bak
+	echo -e "${INFO}-> Nanorc" && cp -Lurv ${HOME}/.nanorc ${HOME}/.bak/.nanorc.bak
 }
 
 echo -e "\n${INFO}Starting files backup...\n"
