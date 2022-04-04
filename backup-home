@@ -1,13 +1,33 @@
 #!/bin/bash
 
-## Method:
+TO_BACKUP="/home/${USER}"
+BACKUP_DIR="/tmp/backup"
+BACKUP_FILE="${BACKUP_DIR}/home-${USER}.zip"
 
-##		compress	->	stdout	->	split	->	stdin	->	compress	-.
-##		^																 |
-##		\<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-<-/
+CREATE_BACKUP()
+{
+	zip -9 -Trev ${BACKUP_DIR} ${TO_BACKUP}
+}
 
-## Compression:
-## level + update + fresh + link
+UPDATE_BACKUP()
+{
+	zip -9 -durfy ${BACKUP_FILE} ${TO_BACKUP}
+}
 
-## Split:
-## XX bytes
+if ! which zip > /dev/null
+	then
+		echo "Zip is not installed!"
+		exit 1
+	else
+		mkdir -p ${BACKUP_DIR}
+		if [[ -f ${BACKUP_FILE} ]]
+			then
+				echo "Updating backup..."
+				UPDATE_BACKUP
+				echo "Done!"
+			else
+				echo "Creating backup..."
+				CREATE_BACKUP
+				echo "Done!"
+		fi
+fi
