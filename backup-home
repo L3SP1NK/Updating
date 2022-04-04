@@ -1,6 +1,5 @@
 #!/bin/bash
 ## Backup /home with zip.
-## See zip -h2 (-s -sv)
 
 TO_BACKUP="/home/${USER}"
 BACKUP_DIR="/var/backups"
@@ -8,7 +7,7 @@ BACKUP_FILE="${BACKUP_DIR}/home-${USER}.zip"
 
 CREATE_BACKUP()
 {
-	zip -9 -Trev ${BACKUP_DIR} ${TO_BACKUP}
+	zip -9 -rv ${BACKUP_DIR} ${TO_BACKUP}
 }
 
 UPDATE_BACKUP()
