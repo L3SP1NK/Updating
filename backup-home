@@ -12,7 +12,7 @@ CREATE_BACKUP()
 
 UPDATE_BACKUP()
 {
-	zip -9 -durfy ${BACKUP_FILE} ${TO_BACKUP}
+	zip -9 -dury ${BACKUP_FILE} ${TO_BACKUP}
 }
 
 if ! which zip > /dev/null
