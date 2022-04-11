@@ -21,7 +21,7 @@ UPDATE_GIT()
 				## Search for GIT repos.
 				for GIT_PATH in $(find ${REPOS_LOCATION} -type d -name ".git" 2>/dev/null)
 					do
-						cd ${GIT_PATH}
+						cd ${GIT_PATH} || exit 1
 						echo -e "\n${INFO}${GIT_PATH}${RC}"
 						cd ..
 						git config pull.rebase true
