@@ -24,6 +24,9 @@ UPDATE_GIT()
 						cd ${GIT_PATH} || exit 1
 						echo -e "\n${INFO}${GIT_PATH}${RC}"
 						cd ..
+						## Pull change
+						git pull
+						## Config
 						git config pull.rebase true
 						git config --global --add safe.directory ${GIT_PATH}
 						## Add files to the repo
