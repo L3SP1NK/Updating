@@ -3,7 +3,7 @@
 
 TO_BACKUP="/home/${USER}"
 BACKUP_DIR="/backup"
-BACKUP_FILE="${BACKUP_DIR}/home-${USER}-${HOSTNAME}_$(date '+%d-%b-%y').zip"
+BACKUP_FILE="${BACKUP_DIR}/home-${USER}-${HOSTNAME}.zip"
 
 CREATE_BACKUP()
 {
