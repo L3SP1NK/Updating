@@ -1,40 +1,53 @@
 #!/bin/bash
-BACKUP_SERVER="ideapad"
+RSYNC_BACKUP()
+{
+	rsync \
+		-4 \
+		--archive\
+		--compress \
+		--compress-choice=zstd \
+		--compress-level=9 \
+		--exclude-from=/root/.exclude_from_backup \
+		--force \
+		--group \
+		--ignore-errors \
+		--owner \
+		--progress \
+		--specials \
+		--times \
+		--update \
+		--verbose \
+		${FROM}/ ${DEST}/
+}
 
 if [[ ${EUID} -ne '0' ]]
 	then
 		echo "Run me as root!"
 		exit 1
+fi
+
+if [[ ${1} && ${2} ]]
+	then
+		FROM=${1}
+		DEST=${2}
 	else
-		which rsync > /dev/null
-		if [[ ${?} -eq '0' ]]
-			then
-				FILE="/root/.exclude_from_backup"
-				if [[ -f ${FILE} ]]
-					then
-						rsync \
-							-4 \
-							--archive \
-							--compress \
-							--compress-choice=zstd \
-							--compress-level=9 \
-							--exclude-from=/root/.exclude_from_backup \
-							--force \
-							--group \
-							--ignore-errors \
-							--owner  \
-							--progress \
-							--specials \
-							--times \
-							--update \
-							--verbose \
-							/ root@${BACKUP_SERVER}:/mnt/$(hostname)/
-					else
-						echo "${FILE} not found!"
-						exit 1
-				fi
-			else
-				echo "Rsync is not installed!"
-				exit 1
-		fi
+		echo "Please, specify <folder to backup> <backup destination>"
+		exit 1
+fi
+
+if ! which rsync zstd>/dev/null
+	then
+		echo "You need zstd and rsync to run me!"
+		exit 1
+fi
+
+FILE="/root/.exclude_from_backup"
+if [[ -f ${FILE} ]]
+	then
+		echo "Starting backup..."
+		RSYNC_BACKUP
+		[[ ${?} -eq "0" ]] && echo "Done!" || echo "Something went wrong!"
+	else
+		echo "${FILE} not found!"
+		exit 1
 fi
