@@ -1,12 +1,11 @@
 #!/bin/bash
 ## This script is only made for Debian based distros, it will update:
-## - APT packages
-## - Git repositories
-## - Flatpak applications
-## - NPM packages
-## - Linux firmware and kernel.
+## - apt packages
+## - git repositories
+## - flatpak applications
+## - npm packages
+## - the linux firmware and kernel
 
-## Set colors.
 RC="\e[0m"
 BOLD="\e[1m"
 GREEN="\e[32m"
@@ -249,6 +248,7 @@ RUN()
 		echo -e "${GOOD}The Linux kernel has been updated in ${SECONDS} seconds."
 
 }
+
 ## Check privileges and proceed.
 if [[ ${EUID} -ne 0 ]]
 	then
