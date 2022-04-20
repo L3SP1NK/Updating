@@ -5,30 +5,33 @@ TO_BACKUP="/home/${USER}"
 BACKUP_DIR="/backup"
 BACKUP_FILE="${BACKUP_DIR}/home-${USER}-${HOSTNAME}.zip"
 
-CREATE_BACKUP()
-{
-	zip -9 -rv ${BACKUP_FILE} ${TO_BACKUP}
-}
-
-UPDATE_BACKUP()
-{
-	zip -9 -dury ${BACKUP_FILE} ${TO_BACKUP}
-}
+if [[ ${EUID} -eq "0" ]]
+	then
+		echo "Run me as simple user!"
+		exit 1
+fi
 
 if ! which zip > /dev/null
 	then
 		echo "Zip is not installed!"
 		exit 1
+fi
+
+if [[ ! -d ${TO_BACKUP} ]]
+	then
+		echo "The folder to backup dosen't exist!"
+		exit 1
+fi
+
+mkdir -p ${BACKUP_DIR}
+
+if [[ -f ${BACKUP_FILE} ]]
+	then
+		echo "Updating backup..."
+		zip -9 -dury ${BACKUP_FILE} ${TO_BACKUP}
+		[[ ${?} -eq "0" ]] && echo "Done." || echo "Something went wrong!"
 	else
-		mkdir -p ${BACKUP_DIR}
-		if [[ -f ${BACKUP_FILE} ]]
-			then
-				echo "Updating backup..."
-				UPDATE_BACKUP
-				echo "Done!"
-			else
-				echo "Creating backup..."
-				CREATE_BACKUP
-				echo "Done!"
-		fi
+		echo "Creating backup..."
+		zip -9 -rv ${BACKUP_FILE} ${TO_BACKUP}
+		[[ ${?} -eq "0" ]] && echo "Done." || echo "Something went wrong!"
 fi

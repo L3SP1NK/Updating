@@ -7,6 +7,7 @@ RSYNC_BACKUP()
 		--compress \
 		--compress-choice=zstd \
 		--compress-level=9 \
+		--delete-delay \
 		--exclude-from=/root/.exclude_from_backup \
 		--force \
 		--group \
@@ -26,7 +27,7 @@ if [[ ${EUID} -ne '0' ]]
 		exit 1
 fi
 
-if [[ ${1} && ${2} ]]
+if [[ ${1} && ${2} && ! ${3} ]]
 	then
 		FROM=${1}
 		DEST=${2}
@@ -37,7 +38,7 @@ fi
 
 if ! which rsync zstd>/dev/null
 	then
-		echo "You need zstd and rsync to run me!"
+		echo "You need zstd and rsync to use compression!"
 		exit 1
 fi
 
@@ -46,7 +47,7 @@ if [[ -f ${FILE} ]]
 	then
 		echo "Starting backup..."
 		RSYNC_BACKUP
-		[[ ${?} -eq "0" ]] && echo "Done!" || echo "Something went wrong!"
+		[[ ${?} -eq '0' ]] && echo "Done!" || echo "Something went wrong!"
 	else
 		echo "${FILE} not found!"
 		exit 1
