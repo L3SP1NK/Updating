@@ -96,7 +96,7 @@ INSTALL_INTEL_FIRMWARE()
 	echo -e "${INFO}Installing the intel firmware packages${RC}:"
 	if apt-get -f -y install "firmware-intel*" intel-gpu-tools intel-microcode
 		then
-			echo "${GREEN}Firmware installed.${RC}"
+			echo "${GOOD}Firmware installed.${RC}"
 		else
 			echo "${WARN}Something went wrong during firmware installation!${RC}"
 	fi
@@ -113,7 +113,7 @@ INSTALL_AMD_FIRMWARE()
 	echo -e "${INFO}Installing the AMD firmware packages${RC}:"
 	if apt-get install -y firmware-amd-graphics radeontop
 		then
-			echo "${GREEN}Firmware installed.${RC}"
+			echo "${GOOD}Firmware installed.${RC}"
 		else
 			echo "${WARN}Something went wrong during firmware installation!${RC}"
 	fi
@@ -131,7 +131,7 @@ INSTALL_OTHER_FIRMWARE()
 	echo -e "${INFO}Installing the linux firmware packages:${RC}"
 	if apt-get -f -y install firmware-linux firmware-linux-free firmware-linux-nonfree firmware-misc-nonfree firmware-misc-nonfree 2>/dev/null
 		then
-			echo "${GREEN}Firmware installed.${RC}"
+			echo "${GOOD}Firmware installed.${RC}"
 		else
 			echo "${WARN}Something went wrong during firmware installation!${RC}"
 	fi
