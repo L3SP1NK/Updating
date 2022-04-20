@@ -18,71 +18,81 @@ REPOS_LOCATION="/opt/My-Repo/"
 
 UPDATE_GIT()
 {
-				## Search for GIT repos.
-				for GIT_PATH in $(find ${REPOS_LOCATION} -type d -name ".git" 2>/dev/null)
-					do
-						cd ${GIT_PATH} || exit 1
-						echo -e "\n${INFO}${GIT_PATH}${RC}"
-						cd ..
-						## Pull change
-						git pull
-						## Config
-						git config pull.rebase true
-						git config --global --add safe.directory ${GIT_PATH}
-						## Add files to the repo
-						git add -v .*
-						git add -v *
-						## Commit change
-						git commit -a
-						git push -v
-						## Pull change
-						git pull
-						echo -e "\n${GOOD} ${GIT_PATH} Updated.${RC}"
-						cd ${CWD}
-						done
+	## Search for GIT repos.
+	for GIT_PATH in $(find ${REPOS_LOCATION} -type d -name ".git" 2>/dev/null)
+		do
+			cd ${GIT_PATH} || exit 1
+			echo -e "\n${INFO}${GIT_PATH}${RC}"
+			cd ..
+			## Pull change:
+			git pull ## Will return error if changes have been made.
+			## Config:
+			git config pull.rebase true
+			git config --global --add safe.directory ${GIT_PATH} ## Add exceptions for use with multiple github accounts.
+			## Add files to the repo:
+			git add -v .*
+			git add -v *
+			## Commit change:
+			git commit -a
+			git push -v
+			## Pull change:
+			git pull
+			echo -e "\n${GOOD} ${GIT_PATH} Updated.${RC}"
+			cd ${CWD}
+	done
 }
+
+MAKE_LINK()
+{
+	cd ${REPOS_LOCATION}
+	## Dot-files.
+	ln -svf /opt/My-Repo/Configs/dot-files/.* ${USER_HOME} 2>/dev/null
+	ln -svf /opt/My-Repo/Configs/dot-files/.* ${HOME} 2>/dev/null
+
+	## Rofi config
+	ln -svf /opt/My-Repo/Configs/rofi/config.rasi ${USER_HOME}/.config/rofi/
+
+	## Custom GTK CSS.
+	ln -svf /opt/My-Repo/Configs/gtk.css ${USER_HOME}/.config/gtk-2.0/
+	ln -svf /opt/My-Repo/Configs/gtk.css ${USER_HOME}/.config/gtk-2.0/
+	ln -svf /opt/My-Repo/Configs/gtk.css ${USER_HOME}/.config/gtk-3.0/
+
+	## Tilix themes.
+	ln -svf /opt/My-Repo/Configs/Pure.json ${USER_HOME}/.config/tilix/schemes/Pure.json
+
+	## Link scripts.
+	[[ -d /opt/My-Repo/Updating/ ]] && ln -svf /opt/My-Repo/Updating/* /usr/local/bin
+	[[ -d /opt/My-Repo/Passwords/ ]] && ln -svf /opt/My-Repo/Passwords/* /usr/local/bin
+	[[ -d /opt/My-Repo/Utilities/ ]] && ln -svf /opt/My-Repo/Utilities/* /usr/local/bin
+	[[ -d /opt/My-Repo/Telebash/ ]] && ln -svf /opt/My-Repo/Telebash/* /usr/local/bin
+	[[ -d /opt/My-Repo/Crypto/ ]] && ln -svf /opt/My-Repo/Crypto/* /usr/local/bin
+}
+
 
 REQUIREMENTS="git"
 if ! which ${REQUIREMENTS} > /dev/null
 	then
  		echo -e "${WARN}To run this program, you need the following packages installed: ${REQUIREMENTS}\n${WARN}Exiting..."
 		exit 1
-	else
-		if [[ ${EUID} -ne 0 ]]
+fi
+
+if [[ ${EUID} -ne "0" ]]
 			then
 				echo -e "${WARN}This script must be run as root!\n${WARN}Exiting..."
 				exit 1
-			else
-				if [[ -f ${USER_HOME}/.git-credentials ]]
-					then
-						cd ${REPOS_LOCATION}
-						UPDATE_GIT
-						## Dot-files.
-						ln -svf /opt/My-Repo/Configs/dot-files/.* ${USER_HOME} 2>/dev/null
-						ln -svf /opt/My-Repo/Configs/dot-files/.* ${HOME} 2>/dev/null
+fi
 
-						## Rofi config
-						ln -svf /opt/My-Repo/Configs/rofi/config.rasi ${USER_HOME}/.config/rofi/
+if [[ ! -f ${USER_HOME}/.git-credentials ]]
+	then
+		echo -e "${WARN}Git credentials not found!\n${WARN}Exiting..."
+		exit 1
+fi
 
-                        ## Custom GTK CSS.
-						ln -svf /opt/My-Repo/Configs/gtk.css ${USER_HOME}/.config/gtk-2.0/
-						ln -svf /opt/My-Repo/Configs/gtk.css ${USER_HOME}/.config/gtk-2.0/
-						ln -svf /opt/My-Repo/Configs/gtk.css ${USER_HOME}/.config/gtk-3.0/
-
-						## Tilix themes.
-						ln -svf /opt/My-Repo/Configs/Pure.json ${USER_HOME}/.config/tilix/schemes/Pure.json
-
-						## Link scripts.
-						ln -svf /opt/My-Repo/Updating/* /usr/local/bin
-						ln -svf /opt/My-Repo/Passwords/* /usr/local/bin
-						ln -svf /opt/My-Repo/Utilities/* /usr/local/bin
-						ln -svf /opt/My-Repo/Telebash/* /usr/local/bin
-						ln -svf /opt/My-Repo/Crypto/* /usr/local/bin
-						echo -e "\n${GOOD} Symbolics links has been made.${RC}"
-
-					else
-						echo -e "${WARN}Git credentials not found!\n${WARN}Exiting..."
-						exit 1
-				fi
-		fi
+UPDATE_GIT
+MAKE_LINK
+if [[ ${1} -eq "0" ]]
+	then
+		echo -e "\n${GOOD}Symbolics links has been made.${RC}"
+	else
+		echo -e "${WARN}Something went wrong!${RC}"
 fi
