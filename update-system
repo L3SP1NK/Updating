@@ -20,29 +20,29 @@ GOOD="${GREEN}${BOLD} [+] ${RC}"
 
 UPDATE_APT()
 {
-	echo -e "${INFO}Configuring/fixing possibly broken packages..."
+	echo -e "${INFO}Configuring/fixing possibly broken packages${RC}:"
 	apt-get -f -y install
 	dpkg --configure -a
 
-	echo -e "${INFO}Removing downloaded archive files and unused packages..."
+	echo -e "${INFO}Removing downloaded archive files and unused packages${RC}:"
 	apt-get -f -y clean
 	apt-get -f -y autoclean
 	apt-get -f -y autoremove --purge
 	apt-get -f -y purge --autoremove
 
-	echo -e "${INFO}Retrieving new lists of packages..."
+	echo -e "${INFO}Retrieving new lists of packages${RC}:"
 	apt-get update
 
-	echo -e "${INFO}Installing packages upgrades..."
+	echo -e "${INFO}Installing packages upgrades${RC}:"
 	apt-get -f -y upgrade
 	apt-get -f -y dist-upgrade
 	apt-get -f -y full-upgrade
 
-	echo -e "${INFO}Configuring/fixing possibly broken packages..."
+	echo -e "${INFO}Configuring/fixing possibly broken packages${RC}:"
 	apt-get -f -y install
 	dpkg --configure -a
 
-	echo -e "${INFO}Removing downloaded archive files and unused packages..."
+	echo -e "${INFO}Removing downloaded archive files and unused packages:${RC}"
 	apt-get -f -y clean
 	apt-get -f -y autoclean
 	apt-get -f -y autoremove --purge
@@ -51,21 +51,21 @@ UPDATE_APT()
 
 UPDATE_NPM()
 {
-	echo -e "${INFO}Checking NPM installation..."
+	echo -e "${INFO}Checking NPM installation:${RC}"
 	npm doctor
-	echo -e "${INFO}Auditing packages..."
+	echo -e "${INFO}Auditing packages:${RC}"
 	npm audit
-	echo -e "${INFO}Updating NPM packages..."
+	echo -e "${INFO}Updating NPM packages:${RC}"
 	npm update
 	cat /root/.npm/_logs/*
 }
 
 UPDATE_FLATPAK()
 {
-	echo -e "${INFO}Flatpak applications installed:"
+	echo -e "${INFO}Flatpak applications installed:${RC}"
 	flatpak list
 	flatpak repair
-	echo -e "${INFO}Updating flatpak..."
+	echo -e "${INFO}Updating flatpak:${RC}"
 	flatpak update -y
 }
 
@@ -78,7 +78,7 @@ UPDATE_GIT()
 	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null | grep -v /mnt/)
 		do
 			cd "${GIT_PATH}" || exit 1
-			echo -e "${INFO}Updating ${GIT_PATH}..."
+			echo -e "${INFO}Updating ${GIT_PATH}:"
 			cd .. || exit 1
 			git config pull.rebase true
 			git stash
@@ -88,71 +88,62 @@ UPDATE_GIT()
 }
 
 FIRMWARE_PATH="/opt/FIRMWARE"
-mkdir -p ${FIRMWARE_PATH}
+mkdir -p ${FIRMWARE_PATH} || exit 1
 
 INSTALL_INTEL_FIRMWARE()
 {
 	echo -e "${INFO}Your X server is configured to use the intel driver."
-	echo -e "${INFO}Installing the intel firmware packages..."
-	apt-get -f -y install "firmware-intel*" intel-gpu-tools intel-microcode
-	echo -e "${INFO}Cloning the linux firmware repository..."
-	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" 2>/dev/null
+	echo -e "${INFO}Installing the intel firmware packages${RC}:"
+	if apt-get -f -y install "firmware-intel*" intel-gpu-tools intel-microcode
+		then
+			echo "${GREEN}Firmware installed.${RC}"
+		else
+			echo "${WARN}Something went wrong during firmware installation!${RC}"
+	fi
+
+
+	echo -e "${INFO}Cloning the linux firmware repository${RC}:"
+	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" || exit 1
 	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware
 }
 
 INSTALL_AMD_FIRMWARE()
 {
 	echo -e "${INFO}Your X server is configured to use the amdgpu driver."
-	echo -e "${INFO}Installing the AMD firmware packages..."
-	apt install firmware-amd-graphics
+	echo -e "${INFO}Installing the AMD firmware packages${RC}:"
+	if apt-get install -y firmware-amd-graphics radeontop
+		then
+			echo "${GREEN}Firmware installed.${RC}"
+		else
+			echo "${WARN}Something went wrong during firmware installation!${RC}"
+	fi
 
-	echo -e "${INFO}Cloning the linux firmware (+ the unofficial AMD) repositories..."
-	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" 2>/dev/null
-	git clone "https://github.com/Umio-Yasuno/unofficial-amdgpu-firmware-repo.git" 2>/dev/null
-	cp -vur ${FIRMWARE_PATH}/unofficial-amdgpu-firmware-repo/amdgpu/* /lib/firmware/amdgpu
-	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware
+	echo -e "${INFO}Cloning the linux firmware (+ the unofficial AMD) repositories${RC}:"
+	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" || exit 1
+	git clone "https://github.com/Umio-Yasuno/unofficial-amdgpu-firmware-repo.git" || exit 1
+	cp -vur ${FIRMWARE_PATH}/unofficial-amdgpu-firmware-repo/amdgpu/* /lib/firmware/amdgpu || exit 1
+	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware || exit 1
 
 }
 
 INSTALL_OTHER_FIRMWARE()
 {
-	echo -e "${INFO}Installing the linux firmware packages..."
-	apt-get -f -y install firmware-linux firmware-linux-free firmware-linux-nonfree firmware-misc-nonfree firmware-misc-nonfree 2>/dev/null
-
-	echo -e "${INFO}Cloning the linux firmware repository..."
-	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" 2>/dev/null
-	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware
-}
-
-
-SYSINFO()
-{
-	## Set the main color based on the distribution.
-	DISTRO=$(grep "PRETTY" /etc/os-release | cut -d "=" -f 2 | sed 's/"//g' | awk '{print $1}')
-	case ${DISTRO} in
-		Kali)
-			HOSTNAME_COLOR=${CYAN}
-			;;
-		Debian)
-			HOSTNAME_COLOR=${MAGENTA}
-			;;
-		*)
-			HOSTNAME_COLOR=${GREEN}
-			;;
-	esac
-
-	REQUIREMENTS="neofetch"
-	if ! which ${REQUIREMENTS} > /dev/null
+	echo -e "${INFO}Installing the linux firmware packages:${RC}"
+	if apt-get -f -y install firmware-linux firmware-linux-free firmware-linux-nonfree firmware-misc-nonfree firmware-misc-nonfree 2>/dev/null
 		then
-			## Print basic system information if neofetch is not available.
-			echo -e "${HOSTNAME_COLOR}$(grep --color=never -iE "^name=" /etc/os-release | sed -e 's/NAME=//g' -e 's/"//g')"
-			free -h
+			echo "${GREEN}Firmware installed.${RC}"
 		else
-			neofetch
+			echo "${WARN}Something went wrong during firmware installation!${RC}"
 	fi
+
+
+	echo -e "${INFO}Cloning the linux firmware repository:${RC}"
+	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" || exit 1
+	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware || exit 1
 }
 
-RUN()
+
+MAIN()
 {
 	echo -e "$(date '+ %T - %A %d %B %Y')"
 	SYSINFO
@@ -160,70 +151,70 @@ RUN()
 	## Update apt packages.
 	if ! which apt-get > /dev/null
 		then
-			echo -e "${INFO}The APT package manager is not installed on this system."
+			echo -e "${INFO}The APT package manager is not installed on this system.${RC}"
 			exit 1
 		else
 			SECONDS="0"
 			PKG_NUM=$(dpkg-query -W | wc -l)
-			echo -e "${INFO}${PKG_NUM} Packages currently installed."
-			echo -e "${INFO}Updating APT packages..."
+			echo -e "${INFO}${PKG_NUM} Packages currently installed.${RC}"
+			echo -e "${INFO}Updating APT packages:${RC}"
 			UPDATE_APT 2>/dev/null
-			echo -e "${GOOD}APT packages updated in ${SECONDS} seconds."
+			echo -e "${GOOD}APT packages updated in ${SECONDS} seconds.${RC}"
 	fi
 
 	## Update flatpak applications.
 	if ! which flatpak > /dev/null
 		then
-				echo -e "${INFO}Flatpak is not installed on this system."
-			else
-				SECONDS="0"
-				echo -e "${INFO}You are using $(flatpak --version)."
-				UPDATE_FLATPAK 2>/dev/null
-				echo -e "${GOOD}Flatpak updated in ${SECONDS} seconds."
-			fi
+			echo -e "${INFO}Flatpak is not installed on this system.${RC}"
+		else
+			SECONDS="0"
+			echo -e "${INFO}You are using $(flatpak --version).${RC}"
+			UPDATE_FLATPAK 2>/dev/null
+			echo -e "${GOOD}Flatpak updated in ${SECONDS} seconds.${RC}"
+	fi
 
 	## Update NPM applications.
 	if ! which npm > /dev/null
 		then
-			echo -e "${INFO}NPM is not installed on this system."
+			echo -e "${INFO}NPM is not installed on this system.${RC}"
 		else
 			SECONDS="0"
-			echo -e "${INFO}UpdatingNPM packages..."
+			echo -e "${INFO}UpdatingNPM packages:${RC}"
 			UPDATE_NPM 2>/dev/null
-			echo -e "${GOOD}NPM updated in ${SECONDS} seconds."
+			echo -e "${GOOD}NPM updated in ${SECONDS} seconds.${RC}"
 	fi
-		## Pull git repos.
+
+	## Pull git repos.
 	if ! which git > /dev/null
 		then
-			echo -e "${INFO}Git is not installed on this system."
+			echo -e "${INFO}Git is not installed on this system.${RC}"
 		else
 			SECONDS="0"
-			echo -e "${INFO}Updating Git repositories..."
+			echo -e "${INFO}Updating Git repositories:${RC}"
 			UPDATE_GIT 2>/dev/null
-			echo -e "${GOOD}Git repositories updated in ${SECONDS} seconds."
+			echo -e "${GOOD}Git repositories updated in ${SECONDS} seconds.${RC}"
 	fi
-		## Update the Linux kernel.
+
+	## Update the Linux kernel.
 	SECONDS="0"
-	echo -e "${INFO}Updating the Linux kernel..."
+	echo -e "${INFO}Updating the Linux kernel:${RC}"
 	## Check which driver Xorg use.
 	if [[ -f /etc/X11/xorg.conf ]]
 		then
 			grep "intel" /etc/X11/xorg.conf > /dev/null && FIRMWARE_TO_INSTALL="intel" || FIRMWARE_TO_INSTALL="other"
 			grep "amdgpu" /etc/X11/xorg.conf > /dev/null && FIRMWARE_TO_INSTALL="amd" || FIRMWARE_TO_INSTALL="other"
-		else
-		echo -e "${WARN}Your X server is not configured yet, run X -configure as root!."
 	fi
 
-	## Get the according firmware.
+	## Install the according firmware.
 	case ${FIRMWARE_TO_INSTALL} in
 		amd)
 			cd ${FIRMWARE_PATH} || exit 1
 			INSTALL_AMD_FIRMWARE
 			INSTALL_OTHER_FIRMWARE
 			cd || exit 1
-			echo -e "${INFO}Generating a new initramfs images..."
+			echo -e "${INFO}Generating a new initramfs images:${RC}"
 			update-initramfs -u
-			echo -e "${GOOD}Done!"
+			echo -e "${GOOD}Done!${RC}"
 			;;
 
 			intel)
@@ -231,30 +222,31 @@ RUN()
 			INSTALL_INTEL_FIRMWARE
 			INSTALL_OTHER_FIRMWARE
 			cd || exit 1
-			echo -e "${INFO}Generating a new initramfs images..."
+			echo -e "${INFO}Generating a new initramfs images:${RC}"
 			update-initramfs -u
-			echo -e "${GOOD}Done!"
+			echo -e "${GOOD}Done!${RC}"
 			;;
 
 			other)
 			cd ${FIRMWARE_PATH} || exit 1
 			INSTALL_OTHER_FIRMWARE
 			cd || exit 1
-			echo -e "${INFO}Generating a new initramfs images..."
+			echo -e "${INFO}Generating a new initramfs images:${RC}"
 			update-initramfs -u
-			echo -e "${GOOD}Done!"
+			echo -e "${GOOD}Done!${RC}"
 			;;
 	esac
-		echo -e "${GOOD}The Linux kernel has been updated in ${SECONDS} seconds."
+
+	echo -e "${GOOD}The Linux kernel has been updated in ${SECONDS} seconds.${RC}"
 
 }
 
 ## Check privileges and proceed.
 if [[ ${EUID} -ne 0 ]]
 	then
-		echo -e "${WARN}This script must be run as root!"
-	    exit 1
+		echo -e "${WARN}This script must be run as root!${RC}"
+		exit 1
 	else
 		reset
-		RUN && echo -e "${GOOD}Update finished!" || echo -e "${WARN}Something went wrong during update..."
+		MAIN && echo -e "${GOOD}Update finished.${RC}" || echo -e "${WARN}Something went wrong during update!${RC}"
 fi
