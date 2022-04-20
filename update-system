@@ -15,7 +15,7 @@ BLUE="\e[34m"
 MAGENTA="\e[35m"
 
 WARN="${RED}${BOLD} [-] ${RC}"
-INFO="${BLUE}${BOLD} [*] ${RC}"
+INFO="\n${BLUE}${BOLD} [*] ${RC}"
 GOOD="${GREEN}${BOLD} [+] ${RC}"
 
 UPDATE_APT()
@@ -145,11 +145,10 @@ INSTALL_OTHER_FIRMWARE()
 
 MAIN()
 {
-	echo -e "$(date '+ %T - %A %d %B %Y')"
-	SYSINFO
+	echo -e "\n$(date '+ %T - %A %d %B %Y')\n"
 
 	## Update apt packages.
-	if ! which apt-get > /dev/null
+	if ! which apt-get>/dev/null
 		then
 			echo -e "${INFO}The APT package manager is not installed on this system.${RC}"
 			exit 1
@@ -163,7 +162,7 @@ MAIN()
 	fi
 
 	## Update flatpak applications.
-	if ! which flatpak > /dev/null
+	if ! which flatpak>/dev/null
 		then
 			echo -e "${INFO}Flatpak is not installed on this system.${RC}"
 		else
@@ -174,7 +173,7 @@ MAIN()
 	fi
 
 	## Update NPM applications.
-	if ! which npm > /dev/null
+	if ! which npm>/dev/null
 		then
 			echo -e "${INFO}NPM is not installed on this system.${RC}"
 		else
@@ -185,7 +184,7 @@ MAIN()
 	fi
 
 	## Pull git repos.
-	if ! which git > /dev/null
+	if ! which git>/dev/null
 		then
 			echo -e "${INFO}Git is not installed on this system.${RC}"
 		else
@@ -201,8 +200,8 @@ MAIN()
 	## Check which driver Xorg use.
 	if [[ -f /etc/X11/xorg.conf ]]
 		then
-			grep "intel" /etc/X11/xorg.conf > /dev/null && FIRMWARE_TO_INSTALL="intel" || FIRMWARE_TO_INSTALL="other"
-			grep "amdgpu" /etc/X11/xorg.conf > /dev/null && FIRMWARE_TO_INSTALL="amd" || FIRMWARE_TO_INSTALL="other"
+			grep "intel" /etc/X11/xorg.conf>/dev/null && FIRMWARE_TO_INSTALL="intel" || FIRMWARE_TO_INSTALL="other"
+			grep "amdgpu" /etc/X11/xorg.conf>/dev/null && FIRMWARE_TO_INSTALL="amd" || FIRMWARE_TO_INSTALL="other"
 	fi
 
 	## Install the according firmware.
