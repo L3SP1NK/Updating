@@ -51,19 +51,21 @@ UPDATE_APT()
 
 UPDATE_NPM()
 {
+	echo -e "${INFO}Updating NPM packages:${RC}"
+	npm update
 	echo -e "${INFO}Checking NPM installation:${RC}"
 	npm doctor
 	echo -e "${INFO}Auditing packages:${RC}"
 	npm audit
-	echo -e "${INFO}Updating NPM packages:${RC}"
-	npm update
-	cat /root/.npm/_logs/*
+	echo -e "${INFO}Fixing packages:${RC}"
+	npm audit fix
 }
 
 UPDATE_FLATPAK()
 {
 	echo -e "${INFO}Flatpak applications installed:${RC}"
 	flatpak list
+	echo -e "${INFO}Checking flatpak applications:${RC}"
 	flatpak repair
 	echo -e "${INFO}Updating flatpak:${RC}"
 	flatpak update -y
@@ -86,62 +88,6 @@ UPDATE_GIT()
 			cd ${GIT_REPO_LOCATION} || exit 1
 		done
 }
-
-FIRMWARE_PATH="/opt/FIRMWARE"
-mkdir -p ${FIRMWARE_PATH} || exit 1
-
-INSTALL_INTEL_FIRMWARE()
-{
-	echo -e "${INFO}Your X server is configured to use the intel driver."
-	echo -e "${INFO}Installing the intel firmware packages${RC}:"
-	if apt-get -f -y install "firmware-intel*" intel-gpu-tools intel-microcode
-		then
-			echo "${GOOD}Firmware installed.${RC}"
-		else
-			echo "${WARN}Something went wrong during firmware installation!${RC}"
-	fi
-
-
-	echo -e "${INFO}Cloning the linux firmware repository${RC}:"
-	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" || exit 1
-	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware
-}
-
-INSTALL_AMD_FIRMWARE()
-{
-	echo -e "${INFO}Your X server is configured to use the amdgpu driver."
-	echo -e "${INFO}Installing the AMD firmware packages${RC}:"
-	if apt-get install -y firmware-amd-graphics radeontop
-		then
-			echo "${GOOD}Firmware installed.${RC}"
-		else
-			echo "${WARN}Something went wrong during firmware installation!${RC}"
-	fi
-
-	echo -e "${INFO}Cloning the linux firmware (+ the unofficial AMD) repositories${RC}:"
-	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" || exit 1
-	git clone "https://github.com/Umio-Yasuno/unofficial-amdgpu-firmware-repo.git" || exit 1
-	cp -vur ${FIRMWARE_PATH}/unofficial-amdgpu-firmware-repo/amdgpu/* /lib/firmware/amdgpu || exit 1
-	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware || exit 1
-
-}
-
-INSTALL_OTHER_FIRMWARE()
-{
-	echo -e "${INFO}Installing the linux firmware packages:${RC}"
-	if apt-get -f -y install firmware-linux firmware-linux-free firmware-linux-nonfree firmware-misc-nonfree firmware-misc-nonfree 2>/dev/null
-		then
-			echo "${GOOD}Firmware installed.${RC}"
-		else
-			echo "${WARN}Something went wrong during firmware installation!${RC}"
-	fi
-
-
-	echo -e "${INFO}Cloning the linux firmware repository:${RC}"
-	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" || exit 1
-	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware || exit 1
-}
-
 
 MAIN()
 {
@@ -193,51 +139,6 @@ MAIN()
 			UPDATE_GIT 2>/dev/null
 			echo -e "${GOOD}Git repositories updated in ${SECONDS} seconds.${RC}"
 	fi
-
-	## Update the Linux kernel.
-	SECONDS="0"
-	echo -e "${INFO}Updating the Linux kernel:${RC}"
-	## Check which driver Xorg use.
-	if [[ -f /etc/X11/xorg.conf ]]
-		then
-			grep "intel" /etc/X11/xorg.conf>/dev/null && FIRMWARE_TO_INSTALL="intel" || FIRMWARE_TO_INSTALL="other"
-			grep "amdgpu" /etc/X11/xorg.conf>/dev/null && FIRMWARE_TO_INSTALL="amd" || FIRMWARE_TO_INSTALL="other"
-	fi
-
-	## Install the according firmware.
-	case ${FIRMWARE_TO_INSTALL} in
-		amd)
-			cd ${FIRMWARE_PATH} || exit 1
-			INSTALL_AMD_FIRMWARE
-			INSTALL_OTHER_FIRMWARE
-			cd || exit 1
-			echo -e "${INFO}Generating a new initramfs images:${RC}"
-			update-initramfs -u
-			echo -e "${GOOD}Done!${RC}"
-			;;
-
-			intel)
-			cd ${FIRMWARE_PATH} || exit 1
-			INSTALL_INTEL_FIRMWARE
-			INSTALL_OTHER_FIRMWARE
-			cd || exit 1
-			echo -e "${INFO}Generating a new initramfs images:${RC}"
-			update-initramfs -u
-			echo -e "${GOOD}Done!${RC}"
-			;;
-
-			other)
-			cd ${FIRMWARE_PATH} || exit 1
-			INSTALL_OTHER_FIRMWARE
-			cd || exit 1
-			echo -e "${INFO}Generating a new initramfs images:${RC}"
-			update-initramfs -u
-			echo -e "${GOOD}Done!${RC}"
-			;;
-	esac
-
-	echo -e "${GOOD}The Linux kernel has been updated in ${SECONDS} seconds.${RC}"
-
 }
 
 ## Check privileges and proceed.
