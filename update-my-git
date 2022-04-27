@@ -57,9 +57,6 @@ MAKE_LINK()
 	ln -svf /opt/My-Repo/Configs/gtk.css ${USER_HOME}/.config/gtk-2.0/
 	ln -svf /opt/My-Repo/Configs/gtk.css ${USER_HOME}/.config/gtk-3.0/
 
-	## Tilix themes.
-	ln -svf /opt/My-Repo/Configs/Pure.json ${USER_HOME}/.config/tilix/schemes/Pure.json
-
 	## Link scripts.
 	[[ -d /opt/My-Repo/Updating/ ]] && ln -svf /opt/My-Repo/Updating/* /usr/local/bin
 	[[ -d /opt/My-Repo/Passwords/ ]] && ln -svf /opt/My-Repo/Passwords/* /usr/local/bin
