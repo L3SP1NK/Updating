@@ -10,12 +10,10 @@ RC="\e[0m"
 BOLD="\e[1m"
 GREEN="\e[32m"
 RED="\e[31m"
-CYAN="\e[36m"
 BLUE="\e[34m"
-MAGENTA="\e[35m"
 
 WARN="${RED}${BOLD} [-] ${RC}"
-INFO="\n${BLUE}${BOLD} [*] ${RC}"
+INFO="${BLUE}${BOLD} [*] ${RC}"
 GOOD="${GREEN}${BOLD} [+] ${RC}"
 
 UPDATE_APT()
@@ -25,10 +23,10 @@ UPDATE_APT()
 	dpkg --configure -a
 
 	echo -e "${INFO}Removing downloaded archive files and unused packages${RC}:"
-	apt-get -f -y clean
-	apt-get -f -y autoclean
-	apt-get -f -y autoremove --purge
-	apt-get -f -y purge --autoremove
+	apt-get -y clean
+	apt-get -y autoclean
+	apt-get -y autoremove --purge
+	apt-get -y purge --autoremove
 
 	echo -e "${INFO}Retrieving new lists of packages${RC}:"
 	apt-get update
@@ -43,9 +41,9 @@ UPDATE_APT()
 	dpkg --configure -a
 
 	echo -e "${INFO}Removing downloaded archive files and unused packages:${RC}"
-	apt-get -f -y clean
-	apt-get -f -y autoclean
-	apt-get -f -y autoremove --purge
+	apt-get -y clean
+	apt-get -y autoclean
+	apt-get -y autoremove --purge
 }
 
 UPDATE_NPM()
@@ -107,55 +105,85 @@ MAIN()
 	## Update apt packages.
 	if ! which apt-get>/dev/null
 		then
-			echo -e "${INFO}The APT package manager is not installed on this system.${RC}"
+			echo -e "${WARN}The APT package manager is not installed on this system.${RC}"
 			exit 1
 		else
 			SECONDS="0"
 			PKG_NUM=$(dpkg-query -W | wc -l)
-			echo -e "${INFO}${PKG_NUM} Packages currently installed.${RC}"
+			echo -e "${GOOD}${PKG_NUM} Packages currently installed.${RC}"
 			echo -e "${INFO}Updating APT packages:${RC}"
 			UPDATE_APT
-			echo -e "${GOOD}APT packages updated in ${SECONDS} seconds.${RC}"
+			if [[ ${?} -eq "0" ]]
+				then
+					echo -e "${GOOD}APT packages updated in ${SECONDS} seconds.${RC}"
+				else
+					echo -e "${RED}Something went wrong!.${RC}"
+					exit 1
+			fi
 	fi
 
 	## Update flatpak applications.
 	if ! which flatpak>/dev/null
 		then
-			echo -e "${INFO}Flatpak is not installed on this system.${RC}"
+			echo -e "${WARN}Flatpak is not installed on this system.${RC}"
 		else
 			SECONDS="0"
-			echo -e "${INFO}You are using $(flatpak --version).${RC}"
+			echo -e "${GOOD}You are using $(flatpak --version).${RC}"
 			UPDATE_FLATPAK
-			echo -e "${GOOD}Flatpak updated in ${SECONDS} seconds.${RC}"
+			if [[ ${?} -eq "0" ]]
+				then
+					echo -e "${GOOD}Flatpak updated in ${SECONDS} seconds.${RC}"
+				else
+					echo -e "${RED}Something went wrong!.${RC}"
+					exit 1
+			fi
 	fi
 
 	## Update NPM applications.
 	if ! which npm>/dev/null
 		then
-			echo -e "${INFO}NPM is not installed on this system.${RC}"
+			echo -e "${WARN}NPM is not installed on this system.${RC}"
 		else
 			SECONDS="0"
 			echo -e "${INFO}UpdatingNPM packages:${RC}"
 			UPDATE_NPM
-			echo -e "${GOOD}NPM updated in ${SECONDS} seconds.${RC}"
+			if [[ ${?} -eq "0" ]]
+				then
+					echo -e "${GOOD}NPM updated in ${SECONDS} seconds.${RC}"
+				else
+					echo -e "${RED}Something went wrong!.${RC}"
+					exit 1
+			fi
 	fi
 
 	## Pull git repos.
 	if ! which git>/dev/null
 		then
-			echo -e "${INFO}Git is not installed on this system.${RC}"
+			echo -e "${WARN}Git is not installed on this system.${RC}"
 		else
 			SECONDS="0"
 			echo -e "${INFO}Updating Git repositories:${RC}"
 			UPDATE_GIT
-			echo -e "${GOOD}Git repositories updated in ${SECONDS} seconds.${RC}"
+			if [[ ${?} -eq "0" ]]
+				then
+					echo -e "${GOOD}Git repositories updated in ${SECONDS} seconds.${RC}"
+				else
+					echo -e "${RED}Something went wrong!.${RC}"
+					exit 1
+			fi
 	fi
 
 	## Update the linux kernel.
 	SECONDS="0"
 	echo -e "${INFO}Updating the linux kernel:${RC}"
 	UPDATE_KERNEL
-	echo -e "${GOOD}Linux kernel updated in ${SECONDS} seconds.${RC}"
+	if [[ ${?} -eq "0" ]]
+		then
+			echo -e "${GOOD}Linux kernel updated in ${SECONDS} seconds.${RC}"
+		else
+			echo -e "${RED}Something went wrong!.${RC}"
+			exit 1
+	fi
 }
 
 ## Check privileges and proceed.
