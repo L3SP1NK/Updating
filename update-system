@@ -46,7 +46,6 @@ UPDATE_APT()
 	apt-get -f -y clean
 	apt-get -f -y autoclean
 	apt-get -f -y autoremove --purge
-
 }
 
 UPDATE_NPM()
@@ -55,9 +54,9 @@ UPDATE_NPM()
 	npm update
 	echo -e "${INFO}Checking NPM installation:${RC}"
 	npm doctor
-	echo -e "${INFO}Auditing packages:${RC}"
+	echo -e "${INFO}Auditing NPM packages:${RC}"
 	npm audit
-	echo -e "${INFO}Fixing packages:${RC}"
+	echo -e "${INFO}Fixing NPM packages:${RC}"
 	npm audit fix
 }
 
@@ -89,6 +88,18 @@ UPDATE_GIT()
 		done
 }
 
+UPDATE_KERNEL()
+{
+	FIRMWARE_PKGS="firmware-linux firmware-linux-free firmware-linux-nonfree firmware-amd-graphics firmware-ast firmware-ath9k-htc firmware-atheros firmware-cavium firmware-intel-sound firmware-intelwimax firmware-ipw2x00 firmware-ivtv firmware-iwlwifi firmware-linux firmware-linux-free firmware-linux-nonfree firmware-misc-nonfree firmware-mod-kit firmware-mod-kit-dbgsym firmware-qcom-media firmware-qcom-soc firmware-realtek firmware-samsung firmware-ti-connectivity"
+	apt-get -f -y install ${FIRMWARE_PKGS}
+
+	FIRMWARE_PATH="/opt/FIRMWARE/"
+	mkdir -p ${FIRMWARE_PATH}
+	cd ${FIRMWARE_PATH} || exit 1
+	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" --depth=8 || exit 1
+	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware/ || exit 1
+}
+
 MAIN()
 {
 	echo -e "\n$(date '+ %T - %A %d %B %Y')\n"
@@ -103,7 +114,7 @@ MAIN()
 			PKG_NUM=$(dpkg-query -W | wc -l)
 			echo -e "${INFO}${PKG_NUM} Packages currently installed.${RC}"
 			echo -e "${INFO}Updating APT packages:${RC}"
-			UPDATE_APT 2>/dev/null
+			UPDATE_APT
 			echo -e "${GOOD}APT packages updated in ${SECONDS} seconds.${RC}"
 	fi
 
@@ -114,7 +125,7 @@ MAIN()
 		else
 			SECONDS="0"
 			echo -e "${INFO}You are using $(flatpak --version).${RC}"
-			UPDATE_FLATPAK 2>/dev/null
+			UPDATE_FLATPAK
 			echo -e "${GOOD}Flatpak updated in ${SECONDS} seconds.${RC}"
 	fi
 
@@ -125,7 +136,7 @@ MAIN()
 		else
 			SECONDS="0"
 			echo -e "${INFO}UpdatingNPM packages:${RC}"
-			UPDATE_NPM 2>/dev/null
+			UPDATE_NPM
 			echo -e "${GOOD}NPM updated in ${SECONDS} seconds.${RC}"
 	fi
 
@@ -136,9 +147,15 @@ MAIN()
 		else
 			SECONDS="0"
 			echo -e "${INFO}Updating Git repositories:${RC}"
-			UPDATE_GIT 2>/dev/null
+			UPDATE_GIT
 			echo -e "${GOOD}Git repositories updated in ${SECONDS} seconds.${RC}"
 	fi
+
+	## Update the linux kernel.
+	SECONDS="0"
+	echo -e "${INFO}Updating the linux kernel:${RC}"
+	UPDATE_KERNEL
+	echo -e "${GOOD}Linux kernel updated in ${SECONDS} seconds.${RC}"
 }
 
 ## Check privileges and proceed.
