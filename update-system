@@ -94,8 +94,12 @@ UPDATE_KERNEL()
 	FIRMWARE_PATH="/opt/FIRMWARE/"
 	mkdir -p ${FIRMWARE_PATH}
 	cd ${FIRMWARE_PATH} || exit 1
-	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" --depth=8 || exit 1
+	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" --depth=8 2>/dev/null
 	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware/ || exit 1
+	if ! update-initramfs -u
+	then
+		echo "${WARN}update-initramfs not found!${RC}"
+	fi
 }
 
 MAIN()
@@ -105,7 +109,7 @@ MAIN()
 	## Update apt packages.
 	if ! which apt-get>/dev/null
 		then
-			echo -e "${WARN}The APT package manager is not installed on this system.${RC}"
+			echo -e "${WARN}The APT package manager is not installed on this system!${RC}"
 			exit 1
 		else
 			SECONDS="0"
@@ -117,7 +121,7 @@ MAIN()
 				then
 					echo -e "${GOOD}APT packages updated in ${SECONDS} seconds.${RC}"
 				else
-					echo -e "${RED}Something went wrong!.${RC}"
+					echo -e "${RED}Something went wrong!${RC}"
 					exit 1
 			fi
 	fi
@@ -125,7 +129,7 @@ MAIN()
 	## Update flatpak applications.
 	if ! which flatpak>/dev/null
 		then
-			echo -e "${WARN}Flatpak is not installed on this system.${RC}"
+			echo -e "${WARN}Flatpak is not installed on this system!${RC}"
 		else
 			SECONDS="0"
 			echo -e "${GOOD}You are using $(flatpak --version).${RC}"
@@ -134,7 +138,7 @@ MAIN()
 				then
 					echo -e "${GOOD}Flatpak updated in ${SECONDS} seconds.${RC}"
 				else
-					echo -e "${RED}Something went wrong!.${RC}"
+					echo -e "${RED}Something went wrong!${RC}"
 					exit 1
 			fi
 	fi
@@ -142,7 +146,7 @@ MAIN()
 	## Update NPM applications.
 	if ! which npm>/dev/null
 		then
-			echo -e "${WARN}NPM is not installed on this system.${RC}"
+			echo -e "${WARN}NPM is not installed on this system!${RC}"
 		else
 			SECONDS="0"
 			echo -e "${INFO}UpdatingNPM packages:${RC}"
@@ -151,7 +155,7 @@ MAIN()
 				then
 					echo -e "${GOOD}NPM updated in ${SECONDS} seconds.${RC}"
 				else
-					echo -e "${RED}Something went wrong!.${RC}"
+					echo -e "${RED}Something went wrong!${RC}"
 					exit 1
 			fi
 	fi
@@ -159,7 +163,7 @@ MAIN()
 	## Pull git repos.
 	if ! which git>/dev/null
 		then
-			echo -e "${WARN}Git is not installed on this system.${RC}"
+			echo -e "${WARN}Git is not installed on this system!${RC}"
 		else
 			SECONDS="0"
 			echo -e "${INFO}Updating Git repositories:${RC}"
@@ -168,7 +172,7 @@ MAIN()
 				then
 					echo -e "${GOOD}Git repositories updated in ${SECONDS} seconds.${RC}"
 				else
-					echo -e "${RED}Something went wrong!.${RC}"
+					echo -e "${RED}Something went wrong!${RC}"
 					exit 1
 			fi
 	fi
@@ -181,7 +185,7 @@ MAIN()
 		then
 			echo -e "${GOOD}Linux kernel updated in ${SECONDS} seconds.${RC}"
 		else
-			echo -e "${RED}Something went wrong!.${RC}"
+			echo -e "${RED}Something went wrong!${RC}"
 			exit 1
 	fi
 }
