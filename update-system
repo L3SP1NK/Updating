@@ -95,7 +95,7 @@ UPDATE_KERNEL()
 	mkdir -p ${FIRMWARE_PATH}
 	cd ${FIRMWARE_PATH} || exit 1
 	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" --depth=8 2>/dev/null
-	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware/ || exit 1
+	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware/
 	if ! update-initramfs -u
 	then
 		echo "${WARN}update-initramfs not found!${RC}"
