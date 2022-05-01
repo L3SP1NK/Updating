@@ -4,25 +4,21 @@
 ## Set colors.
 RC="\e[0m"
 BOLD="\e[1m"
-GREEN="\e[32m"
+green="\e[32m"
 RED="\e[31m"
 BLUE="\e[34m"
 
-WARN="${RED}${BOLD} [-] ${RC}"
-INFO="${BLUE}${BOLD} [*] ${RC}"
-GOOD="${GREEN}${BOLD} [+] ${RC}"
-
 CWD=$(pwd)
 USER_HOME="/home/lespink"
-REPOS_LOCATION="/opt/My-Repo/"
+REPOS_DIR="/opt/mygit"
 
-UPDATE_GIT()
+updateGit()
 {
 	## Search for GIT repos.
-	for GIT_PATH in $(find ${REPOS_LOCATION} -type d -name ".git" 2>/dev/null)
+	for GIT_PATH in $(find ${REPOS_DIR}/ -type d -name ".git" 2>/dev/null)
 		do
 			cd ${GIT_PATH} || exit 1
-			echo -e "\n${INFO}${GIT_PATH}${RC}"
+			echo -e "\n${BLUE}${GIT_PATH}${RC}"
 			cd ..
 			## Pull change:
 			git pull ## Will return error if changes have been made.
@@ -37,57 +33,52 @@ UPDATE_GIT()
 			git push -v
 			## Pull change:
 			git pull
-			echo -e "${GOOD} ${GIT_PATH} Updated.${RC}"
+			echo -e "${green}${GIT_PATH}Updated.${RC}"
 			cd ${CWD}
 	done
 }
 
-MAKE_LINK()
+makeLink()
 {
-	cd ${REPOS_LOCATION}
+	cd ${REPOS_DIR}/
 	## Dot-files.
-	ln -svf /opt/My-Repo/Configs/dot-files/.* ${USER_HOME} 2>/dev/null
-	ln -svf /opt/My-Repo/Configs/dot-files/.* ${HOME} 2>/dev/null
+	ln -svf ${REPOS_DIR}/Configs/dot-files/.* ${USER_HOME} 2>/dev/null
+	ln -svf ${REPOS_DIR}/Configs/dot-files/.* ${HOME} 2>/dev/null
 
 	## Rofi config
-	[[ -f /opt/My-Repo/Configs/rofi/config.rasi ]] && ln -svf /opt/My-Repo/Configs/rofi/config.rasi ${USER_HOME}/.config/rofi/
+	[[ -f ${REPOS_DIR}/Configs/rofi/config.rasi ]] && ln -svf ${REPOS_DIR}/Configs/rofi/config.rasi ${USER_HOME}/.config/rofi/
 
 	## Custom GTK CSS.
-	[[ -f /opt/My-Repo/Configs/gtk.css ]] && ln -svf /opt/My-Repo/Configs/gtk.css ${USER_HOME}/.config/gtk-.0/
+	[[ -f ${REPOS_DIR}/Configs/gtk.css ]] && ln -svf ${REPOS_DIR}/Configs/gtk.css ${USER_HOME}/.config/gtk-3.0/
 
 	## Link scripts.
-	[[ -d /opt/My-Repo/Updating/ ]] && ln -svf /opt/My-Repo/Updating/* /usr/local/bin
-	[[ -d /opt/My-Repo/Passwords/ ]] && ln -svf /opt/My-Repo/Passwords/* /usr/local/bin
-	[[ -d /opt/My-Repo/Utilities/ ]] && ln -svf /opt/My-Repo/Utilities/* /usr/local/bin
-	[[ -d /opt/My-Repo/Telebash/ ]] && ln -svf /opt/My-Repo/Telebash/* /usr/local/bin
-	[[ -d /opt/My-Repo/Crypto/ ]] && ln -svf /opt/My-Repo/Crypto/* /usr/local/bin
+	[[ -d ${REPOS_DIR}/Updating/ ]] && ln -svf ${REPOS_DIR}/Updating/* /usr/local/bin
+	[[ -d ${REPOS_DIR}/Utilities/ ]] && ln -svf ${REPOS_DIR}/Utilities/* /usr/local/bin
+	[[ -d ${REPOS_DIR}/Telebash/ ]] && ln -svf ${REPOS_DIR}/Telebash/* /usr/local/bin
+	[[ -d ${REPOS_DIR}/Crypto/ ]] && ln -svf ${REPOS_DIR}/Crypto/* /usr/local/bin
 }
 
+checkEnv()
+{
+	if ! which git>/dev/null
+		then
+			echo "${RED}Git is not installed on this system!${RC}"
+			exit 1
+	fi
 
-REQUIREMENTS="git"
-if ! which ${REQUIREMENTS} > /dev/null
-	then
- 		echo -e "${WARN}To run this program, you need the following packages installed: ${REQUIREMENTS}\n${WARN}Exiting..."
-		exit 1
-fi
+	if [[ ${EUID} -ne "0" ]]
+		then
+			echo -e "${RED}Run me as root!${RC}"
+			exit 1
+	fi
 
-if [[ ${EUID} -ne "0" ]]
-			then
-				echo -e "${WARN}This script must be run as root!\n${WARN}Exiting..."
-				exit 1
-fi
+	if [[ ! -f ${HOME}/.git-credentials ]]
+		then
+			echo -e "${RED}Git credentials not found!${RC}"
+			exit 1
+	fi
+}
 
-if [[ ! -f ${USER_HOME}/.git-credentials ]]
-	then
-		echo -e "${WARN}Git credentials not found!\n${WARN}Exiting..."
-		exit 1
-fi
-
-UPDATE_GIT
-MAKE_LINK
-if [[ ${1} -eq "0" ]]
-	then
-		echo -e "\n${GOOD}Symbolics links has been made.${RC}"
-	else
-		echo -e "${WARN}Something went wrong!${RC}"
-fi
+checkEnv
+updateGit 1>/dev/null
+makeLink 1>/dev/null
