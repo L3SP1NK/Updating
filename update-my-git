@@ -81,4 +81,11 @@ checkEnv()
 
 checkEnv
 updateGit
-makeLink
+makeLink 1>/dev/null
+if [[ ${?} -eq "0" ]]
+	then
+		echo -e "${GREEN}→ Symbolic links have been made successfully${RC}"
+	else
+		echo -e "${RED}→ Something went wrong during symbolic link creation!${RC}"
+		exit 1
+fi
