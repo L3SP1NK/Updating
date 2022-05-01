@@ -2,11 +2,11 @@
 ## Update my git repository.
 
 ## Set colors.
-RC="\e[0m"
+RC="\e[1m\e[0m"
 BOLD="\e[1m"
-green="\e[32m"
-RED="\e[31m"
-BLUE="\e[34m"
+green="\e[1m\e[32m"
+RED="\e[1m\e[31m"
+BLUE="\e[1m\e[34m"
 
 CWD=$(pwd)
 USER_HOME="/home/lespink"
@@ -17,24 +17,24 @@ updateGit()
 	## Search for GIT repos.
 	for GIT_PATH in $(find ${REPOS_DIR}/ -type d -name ".git" 2>/dev/null)
 		do
+			CURRENT_GIT="$(echo ${GIT_PATH}|cut -d '/' -f 4 )"
 			cd ${GIT_PATH} || exit 1
-			echo -e "\n${BLUE}${GIT_PATH}${RC}"
 			cd ..
+			echo -e "\n${BLUE}→ ${CURRENT_GIT}${RC}"
 			## Pull change:
 			git pull ## Will return error if changes have been made.
 			## Config:
 			git config pull.rebase true
 			git config --global --add safe.directory ${GIT_PATH} ## Add exceptions for use with multiple github accounts.
 			## Add files to the repo:
-			git add -v .*
-			git add -v *
-			## Commit change:
+			git add -v .* 2>/dev/null ## Dismiss error due to ".."
+			git add -v * 2>/dev/null ## Dismiss error due to ".."
+			## Commit change:s
 			git commit -a
 			git push -v
 			## Pull change:
 			git pull
-			echo -e "${green}${GIT_PATH}Updated.${RC}"
-			cd ${CWD}
+			echo -e "${green}→ ${CURRENT_GIT} Updated.${RC}"
 	done
 }
 
@@ -62,23 +62,23 @@ checkEnv()
 {
 	if ! which git>/dev/null
 		then
-			echo "${RED}Git is not installed on this system!${RC}"
+			echo "${RED}→ Git is not installed on this system!${RC}"
 			exit 1
 	fi
 
 	if [[ ${EUID} -ne "0" ]]
 		then
-			echo -e "${RED}Run me as root!${RC}"
+			echo -e "${RED}→ Run me as root!${RC}"
 			exit 1
 	fi
 
 	if [[ ! -f ${HOME}/.git-credentials ]]
 		then
-			echo -e "${RED}Git credentials not found!${RC}"
+			echo -e "${RED}→ Git credentials not found!${RC}"
 			exit 1
 	fi
 }
 
 checkEnv
-updateGit 1>/dev/null
-makeLink 1>/dev/null
+updateGit
+makeLink
