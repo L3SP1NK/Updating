@@ -1,2 +1,2 @@
 ## Updating
-⚠️ THESE SCRIPTS ARE PERSONAL AND FREQUENTLY UPDATED/BROKEN⚠️
+Script to update/backup your system.
