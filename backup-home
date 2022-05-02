@@ -1,5 +1,8 @@
 #!/bin/bash
 ## Backup /home with zip.
+RED="\e[31m"
+GREEN="\e[32m"
+YELLOW="\e[33m"
 
 TO_BACKUP="/home/${USER}"
 BACKUP_DIR="/backup"
@@ -7,19 +10,19 @@ BACKUP_FILE="${BACKUP_DIR}/home-${USER}-${HOSTNAME}.zip"
 
 if [[ ${EUID} -eq "0" ]]
 	then
-		echo "Run me as simple user!"
+		echo -e "${RED}× Run me as simple user!"
 		exit 1
 fi
 
 if ! which zip > /dev/null
 	then
-		echo "Zip is not installed!"
+		echo -e "${RED}× Zip is not installed!"
 		exit 1
 fi
 
 if [[ ! -d ${TO_BACKUP} ]]
 	then
-		echo "The folder to backup dosen't exist!"
+		echo -e "${RED}× The folder to backup dosen't exist!"
 		exit 1
 fi
 
@@ -27,11 +30,11 @@ mkdir -p ${BACKUP_DIR}
 
 if [[ -f ${BACKUP_FILE} ]]
 	then
-		echo "Updating backup..."
+		echo -e "${YELLOW}→ Updating backup..."
 		zip -9 -dury ${BACKUP_FILE} ${TO_BACKUP}
-		[[ ${?} -eq "0" ]] && echo "Done." || echo "Something went wrong!"
+		[[ ${?} -eq "0" ]] && echo -e "${GREEN}ø Done." || echo -e "${RED}× Something went wrong!"
 	else
-		echo "Creating backup..."
+		echo -e "${YELLOW}→ Creating backup..."
 		zip -9 -rv ${BACKUP_FILE} ${TO_BACKUP}
-		[[ ${?} -eq "0" ]] && echo "Done." || echo "Something went wrong!"
+		[[ ${?} -eq "0" ]] && echo -e "${GREEN}ø Done." || echo -e "${RED}× Something went wrong!"
 fi

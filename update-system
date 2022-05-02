@@ -7,77 +7,78 @@
 ## - the linux firmware and kernel
 
 RC="\e[0m"
+UL="\e[4m"
 BOLD="\e[1m"
-GREEN="\e[32m"
-RED="\e[31m"
-BLUE="\e[34m"
+GREEN="\e[1m\e[32m"
+RED="\e[1m\e[31m"
+YELLOW="\e[33m"
+GREY="\e[37m"
 
-WARN="${RED}${BOLD} [-] ${RC}"
-INFO="${BLUE}${BOLD} [*] ${RC}"
-GOOD="${GREEN}${BOLD} [+] ${RC}"
 
-UPDATE_APT()
+updateApt()
 {
-	echo -e "${INFO}Configuring/fixing possibly broken packages${RC}:"
+	echo -e " ${RC}${YELLOW}→ Configuring/fixing possibly broken packages:${RC}${GREY}"
 	apt-get -f -y install
 	dpkg --configure -a
 
-	echo -e "${INFO}Removing downloaded archive files and unused packages${RC}:"
+	echo -e " ${RC}${YELLOW}→ Removing downloaded archive files and unused packages:${RC}${GREY}"
 	apt-get -y clean
 	apt-get -y autoclean
 	apt-get -y autoremove --purge
 	apt-get -y purge --autoremove
 
-	echo -e "${INFO}Retrieving new lists of packages${RC}:"
+	echo -e " ${RC}${YELLOW}→ Retrieving new lists of packages:${RC}${GREY}"
 	apt-get update
 
-	echo -e "${INFO}Installing packages upgrades${RC}:"
+	echo -e " ${RC}${YELLOW}→ Installing packages upgrades:${RC}${GREY}"
 	apt-get -f -y upgrade
 	apt-get -f -y dist-upgrade
 	apt-get -f -y full-upgrade
 
-	echo -e "${INFO}Configuring/fixing possibly broken packages${RC}:"
+	echo -e " ${RC}${YELLOW}→ Configuring/fixing possibly broken packages:${RC}${GREY}"
 	apt-get -f -y install
 	dpkg --configure -a
 
-	echo -e "${INFO}Removing downloaded archive files and unused packages:${RC}"
+	echo -e " ${RC}${YELLOW}→ Removing downloaded archive files and unused packages:${RC}${GREY}"
 	apt-get -y clean
 	apt-get -y autoclean
 	apt-get -y autoremove --purge
 }
 
-UPDATE_NPM()
+updateNpm()
 {
-	echo -e "${INFO}Updating NPM packages:${RC}"
+	echo -e " ${RC}${YELLOW}→ Updating NPM packages:${RC}${GREY}"
 	npm update
-	echo -e "${INFO}Checking NPM installation:${RC}"
+	echo -e " ${RC}${YELLOW}→ Checking NPM installation:${RC}${GREY}"
 	npm doctor
-	echo -e "${INFO}Auditing NPM packages:${RC}"
+	echo -e " ${RC}${YELLOW}→ Auditing NPM packages:${RC}${GREY}"
 	npm audit
-	echo -e "${INFO}Fixing NPM packages:${RC}"
+	echo -e " ${RC}${YELLOW}→ Fixing NPM packages:${RC}${GREY}"
 	npm audit fix
 }
 
-UPDATE_FLATPAK()
+updateFlatpak()
 {
-	echo -e "${INFO}Flatpak applications installed:${RC}"
+	echo -e " ${RC}${YELLOW}→ Flatpak applications installed:${RC}${GREY}"
 	flatpak list
-	echo -e "${INFO}Checking flatpak applications:${RC}"
+	echo -e " ${RC}${YELLOW}→ Checking flatpak applications:${RC}${GREY}"
 	flatpak repair
-	echo -e "${INFO}Updating flatpak:${RC}"
+	echo -e " ${RC}${YELLOW}→ Updating flatpak:${RC}${GREY}"
 	flatpak update -y
 }
 
-UPDATE_GIT()
+updateGit()
 {
 	GIT_REPO_LOCATION="/"
 	cd ${GIT_REPO_LOCATION} || exit 1
 	## Search for GIT repos and update them.
 	## (Need to find a better way to exclude /mnt)
-	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null | grep -v /mnt/)
+#	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null | grep -v /mnt/)
+	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -path "/mnt" -prune -type d -name ".git" 2>/dev/null)
 		do
+			CURRENT_GIT="$(echo ${GIT_PATH}|cut -d '/' -f 4 )"
 			cd "${GIT_PATH}" || exit 1
-			echo -e "${INFO}Updating ${GIT_PATH}:"
+			echo -e " ${RC}${YELLOW}→ Updating ${CURRENT_GIT}:"
 			cd .. || exit 1
 			git config pull.rebase true
 			git stash
@@ -86,42 +87,40 @@ UPDATE_GIT()
 		done
 }
 
-UPDATE_KERNEL()
+updateKernel()
 {
+	FIRMWARE_PATH="/opt/FIRMWARE/"
 	FIRMWARE_PKGS="firmware-linux firmware-linux-free firmware-linux-nonfree firmware-amd-graphics firmware-ast firmware-ath9k-htc firmware-atheros firmware-cavium firmware-intel-sound firmware-intelwimax firmware-ipw2x00 firmware-ivtv firmware-iwlwifi firmware-linux firmware-linux-free firmware-linux-nonfree firmware-misc-nonfree firmware-mod-kit firmware-mod-kit-dbgsym firmware-qcom-media firmware-qcom-soc firmware-realtek firmware-samsung firmware-ti-connectivity"
 	apt-get -f -y install ${FIRMWARE_PKGS}
 
-	FIRMWARE_PATH="/opt/FIRMWARE/"
 	mkdir -p ${FIRMWARE_PATH}
 	cd ${FIRMWARE_PATH} || exit 1
 	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" --depth=8 2>/dev/null
 	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware/
 	if ! update-initramfs -u
-	then
-		echo "${WARN}update-initramfs not found!${RC}"
+		then
+			echo -e " ${RED}× update-initramfs not found!${RC}\n"
 	fi
 }
 
-MAIN()
-{
-	echo -e "\n$(date '+ %T - %A %d %B %Y')\n"
 
+main()
+{
 	## Update apt packages.
 	if ! which apt-get>/dev/null
 		then
-			echo -e "${WARN}The APT package manager is not installed on this system!${RC}"
-			exit 1
+			echo -e " ${RED}× The APT package manager is not installed on this system!${RC}\n"
 		else
 			SECONDS="0"
 			PKG_NUM=$(dpkg-query -W | wc -l)
-			echo -e "${GOOD}${PKG_NUM} Packages currently installed.${RC}"
-			echo -e "${INFO}Updating APT packages:${RC}"
-			UPDATE_APT
+			echo -e "\n ${RC}${GREEN}ø ${PKG_NUM} APT Packages currently installed.${RC}"
+			echo -e " ${RC}${UL}${YELLOW}→ Updating APT packages:${RC}${GREY}"
+			updateApt
 			if [[ ${?} -eq "0" ]]
 				then
-					echo -e "${GOOD}APT packages updated in ${SECONDS} seconds.${RC}"
+					echo -e " ${RC}${GREEN}ø APT packages updated in ${SECONDS} seconds.${RC}"
 				else
-					echo -e "${RED}Something went wrong!${RC}"
+					echo -e " ${RED}× Something went wrong!${RC}\n"
 					exit 1
 			fi
 	fi
@@ -129,16 +128,17 @@ MAIN()
 	## Update flatpak applications.
 	if ! which flatpak>/dev/null
 		then
-			echo -e "${WARN}Flatpak is not installed on this system!${RC}"
+			echo -e " ${RED}× Flatpak is not installed on this system!${RC}\n"
 		else
 			SECONDS="0"
-			echo -e "${GOOD}You are using $(flatpak --version).${RC}"
-			UPDATE_FLATPAK
+			echo -e "\n ${RC}${GREEN}ø You are using $(flatpak --version).${RC}"
+			echo -e " ${RC}${UL}${YELLOW}→ Updating Flatpak.${RC}"
+			updateFlatpak
 			if [[ ${?} -eq "0" ]]
 				then
-					echo -e "${GOOD}Flatpak updated in ${SECONDS} seconds.${RC}"
+					echo -e " ${RC}${GREEN}ø Flatpak updated in ${SECONDS} seconds.${RC}"
 				else
-					echo -e "${RED}Something went wrong!${RC}"
+					echo -e " ${RED}× Something went wrong!${RC}\n"
 					exit 1
 			fi
 	fi
@@ -146,16 +146,17 @@ MAIN()
 	## Update NPM applications.
 	if ! which npm>/dev/null
 		then
-			echo -e "${WARN}NPM is not installed on this system!${RC}"
+			echo -e " ${RED}× NPM is not installed on this system!${RC}\n"
 		else
 			SECONDS="0"
-			echo -e "${INFO}UpdatingNPM packages:${RC}"
-			UPDATE_NPM
+			## echo You are using $(npm -V)
+			echo -e "\n ${RC}${UL}${YELLOW}→ Updating NPM packages:${RC}${GREY}"
+			updateNpm
 			if [[ ${?} -eq "0" ]]
 				then
-					echo -e "${GOOD}NPM updated in ${SECONDS} seconds.${RC}"
+					echo -e " ${RC}${GREEN}ø NPM updated in ${SECONDS} seconds.${RC}"
 				else
-					echo -e "${RED}Something went wrong!${RC}"
+					echo -e " ${RED}× Something went wrong!${RC}\n"
 					exit 1
 			fi
 	fi
@@ -163,39 +164,42 @@ MAIN()
 	## Pull git repos.
 	if ! which git>/dev/null
 		then
-			echo -e "${WARN}Git is not installed on this system!${RC}"
+			echo -e " ${RED}× Git is not installed on this system!${RC}\n"
 		else
 			SECONDS="0"
-			echo -e "${INFO}Updating Git repositories:${RC}"
-			UPDATE_GIT 2>/dev/null
+			echo -e "\n ${RC}${GREEN}ø You are using $(git --version)${RC}"
+			echo -e " ${RC}${UL}${YELLOW}→ Updating Git repositories:${RC}${GREY}"
+			updateGit
 			if [[ ${?} -eq "0" ]]
 				then
-					echo -e "${GOOD}Git repositories updated in ${SECONDS} seconds.${RC}"
+					echo -e " ${RC}${GREEN}ø Git repositories updated in ${SECONDS} seconds.${RC}"
 				else
-					echo -e "${RED}Something went wrong!${RC}"
+					echo -e " ${RED}× Something went wrong!${RC}\n"
 					exit 1
 			fi
 	fi
 
 	## Update the linux kernel.
 	SECONDS="0"
-	echo -e "${INFO}Updating the linux kernel:${RC}"
-	UPDATE_KERNEL
+	echo -e "\ns ${RC}${UL}${GREEN}ø You are using the linux kernel version $(uname -r)${RC}"
+	echo -e " ${RC}${UL}${YELLOW}→ Updating the linux kernel:${RC}${GREY}"
+	updateKernel
 	if [[ ${?} -eq "0" ]]
 		then
-			echo -e "${GOOD}Linux kernel updated in ${SECONDS} seconds.${RC}"
+			echo -e " ${RC}${GREEN}ø Linux kernel updated in ${SECONDS} seconds.${RC}"
 		else
-			echo -e "${RED}Something went wrong!${RC}"
+			echo -e " ${RED}× Something went wrong!${RC}\n"
 			exit 1
 	fi
 }
 
+clear
 ## Check privileges and proceed.
 if [[ ${EUID} -ne 0 ]]
 	then
-		echo -e "${WARN}This script must be run as root!${RC}"
+		echo -e " ${RED}× This script must be run as root!${RC}"
 		exit 1
 	else
-		reset
-		MAIN && echo -e "${GOOD}Update finished.${RC}" || echo -e "${WARN}Something went wrong during update!${RC}"
+		echo -e " $(date '+ %T - %A %d %B %Y')"
+		main && echo -e " \n${RC}${GREEN}ø Update finished.${RC}" || echo -e " \n${RED}× Something went wrong during update!${RC}\n"
 fi

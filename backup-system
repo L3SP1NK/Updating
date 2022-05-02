@@ -1,5 +1,7 @@
 #!/bin/bash
-RSYNC_BACKUP()
+RED="\e[31m"
+
+rsyncBackup()
 {
 	rsync \
 		-4 \
@@ -23,7 +25,7 @@ RSYNC_BACKUP()
 
 if [[ ${EUID} -ne '0' ]]
 	then
-		echo "Run me as root!"
+		echo -e "${RED}× Run me as root!"
 		exit 1
 fi
 
@@ -32,23 +34,23 @@ if [[ ${1} && ${2} && ! ${3} ]]
 		FROM=${1}
 		DEST=${2}
 	else
-		echo "Please, specify <folder to backup> <backup destination>"
+		echo -e "${RED}× Please, specify <folder to backup> <backup destination>"
 		exit 1
 fi
 
 if ! which rsync zstd>/dev/null
 	then
-		echo "You need zstd and rsync to use compression!"
+		echo -e "${RED}× You need zstd and rsync to use compression!"
 		exit 1
 fi
 
 FILE="/root/.exclude_from_backup"
 if [[ -f ${FILE} ]]
 	then
-		echo "Starting backup..."
+		echo -e "Starting backup..."
 		RSYNC_BACKUP
-		[[ ${?} -eq '0' ]] && echo "Done!" || echo "Something went wrong!"
+		[[ ${?} -eq '0' ]] && echo -e "Done!" || echo -e "Something went wrong!"
 	else
-		echo "${FILE} not found!"
+		echo -e "${FILE} not found!"
 		exit 1
 fi

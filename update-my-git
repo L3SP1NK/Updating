@@ -4,7 +4,7 @@
 ## Set colors.
 RC="\e[1m\e[0m"
 BOLD="\e[1m"
-green="\e[1m\e[32m"
+GREEN="\e[1m\e[32m"
 RED="\e[1m\e[31m"
 BLUE="\e[1m\e[34m"
 
@@ -20,7 +20,7 @@ updateGit()
 			CURRENT_GIT="$(echo ${GIT_PATH}|cut -d '/' -f 4 )"
 			cd ${GIT_PATH} || exit 1
 			cd ..
-			echo -e "\n${BLUE}→ ${CURRENT_GIT}${RC}"
+			echo -e "\n ${BLUE}→ ${CURRENT_GIT}${RC}"
 			## Pull change:
 			git pull ## Will return error if changes have been made.
 			## Config:
@@ -34,7 +34,7 @@ updateGit()
 			git push -v
 			## Pull change:
 			git pull
-			echo -e "${green}→ ${CURRENT_GIT} Updated.${RC}"
+			echo -e "\n ${GREEN}ø ${CURRENT_GIT} Updated.${RC}"
 	done
 }
 
@@ -62,19 +62,19 @@ checkEnv()
 {
 	if ! which git>/dev/null
 		then
-			echo "${RED}→ Git is not installed on this system!${RC}"
+			echo "${RED}× Git is not installed on this system!${RC}\n"
 			exit 1
 	fi
 
 	if [[ ${EUID} -ne "0" ]]
 		then
-			echo -e "${RED}→ Run me as root!${RC}"
+			echo -e "\n ${RED}× Run me as root!${RC}\n"
 			exit 1
 	fi
 
 	if [[ ! -f ${HOME}/.git-credentials ]]
 		then
-			echo -e "${RED}→ Git credentials not found!${RC}"
+			echo -e "\n ${RED}× Git credentials not found!${RC}\n"
 			exit 1
 	fi
 }
@@ -82,10 +82,11 @@ checkEnv()
 checkEnv
 updateGit
 makeLink 1>/dev/null
+
 if [[ ${?} -eq "0" ]]
 	then
-		echo -e "${GREEN}→ Symbolic links have been made successfully${RC}"
+		echo -e "\n ${GREEN}ø Symbolic links have been made successfully${RC}\n"
 	else
-		echo -e "${RED}→ Something went wrong during symbolic link creation!${RC}"
+		echo -e "\n ${RED}× Something went wrong during symbolic link creation!${RC}\n"
 		exit 1
 fi
