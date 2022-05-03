@@ -1,0 +1,71 @@
+#!/bin/bash
+RC="\e[0m"
+RED="\e[31m"
+GREEN="\e[32m"
+YELLOW="\e[33m"
+
+REQUIREMENTS="rsync zstd"
+
+backupDir()
+{
+	clear
+	echo -e "${YELLOW} → Starting backup of ${TO_BACKUP}${RC}"
+	rsync \
+		--archive \
+		--verbose \
+		--recursive \
+		--update \
+		--links \
+		--perms \
+		--executability \
+		--acls \
+		--xattrs \
+		--owner \
+		--group \
+		--devices \
+		--specials \
+		--times \
+		--atimes \
+		--delete-delay \
+		--ignore-errors \
+		--compress \
+		--compress-choice=zstd \
+		--compress-level=9 \
+		--human-readable \
+		--progress \
+		--ipv4 \
+		--exclude-from=${HOME}/.exclude_from_backup \
+		/ ${BACKUP_DEST}/
+}
+
+if [[ ${EUID} -ne "0" ]]
+	then
+		echo -e "${RED} × Run me as root!${RC}"
+		exit 1
+fi
+
+if ! which ${REQUIREMENTS}>/dev/null
+	then
+		echo -e "${RED} × To run this program, you need ${REQUIREMENTS}${RC}"
+fi
+
+if [[ ! -f ${HOME}/.exclude_from_backup ]]
+	then
+		echo -e "${RED}The file containing the directories to exclude is not present!${RC}"
+		exit 1
+fi
+
+if [[ -d ${1} ]]
+	then
+		BACKUP_DEST="${1}"
+	else
+		echo -e "${RED} × Specify the backup destination.${RC}"
+		exit 1
+fi
+
+if backupDir
+	then
+		echo -e "${GREEN} ø Done${RC}"
+	else
+		echo -e "${RED} × Something went wrong!${RC}"
+fi
