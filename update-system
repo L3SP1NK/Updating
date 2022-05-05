@@ -99,7 +99,7 @@ updateKernel()
 	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware/ 2>/dev/null
 	if ! update-initramfs -u
 		then
-			echo -e " ${RED}× update-initramfs not found!${RC}\n"
+			echo -e " ${RED}× update-initramfs not found!${RC}"
 	fi
 }
 
@@ -109,18 +109,18 @@ main()
 	## Update apt packages.
 	if ! which apt-get>/dev/null
 		then
-			echo -e " ${RED}× The APT package manager is not installed on this system!${RC}\n"
+			echo -e " ${RED}× The APT package manager is not installed on this system!${RC}"
 		else
 			SECONDS="0"
 			PKG_NUM=$(dpkg-query -W | wc -l)
-			echo -e "\n ${RC}${GREEN}ø ${PKG_NUM} APT Packages currently installed.${RC}"
+			echo -e " ${RC}${GREEN}ø ${PKG_NUM} APT Packages currently installed.${RC}"
 			echo -e " ${RC}${UL}${YELLOW}→ Updating APT packages:${RC}${GREY}"
 			updateApt
 			if [[ ${?} -eq "0" ]]
 				then
 					echo -e " ${RC}${GREEN}ø APT packages updated in ${SECONDS} seconds.${RC}"
 				else
-					echo -e " ${RED}× Something went wrong!${RC}\n"
+					echo -e " ${RED}× Something went wrong!${RC}"
 					exit 1
 			fi
 	fi
@@ -128,17 +128,17 @@ main()
 	## Update flatpak applications.
 	if ! which flatpak>/dev/null
 		then
-			echo -e " ${RED}× Flatpak is not installed on this system!${RC}\n"
+			echo -e " ${RED}× Flatpak is not installed on this system!${RC}"
 		else
 			SECONDS="0"
-			echo -e "\n ${RC}${GREEN}ø You are using $(flatpak --version).${RC}"
+			echo -e " ${RC}${GREEN}ø You are using $(flatpak --version).${RC}"
 			echo -e " ${RC}${UL}${YELLOW}→ Updating Flatpak.${RC}"
 			updateFlatpak
 			if [[ ${?} -eq "0" ]]
 				then
 					echo -e " ${RC}${GREEN}ø Flatpak updated in ${SECONDS} seconds.${RC}"
 				else
-					echo -e " ${RED}× Something went wrong!${RC}\n"
+					echo -e " ${RED}× Something went wrong!${RC}"
 					exit 1
 			fi
 	fi
@@ -146,17 +146,17 @@ main()
 	## Update NPM applications.
 	if ! which npm>/dev/null
 		then
-			echo -e " ${RED}× NPM is not installed on this system!${RC}\n"
+			echo -e " ${RED}× NPM is not installed on this system!${RC}"
 		else
 			SECONDS="0"
 			## echo You are using $(npm -V)
-			echo -e "\n ${RC}${UL}${YELLOW}→ Updating NPM packages:${RC}${GREY}"
+			echo -e " ${RC}${UL}${YELLOW}→ Updating NPM packages:${RC}${GREY}"
 			updateNpm
 			if [[ ${?} -eq "0" ]]
 				then
 					echo -e " ${RC}${GREEN}ø NPM updated in ${SECONDS} seconds.${RC}"
 				else
-					echo -e " ${RED}× Something went wrong!${RC}\n"
+					echo -e " ${RED}× Something went wrong!${RC}"
 					exit 1
 			fi
 	fi
@@ -164,31 +164,31 @@ main()
 	## Pull git repos.
 	if ! which git>/dev/null
 		then
-			echo -e " ${RED}× Git is not installed on this system!${RC}\n"
+			echo -e " ${RED}× Git is not installed on this system!${RC}"
 		else
 			SECONDS="0"
-			echo -e "\n ${RC}${GREEN}ø You are using $(git --version)${RC}"
+			echo -e " ${RC}${GREEN}ø You are using $(git --version)${RC}"
 			echo -e " ${RC}${UL}${YELLOW}→ Updating Git repositories:${RC}${GREY}"
 			updateGit
 			if [[ ${?} -eq "0" ]]
 				then
 					echo -e " ${RC}${GREEN}ø Git repositories updated in ${SECONDS} seconds.${RC}"
 				else
-					echo -e " ${RED}× Something went wrong!${RC}\n"
+					echo -e " ${RED}× Something went wrong!${RC}"
 					exit 1
 			fi
 	fi
 
 	## Update the linux kernel.
 	SECONDS="0"
-	echo -e "\ns ${RC}${UL}${GREEN}ø You are using the linux kernel version $(uname -r)${RC}"
+	echo -e "s ${RC}${UL}${GREEN}ø You are using the linux kernel version $(uname -r)${RC}"
 	echo -e " ${RC}${UL}${YELLOW}→ Updating the linux kernel:${RC}${GREY}"
 	updateKernel
 	if [[ ${?} -eq "0" ]]
 		then
 			echo -e " ${RC}${GREEN}ø Linux kernel updated in ${SECONDS} seconds.${RC}"
 		else
-			echo -e " ${RED}× Something went wrong!${RC}\n"
+			echo -e " ${RED}× Something went wrong!${RC}"
 			exit 1
 	fi
 }
@@ -201,5 +201,5 @@ if [[ ${EUID} -ne 0 ]]
 		exit 1
 	else
 		echo -e " $(date '+ %T - %A %d %B %Y')"
-		main && echo -e " \n${RC}${GREEN}ø Update finished.${RC}" || echo -e " \n${RED}× Something went wrong during update!${RC}\n"
+		main && echo -e " ${RC}${GREEN}ø Update finished.${RC}" || echo -e " ${RED}× Something went wrong during update!${RC}"
 fi
