@@ -7,6 +7,7 @@
 ## - the linux firmware and kernel
 
 RC="\e[0m"
+LIGHT="\e[2m"
 INV="\e[7m"
 GREEN="\e[32m"
 RED="\e[31m"
@@ -14,23 +15,23 @@ YELLOW="\e[33m"
 
 updateApt()
 {
-	echo -e " ${RC}${YELLOW}→ Configuring/fixing possibly broken packages:${RC}"
+	echo -e " \n${RC}${YELLOW}→ Configuring/fixing possibly broken packages:${RC}${LIGHT}"
 	apt-get -f -y install
 	dpkg --configure -a
 
-	echo -e " ${RC}${YELLOW}→ Retrieving new lists of packages:${RC}"
+	echo -e " \n${RC}${YELLOW}→ Retrieving new lists of packages:${RC}${LIGHT}"
 	apt-get update
 
-	echo -e " ${RC}${YELLOW}→ Installing packages upgrades:${RC}"
+	echo -e " \n${RC}${YELLOW}→ Installing packages upgrades:${RC}${LIGHT}"
 	apt-get -f -y upgrade
 	apt-get -f -y dist-upgrade
 	apt-get -f -y full-upgrade
 
-	echo -e " ${RC}${YELLOW}→ Configuring/fixing possibly broken packages:${RC}"
+	echo -e " \n${RC}${YELLOW}→ Configuring/fixing possibly broken packages:${RC}${LIGHT}"
 	apt-get -f -y install
 	dpkg --configure -a
 
-	echo -e " ${RC}${YELLOW}→ Removing downloaded archive files and unused packages:${RC}"
+	echo -e " \n${RC}${YELLOW}→ Removing downloaded archive files and unused packages:${RC}${LIGHT}"
 	apt-get -y clean
 	apt-get -y autoclean
 	apt-get -y autoremove --purge
@@ -38,41 +39,41 @@ updateApt()
 
 updateNpm()
 {
-	echo -e " ${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}"
+	echo -e " \n${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}${LIGHT}"
 	npm update
-	echo -e " ${RC}${YELLOW}→ Checking NPM installation:${RC}"
+	echo -e " \n${RC}${YELLOW}→ Checking NPM installation:${RC}${LIGHT}"
 	npm doctor
-	echo -e " ${RC}${YELLOW}→ Auditing NPM packages:${RC}"
+	echo -e " \n${RC}${YELLOW}→ Auditing NPM packages:${RC}${LIGHT}"
 	npm audit
-	echo -e " ${RC}${YELLOW}→ Fixing NPM packages:${RC}"
+	echo -e " \n${RC}${YELLOW}→ Fixing NPM packages:${RC}${LIGHT}"
 	npm audit fix
 }
 
 updateFlatpak()
 {
-	echo -e " ${RC}${YELLOW}→ Flatpak applications installed:${RC}"
+	echo -e " \n${RC}${YELLOW}→ Flatpak applications installed:${RC}${LIGHT}"
 	flatpak list
-	echo -e " ${RC}${YELLOW}→ Checking flatpak applications:${RC}"
+	echo -e " \n${RC}${YELLOW}→ Checking flatpak applications:${RC}${LIGHT}"
 	flatpak repair
-	echo -e " ${RC}${YELLOW}${INV}→ Updating flatpak:${RC}"
+	echo -e " \n${RC}${YELLOW}${INV}→ Updating flatpak:${RC}${LIGHT}"
 	flatpak update -y
 }
 
 updateGit()
 {
 	GIT_REPO_LOCATION="/opt"
-	cd ${GIT_REPO_LOCATION} || exit 1
+	cd ${GIT_REPO_LOCATION}||exit 1
 	## Search for GIT repos and update them.
-	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null | grep -v /mnt/)
+	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null|grep -v /mnt/)
 		do
-			cd "${GIT_PATH}" || exit 1
-			echo -e " ${RC}${YELLOW}→ Updating ${GIT_PATH}:${RC}"
-			cd .. || exit 1
+			cd "${GIT_PATH}"||exit 1
+			echo -e " \n${RC}${YELLOW}→ Updating ${GIT_PATH}:${RC}${LIGHT}"
+			cd ..||exit 1
 			git config --global --add safe.directory ${GIT_PATH}
 			git config pull.rebase true
 			git stash
 			git pull
-			cd ${GIT_REPO_LOCATION} || exit 1
+			cd ${GIT_REPO_LOCATION}||exit 1
 		done
 }
 
@@ -83,7 +84,7 @@ updateKernel()
 	apt-get -f -y install ${FIRMWARE_PKGS}
 
 	mkdir -p ${FIRMWARE_PATH}
-	cd ${FIRMWARE_PATH} || exit 1
+	cd ${FIRMWARE_PATH}||exit 1
 	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" --depth=8 2>/dev/null
 	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware/ 2>/dev/null
 	update-initramfs -u
@@ -98,9 +99,8 @@ main()
 			echo -e " ${RED}× The APT package manager is not installed on this system!${RC}"
 		else
 			SECONDS="0"
-			PKG_NUM=$(dpkg-query -W | wc -l)
-			echo -e " ${RC}${GREEN}ø ${PKG_NUM} APT Packages currently installed.${RC}"
-			echo -e " ${RC}${YELLOW}${INV}→ Updating APT packages:${RC}"
+			PKG_NUM=$(dpkg-query -W|wc -l)
+			echo -e " \n${RC}${YELLOW}${INV}→ Updating APT packages:${RC}${LIGHT}"
 			updateApt
 			if [[ ${?} -eq "0" ]]
 				then
@@ -117,8 +117,7 @@ main()
 			echo -e " ${RED}× Flatpak is not installed on this system!${RC}"
 		else
 			SECONDS="0"
-			echo -e " ${RC}${GREEN}ø You are using $(flatpak --version).${RC}"
-			echo -e " ${RC}${YELLOW}${INV}→ Updating Flatpak:${RC}"
+			echo -e " \n${RC}${YELLOW}${INV}→ Updating Flatpak:${RC}${LIGHT}"
 			updateFlatpak
 			if [[ ${?} -eq "0" ]]
 				then
@@ -136,7 +135,7 @@ main()
 		else
 			SECONDS="0"
 			## echo You are using $(npm -V)
-			echo -e " ${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}"
+			echo -e " \n${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}${LIGHT}"
 			updateNpm
 			if [[ ${?} -eq "0" ]]
 				then
@@ -153,8 +152,7 @@ main()
 			echo -e " ${RED}× Git is not installed on this system!${RC}"
 		else
 			SECONDS="0"
-			echo -e " ${RC}${GREEN}ø You are using $(git --version)${RC}"
-			echo -e " ${RC}${YELLOW}${INV}→ Updating Git repositories:${RC}"
+			echo -e " \n${RC}${YELLOW}${INV}→ Updating Git repositories:${RC}${LIGHT}"
 			updateGit
 			if [[ ${?} -eq "0" ]]
 				then
@@ -167,8 +165,7 @@ main()
 
 	## Update the linux kernel.
 	SECONDS="0"
-	echo -e "s ${RC}${GREEN}ø You are using the linux kernel version $(uname -r)${RC}"
-	echo -e " ${RC}${YELLOW}${INV}→ Updating the linux kernel:${RC}"
+	echo -e " \n${RC}${YELLOW}${INV}→ Updating the linux kernel:${RC}${LIGHT}"
 	updateKernel
 	if [[ ${?} -eq "0" ]]
 		then
@@ -186,6 +183,5 @@ if [[ ${EUID} -ne 0 ]]
 		echo -e " ${RED}× This script must be run as root!${RC}"
 		exit 1
 	else
-
 		main && echo -e " ${RC}${GREEN}ø Update finished.${RC}" || echo -e " ${RED}× Something went wrong during update!${RC}"
 fi
