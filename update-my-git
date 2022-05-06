@@ -20,7 +20,7 @@ updateGit()
 			CURRENT_GIT="$(echo ${GIT_PATH}|cut -d '/' -f 4 )"
 			cd ${GIT_PATH} || exit 1
 			cd ..
-			echo -e "\n ${BLUE}→ ${CURRENT_GIT}${RC}"
+			echo -e " ${BLUE}→ ${CURRENT_GIT}${RC}"
 			## Pull change:
 			git pull ## Will return error if changes have been made.
 			## Config:
@@ -34,7 +34,7 @@ updateGit()
 			git push -v
 			## Pull change:
 			git pull
-			echo -e "\n ${GREEN}ø ${CURRENT_GIT} Updated.${RC}"
+			echo -e " ${GREEN}ø ${CURRENT_GIT} Updated.${RC}"
 	done
 }
 
@@ -62,19 +62,19 @@ checkEnv()
 {
 	if ! which git>/dev/null
 		then
-			echo "${RED}× Git is not installed on this system!${RC}\n"
+			echo "${RED}× Git is not installed on this system!${RC}"
 			exit 1
 	fi
 
 	if [[ ${EUID} -ne "0" ]]
 		then
-			echo -e "\n ${RED}× Run me as root!${RC}\n"
+			echo -e " ${RED}× Run me as root!${RC}"
 			exit 1
 	fi
 
 	if [[ ! -f ${HOME}/.git-credentials ]]
 		then
-			echo -e "\n ${RED}× Git credentials not found!${RC}\n"
+			echo -e " ${RED}× Git credentials not found!${RC}"
 			exit 1
 	fi
 }
@@ -85,8 +85,8 @@ makeLink 1>/dev/null
 
 if [[ ${?} -eq "0" ]]
 	then
-		echo -e "\n ${GREEN}ø Symbolic links have been made successfully${RC}\n"
+		echo -e " ${GREEN}ø Symbolic links have been made successfully${RC}"
 	else
-		echo -e "\n ${RED}× Something went wrong during symbolic link creation!${RC}\n"
+		echo -e " ${RED}× Something went wrong during symbolic link creation!${RC}"
 		exit 1
 fi
