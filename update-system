@@ -96,7 +96,7 @@ main()
 		then
 			SECONDS="0"
 			echo -e "\n${RC}${YELLOW}${INV}→ Updating APT packages:${RC}"
-			updateApt&
+			updateApt
 			if [[ ${?} -eq "0" ]]
 				then
 					echo -e "${RC}${GREEN}ø APT packages updated in ${SECONDS} seconds.${RC}"
@@ -111,7 +111,7 @@ main()
 		then
 			SECONDS="0"
 			echo -e "\n${RC}${YELLOW}${INV}→ Updating Flatpak:${RC}"
-			updateFlatpak&
+			updateFlatpak
 			if [[ ${?} -eq "0" ]]
 				then
 					echo -e "${RC}${GREEN}ø Flatpak updated in ${SECONDS} seconds.${RC}"
@@ -127,7 +127,7 @@ main()
 			SECONDS="0"
 			## echo You are using $(npm -V)
 			echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}"
-			updateNpm&
+			updateNpm
 			if [[ ${?} -eq "0" ]]
 				then
 					echo -e "${RC}${GREEN}ø NPM updated in ${SECONDS} seconds.${RC}"
