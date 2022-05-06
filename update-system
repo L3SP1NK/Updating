@@ -7,7 +7,6 @@
 ## - the linux firmware and kernel
 
 RC="\e[0m"
-LIGHT="\e[2m"
 INV="\e[7m"
 GREEN="\e[32m"
 RED="\e[31m"
@@ -15,23 +14,23 @@ YELLOW="\e[33m"
 
 updateApt()
 {
-	echo -e "\n${RC}${YELLOW}→ Configuring/fixing possibly broken packages...${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Configuring/fixing possibly broken packages...${RC}"
 	apt-get -f -y install
 	dpkg --configure -a
 
-	echo -e "\n${RC}${YELLOW}→ Retrieving new lists of packages...${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Retrieving new lists of packages...${RC}"
 	apt-get update
 
-	echo -e "\n${RC}${YELLOW}→ Installing packages upgrades...${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Installing packages upgrades...${RC}"
 	apt-get -f -y upgrade
 	apt-get -f -y dist-upgrade
 	apt-get -f -y full-upgrade
 
-	echo -e "\n${RC}${YELLOW}→ Configuring/fixing possibly broken packages...${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Configuring/fixing possibly broken packages...${RC}"
 	apt-get -f -y install
 	dpkg --configure -a
 
-	echo -e "\n${RC}${YELLOW}→ Removing downloaded archive files and unused packages...${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Removing downloaded archive files and unused packages...${RC}"
 	apt-get -y clean
 	apt-get -y autoclean
 	apt-get -y autoremove --purge
@@ -39,23 +38,23 @@ updateApt()
 
 updateNpm()
 {
-	echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages...${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages...${RC}"
 	npm update
-	echo -e "\n${RC}${YELLOW}→ Checking NPM installation...${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Checking NPM installation...${RC}"
 	npm doctor
-	echo -e "\n${RC}${YELLOW}→ Auditing NPM packages...${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Auditing NPM packages...${RC}"
 	npm audit
-	echo -e "\n${RC}${YELLOW}→ Fixing NPM packages...${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Fixing NPM packages...${RC}"
 	npm audit fix
 }
 
 updateFlatpak()
 {
-	echo -e "\n${RC}${YELLOW}→ Flatpak applications installed...${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Flatpak applications installed...${RC}"
 	flatpak list
-	echo -e "\n${RC}${YELLOW}→ Checking flatpak applications...${RC}${LIGHT}"
-	flatpak repair -vy
-	echo -e "\n${RC}${YELLOW}${INV}→ Updating flatpak...${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Checking flatpak applications...${RC}"
+	flatpak repair -v
+	echo -e "\n${RC}${YELLOW}${INV}→ Updating flatpak...${RC}"
 	flatpak update -vy
 }
 
@@ -67,11 +66,11 @@ updateGit()
 	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null|grep -v /mnt/)
 		do
 			cd "${GIT_PATH}"||exit 1
-			echo -e "\n${RC}${YELLOW}→ Updating ${GIT_PATH}...${RC}${LIGHT}"
+			echo -e "\n${RC}${YELLOW}→ Updating ${GIT_PATH}...${RC}"
 			cd ..||exit 1
 			git config pull.rebase true
 			git stash
-			git pull&
+			git pull
 			cd ${GIT_REPO_LOCATION}||exit 1
 		done
 }
@@ -96,7 +95,7 @@ main()
 	if which apt-get>/dev/null
 		then
 			SECONDS="0"
-			echo -e "\n${RC}${YELLOW}${INV}→ Updating APT packages:${RC}${LIGHT}"
+			echo -e "\n${RC}${YELLOW}${INV}→ Updating APT packages:${RC}"
 			updateApt&
 			if [[ ${?} -eq "0" ]]
 				then
@@ -111,7 +110,7 @@ main()
 	if which flatpak>/dev/null
 		then
 			SECONDS="0"
-			echo -e "\n${RC}${YELLOW}${INV}→ Updating Flatpak:${RC}${LIGHT}"
+			echo -e "\n${RC}${YELLOW}${INV}→ Updating Flatpak:${RC}"
 			updateFlatpak&
 			if [[ ${?} -eq "0" ]]
 				then
@@ -127,7 +126,7 @@ main()
 		then
 			SECONDS="0"
 			## echo You are using $(npm -V)
-			echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}${LIGHT}"
+			echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}"
 			updateNpm&
 			if [[ ${?} -eq "0" ]]
 				then
@@ -142,7 +141,7 @@ main()
 	if which git>/dev/null
 		then
 			SECONDS="0"
-			echo -e "\n${RC}${YELLOW}${INV}→ Updating Git repositories:${RC}${LIGHT}"
+			echo -e "\n${RC}${YELLOW}${INV}→ Updating Git repositories:${RC}"
 			## /!\ This function can't be ran in the background,
 			## you must pull the git repo containing the linux firmware before updating the kernel.
 			updateGit
@@ -157,7 +156,7 @@ main()
 
 	## Update the linux kernel.
 	SECONDS="0"
-	echo -e "\n${RC}${YELLOW}${INV}→ Updating the linux kernel:${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}${INV}→ Updating the linux kernel:${RC}"
 	updateKernel
 	if [[ ${?} -eq "0" ]]
 		then
