@@ -15,23 +15,23 @@ YELLOW="\e[33m"
 
 updateApt()
 {
-	echo -e " \n${RC}${YELLOW}→ Configuring/fixing possibly broken packages:${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Configuring/fixing possibly broken packages:${RC}${LIGHT}..."
 	apt-get -f -y install
 	dpkg --configure -a
 
-	echo -e " \n${RC}${YELLOW}→ Retrieving new lists of packages:${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Retrieving new lists of packages:${RC}${LIGHT}..."
 	apt-get update
 
-	echo -e " \n${RC}${YELLOW}→ Installing packages upgrades:${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Installing packages upgrades:${RC}${LIGHT}..."
 	apt-get -f -y upgrade
 	apt-get -f -y dist-upgrade
 	apt-get -f -y full-upgrade
 
-	echo -e " \n${RC}${YELLOW}→ Configuring/fixing possibly broken packages:${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Configuring/fixing possibly broken packages:${RC}${LIGHT}..."
 	apt-get -f -y install
 	dpkg --configure -a
 
-	echo -e " \n${RC}${YELLOW}→ Removing downloaded archive files and unused packages:${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Removing downloaded archive files and unused packages:${RC}${LIGHT}..."
 	apt-get -y clean
 	apt-get -y autoclean
 	apt-get -y autoremove --purge
@@ -39,23 +39,23 @@ updateApt()
 
 updateNpm()
 {
-	echo -e " \n${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}${LIGHT}..."
 	npm update
-	echo -e " \n${RC}${YELLOW}→ Checking NPM installation:${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Checking NPM installation:${RC}${LIGHT}..."
 	npm doctor
-	echo -e " \n${RC}${YELLOW}→ Auditing NPM packages:${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Auditing NPM packages:${RC}${LIGHT}..."
 	npm audit
-	echo -e " \n${RC}${YELLOW}→ Fixing NPM packages:${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Fixing NPM packages:${RC}${LIGHT}..."
 	npm audit fix
 }
 
 updateFlatpak()
 {
-	echo -e " \n${RC}${YELLOW}→ Flatpak applications installed:${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Flatpak applications installed:${RC}${LIGHT}..."
 	flatpak list
-	echo -e " \n${RC}${YELLOW}→ Checking flatpak applications:${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}→ Checking flatpak applications:${RC}${LIGHT}..."
 	flatpak repair
-	echo -e " \n${RC}${YELLOW}${INV}→ Updating flatpak:${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}${INV}→ Updating flatpak:${RC}${LIGHT}..."
 	flatpak update -y
 }
 
@@ -67,7 +67,7 @@ updateGit()
 	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null|grep -v /mnt/)
 		do
 			cd "${GIT_PATH}"||exit 1
-			echo -e " \n${RC}${YELLOW}→ Updating ${GIT_PATH}:${RC}${LIGHT}"
+			echo -e "\n${RC}${YELLOW}→ Updating ${GIT_PATH}:${RC}${LIGHT}..."
 			cd ..||exit 1
 			git config --global --add safe.directory ${GIT_PATH}
 			git config pull.rebase true
@@ -94,94 +94,86 @@ updateKernel()
 main()
 {
 	## Update apt packages.
-	if ! which apt-get>/dev/null
+	if which apt-get>/dev/null
 		then
-			echo -e " ${RED}× The APT package manager is not installed on this system!${RC}"
-		else
 			SECONDS="0"
 			PKG_NUM=$(dpkg-query -W|wc -l)
-			echo -e " \n${RC}${YELLOW}${INV}→ Updating APT packages:${RC}${LIGHT}"
+			echo -e "\n${RC}${YELLOW}${INV}→ Updating APT packages:${RC}${LIGHT}:"
 			updateApt
 			if [[ ${?} -eq "0" ]]
 				then
-					echo -e " ${RC}${GREEN}ø APT packages updated in ${SECONDS} seconds.${RC}"
+					echo -e "${RC}${GREEN}ø APT packages updated in ${SECONDS} seconds.${RC}"
 				else
-					echo -e " ${RED}× Something went wrong!${RC}"
+					echo -e "${RED}× Something went wrong!${RC}"
 					exit 1
 			fi
 	fi
 
 	## Update flatpak applications.
-	if ! which flatpak>/dev/null
+	if which flatpak>/dev/null
 		then
-			echo -e " ${RED}× Flatpak is not installed on this system!${RC}"
-		else
 			SECONDS="0"
-			echo -e " \n${RC}${YELLOW}${INV}→ Updating Flatpak:${RC}${LIGHT}"
+			echo -e "\n${RC}${YELLOW}${INV}→ Updating Flatpak:${RC}${LIGHT}:"
 			updateFlatpak
 			if [[ ${?} -eq "0" ]]
 				then
-					echo -e " ${RC}${GREEN}ø Flatpak updated in ${SECONDS} seconds.${RC}"
+					echo -e "${RC}${GREEN}ø Flatpak updated in ${SECONDS} seconds.${RC}"
 				else
-					echo -e " ${RED}× Something went wrong!${RC}"
+					echo -e "${RED}× Something went wrong!${RC}"
 					exit 1
 			fi
 	fi
 
 	## Update NPM applications.
-	if ! which npm>/dev/null
+	if which npm>/dev/null
 		then
-			echo -e " ${RED}× NPM is not installed on this system!${RC}"
-		else
 			SECONDS="0"
 			## echo You are using $(npm -V)
-			echo -e " \n${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}${LIGHT}"
+			echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}${LIGHT}:"
 			updateNpm
 			if [[ ${?} -eq "0" ]]
 				then
-					echo -e " ${RC}${GREEN}ø NPM updated in ${SECONDS} seconds.${RC}"
+					echo -e "${RC}${GREEN}ø NPM updated in ${SECONDS} seconds.${RC}"
 				else
-					echo -e " ${RED}× Something went wrong!${RC}"
+					echo -e "${RED}× Something went wrong!${RC}"
 					exit 1
 			fi
 	fi
 
 	## Pull git repos.
-	if ! which git>/dev/null
+	if which git>/dev/null
 		then
-			echo -e " ${RED}× Git is not installed on this system!${RC}"
-		else
 			SECONDS="0"
-			echo -e " \n${RC}${YELLOW}${INV}→ Updating Git repositories:${RC}${LIGHT}"
+			echo -e "\n${RC}${YELLOW}${INV}→ Updating Git repositories:${RC}${LIGHT}:"
 			updateGit
 			if [[ ${?} -eq "0" ]]
 				then
-					echo -e " ${RC}${GREEN}ø Git repositories updated in ${SECONDS} seconds.${RC}"
+					echo -e "${RC}${GREEN}ø Git repositories updated in ${SECONDS} seconds.${RC}"
 				else
-					echo -e " ${RED}× Something went wrong!${RC}"
+					echo -e "${RED}× Something went wrong!${RC}"
 					exit 1
 			fi
 	fi
 
 	## Update the linux kernel.
 	SECONDS="0"
-	echo -e " \n${RC}${YELLOW}${INV}→ Updating the linux kernel:${RC}${LIGHT}"
+	echo -e "\n${RC}${YELLOW}${INV}→ Updating the linux kernel:${RC}${LIGHT}:"
 	updateKernel
 	if [[ ${?} -eq "0" ]]
 		then
-			echo -e " ${RC}${GREEN}ø Linux kernel updated in ${SECONDS} seconds.${RC}"
+			echo -e "${RC}${GREEN}ø Linux kernel updated in ${SECONDS} seconds.${RC}"
 		else
-			echo -e " ${RED}× Something went wrong!${RC}"
+			echo -e "${RED}× Something went wrong!${RC}"
 			exit 1
 	fi
 }
 
 clear
 ## Check privileges and proceed.
-if [[ ${EUID} -ne 0 ]]
+if [[ ${EUID} -ne "0" ]]
 	then
-		echo -e " ${RED}× This script must be run as root!${RC}"
+		echo -e "${RED}× This script must be run as root!${RC}"
 		exit 1
 	else
-		main && echo -e " ${RC}${GREEN}ø Update finished.${RC}" || echo -e " ${RED}× Something went wrong during update!${RC}"
+		main&&echo -e "${RC}${GREEN}ø Update finished.${RC}"||echo -e "${RED}× Something went wrong during update!${RC}"
 fi
