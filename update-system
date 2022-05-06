@@ -7,39 +7,30 @@
 ## - the linux firmware and kernel
 
 RC="\e[0m"
-UL="\e[4m"
-BOLD="\e[1m"
-GREEN="\e[1m\e[32m"
-RED="\e[1m\e[31m"
+INV="\e[7m"
+GREEN="\e[32m"
+RED="\e[31m"
 YELLOW="\e[33m"
-GREY="\e[37m"
-
 
 updateApt()
 {
-	echo -e " ${RC}${YELLOW}→ Configuring/fixing possibly broken packages:${RC}${GREY}"
+	echo -e " ${RC}${YELLOW}→ Configuring/fixing possibly broken packages:${RC}"
 	apt-get -f -y install
 	dpkg --configure -a
 
-	echo -e " ${RC}${YELLOW}→ Removing downloaded archive files and unused packages:${RC}${GREY}"
-	apt-get -y clean
-	apt-get -y autoclean
-	apt-get -y autoremove --purge
-	apt-get -y purge --autoremove
-
-	echo -e " ${RC}${YELLOW}→ Retrieving new lists of packages:${RC}${GREY}"
+	echo -e " ${RC}${YELLOW}→ Retrieving new lists of packages:${RC}"
 	apt-get update
 
-	echo -e " ${RC}${YELLOW}→ Installing packages upgrades:${RC}${GREY}"
+	echo -e " ${RC}${YELLOW}→ Installing packages upgrades:${RC}"
 	apt-get -f -y upgrade
 	apt-get -f -y dist-upgrade
 	apt-get -f -y full-upgrade
 
-	echo -e " ${RC}${YELLOW}→ Configuring/fixing possibly broken packages:${RC}${GREY}"
+	echo -e " ${RC}${YELLOW}→ Configuring/fixing possibly broken packages:${RC}"
 	apt-get -f -y install
 	dpkg --configure -a
 
-	echo -e " ${RC}${YELLOW}→ Removing downloaded archive files and unused packages:${RC}${GREY}"
+	echo -e " ${RC}${YELLOW}→ Removing downloaded archive files and unused packages:${RC}"
 	apt-get -y clean
 	apt-get -y autoclean
 	apt-get -y autoremove --purge
@@ -47,38 +38,37 @@ updateApt()
 
 updateNpm()
 {
-	echo -e " ${RC}${YELLOW}→ Updating NPM packages:${RC}${GREY}"
+	echo -e " ${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}"
 	npm update
-	echo -e " ${RC}${YELLOW}→ Checking NPM installation:${RC}${GREY}"
+	echo -e " ${RC}${YELLOW}→ Checking NPM installation:${RC}"
 	npm doctor
-	echo -e " ${RC}${YELLOW}→ Auditing NPM packages:${RC}${GREY}"
+	echo -e " ${RC}${YELLOW}→ Auditing NPM packages:${RC}"
 	npm audit
-	echo -e " ${RC}${YELLOW}→ Fixing NPM packages:${RC}${GREY}"
+	echo -e " ${RC}${YELLOW}→ Fixing NPM packages:${RC}"
 	npm audit fix
 }
 
 updateFlatpak()
 {
-	echo -e " ${RC}${YELLOW}→ Flatpak applications installed:${RC}${GREY}"
+	echo -e " ${RC}${YELLOW}→ Flatpak applications installed:${RC}"
 	flatpak list
-	echo -e " ${RC}${YELLOW}→ Checking flatpak applications:${RC}${GREY}"
+	echo -e " ${RC}${YELLOW}→ Checking flatpak applications:${RC}"
 	flatpak repair
-	echo -e " ${RC}${YELLOW}→ Updating flatpak:${RC}${GREY}"
+	echo -e " ${RC}${YELLOW}${INV}→ Updating flatpak:${RC}"
 	flatpak update -y
 }
 
 updateGit()
 {
-	GIT_REPO_LOCATION="/"
+	GIT_REPO_LOCATION="/opt"
 	cd ${GIT_REPO_LOCATION} || exit 1
 	## Search for GIT repos and update them.
-#	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null | grep -v /mnt/)
-	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -path "/mnt" -prune -type d -name ".git" 2>/dev/null)
+	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null | grep -v /mnt/)
 		do
-			CURRENT_GIT="$(echo ${GIT_PATH}|cut -d '/' -f 4 )"
 			cd "${GIT_PATH}" || exit 1
-			echo -e " ${RC}${YELLOW}→ Updating ${CURRENT_GIT}:"
+			echo -e " ${RC}${YELLOW}→ Updating ${GIT_PATH}:${RC}"
 			cd .. || exit 1
+			git config --global --add safe.directory ${GIT_PATH}
 			git config pull.rebase true
 			git stash
 			git pull
@@ -96,10 +86,7 @@ updateKernel()
 	cd ${FIRMWARE_PATH} || exit 1
 	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" --depth=8 2>/dev/null
 	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware/ 2>/dev/null
-	if ! update-initramfs -u
-		then
-			echo -e " ${RED}× update-initramfs not found!${RC}"
-	fi
+	update-initramfs -u
 }
 
 
@@ -113,7 +100,7 @@ main()
 			SECONDS="0"
 			PKG_NUM=$(dpkg-query -W | wc -l)
 			echo -e " ${RC}${GREEN}ø ${PKG_NUM} APT Packages currently installed.${RC}"
-			echo -e " ${RC}${UL}${YELLOW}→ Updating APT packages:${RC}${GREY}"
+			echo -e " ${RC}${YELLOW}${INV}→ Updating APT packages:${RC}"
 			updateApt
 			if [[ ${?} -eq "0" ]]
 				then
@@ -131,7 +118,7 @@ main()
 		else
 			SECONDS="0"
 			echo -e " ${RC}${GREEN}ø You are using $(flatpak --version).${RC}"
-			echo -e " ${RC}${UL}${YELLOW}→ Updating Flatpak.${RC}"
+			echo -e " ${RC}${YELLOW}${INV}→ Updating Flatpak:${RC}"
 			updateFlatpak
 			if [[ ${?} -eq "0" ]]
 				then
@@ -149,7 +136,7 @@ main()
 		else
 			SECONDS="0"
 			## echo You are using $(npm -V)
-			echo -e " ${RC}${UL}${YELLOW}→ Updating NPM packages:${RC}${GREY}"
+			echo -e " ${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}"
 			updateNpm
 			if [[ ${?} -eq "0" ]]
 				then
@@ -167,7 +154,7 @@ main()
 		else
 			SECONDS="0"
 			echo -e " ${RC}${GREEN}ø You are using $(git --version)${RC}"
-			echo -e " ${RC}${UL}${YELLOW}→ Updating Git repositories:${RC}${GREY}"
+			echo -e " ${RC}${YELLOW}${INV}→ Updating Git repositories:${RC}"
 			updateGit
 			if [[ ${?} -eq "0" ]]
 				then
@@ -180,8 +167,8 @@ main()
 
 	## Update the linux kernel.
 	SECONDS="0"
-	echo -e "s ${RC}${UL}${GREEN}ø You are using the linux kernel version $(uname -r)${RC}"
-	echo -e " ${RC}${UL}${YELLOW}→ Updating the linux kernel:${RC}${GREY}"
+	echo -e "s ${RC}${GREEN}ø You are using the linux kernel version $(uname -r)${RC}"
+	echo -e " ${RC}${YELLOW}${INV}→ Updating the linux kernel:${RC}"
 	updateKernel
 	if [[ ${?} -eq "0" ]]
 		then
@@ -199,6 +186,6 @@ if [[ ${EUID} -ne 0 ]]
 		echo -e " ${RED}× This script must be run as root!${RC}"
 		exit 1
 	else
-		echo -e " $(date '+ %T - %A %d %B %Y')"
+
 		main && echo -e " ${RC}${GREEN}ø Update finished.${RC}" || echo -e " ${RED}× Something went wrong during update!${RC}"
 fi
