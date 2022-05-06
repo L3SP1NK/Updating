@@ -54,14 +54,14 @@ updateFlatpak()
 	echo -e "\n${RC}${YELLOW}→ Flatpak applications installed...${RC}${LIGHT}"
 	flatpak list
 	echo -e "\n${RC}${YELLOW}→ Checking flatpak applications...${RC}${LIGHT}"
-	flatpak repair
+	flatpak repair -vy
 	echo -e "\n${RC}${YELLOW}${INV}→ Updating flatpak...${RC}${LIGHT}"
-	flatpak update -y
+	flatpak update -vy
 }
 
 updateGit()
 {
-	GIT_REPO_LOCATION="/opt"
+	GIT_REPO_LOCATION="/"
 	cd ${GIT_REPO_LOCATION}||exit 1
 	## Search for GIT repos and update them.
 	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null|grep -v /mnt/)
@@ -69,10 +69,9 @@ updateGit()
 			cd "${GIT_PATH}"||exit 1
 			echo -e "\n${RC}${YELLOW}→ Updating ${GIT_PATH}...${RC}${LIGHT}"
 			cd ..||exit 1
-			git config --global --add safe.directory ${GIT_PATH}
 			git config pull.rebase true
 			git stash
-			git pull
+			git pull&
 			cd ${GIT_REPO_LOCATION}||exit 1
 		done
 }
@@ -97,9 +96,8 @@ main()
 	if which apt-get>/dev/null
 		then
 			SECONDS="0"
-			PKG_NUM=$(dpkg-query -W|wc -l)
-			echo -e "\n${RC}${YELLOW}${INV}→ Updating APT packages:${RC}${LIGHT}:"
-			updateApt
+			echo -e "\n${RC}${YELLOW}${INV}→ Updating APT packages:${RC}${LIGHT}"
+			updateApt&
 			if [[ ${?} -eq "0" ]]
 				then
 					echo -e "${RC}${GREEN}ø APT packages updated in ${SECONDS} seconds.${RC}"
@@ -113,8 +111,8 @@ main()
 	if which flatpak>/dev/null
 		then
 			SECONDS="0"
-			echo -e "\n${RC}${YELLOW}${INV}→ Updating Flatpak:${RC}${LIGHT}:"
-			updateFlatpak
+			echo -e "\n${RC}${YELLOW}${INV}→ Updating Flatpak:${RC}${LIGHT}"
+			updateFlatpak&
 			if [[ ${?} -eq "0" ]]
 				then
 					echo -e "${RC}${GREEN}ø Flatpak updated in ${SECONDS} seconds.${RC}"
@@ -129,8 +127,8 @@ main()
 		then
 			SECONDS="0"
 			## echo You are using $(npm -V)
-			echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}${LIGHT}:"
-			updateNpm
+			echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}${LIGHT}"
+			updateNpm&
 			if [[ ${?} -eq "0" ]]
 				then
 					echo -e "${RC}${GREEN}ø NPM updated in ${SECONDS} seconds.${RC}"
@@ -144,7 +142,9 @@ main()
 	if which git>/dev/null
 		then
 			SECONDS="0"
-			echo -e "\n${RC}${YELLOW}${INV}→ Updating Git repositories:${RC}${LIGHT}:"
+			echo -e "\n${RC}${YELLOW}${INV}→ Updating Git repositories:${RC}${LIGHT}"
+			## /!\ This function can't be ran in the background,
+			## you must pull the git repo containing the linux firmware before updating the kernel.
 			updateGit
 			if [[ ${?} -eq "0" ]]
 				then
@@ -157,7 +157,7 @@ main()
 
 	## Update the linux kernel.
 	SECONDS="0"
-	echo -e "\n${RC}${YELLOW}${INV}→ Updating the linux kernel:${RC}${LIGHT}:"
+	echo -e "\n${RC}${YELLOW}${INV}→ Updating the linux kernel:${RC}${LIGHT}"
 	updateKernel
 	if [[ ${?} -eq "0" ]]
 		then
