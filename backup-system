@@ -9,7 +9,7 @@ REQUIREMENTS="rsync zstd"
 backupDir()
 {
 	clear
-	echo -e "${YELLOW} → Starting backup of ${TO_BACKUP}${RC}"
+	echo -e "${YELLOW} → Starting backup...${RC}"
 	rsync \
 		--archive \
 		--verbose \

@@ -2,11 +2,10 @@
 ## Update my git repository.
 
 ## Set colors.
-RC="\e[1m\e[0m"
-BOLD="\e[1m"
-GREEN="\e[1m\e[32m"
-RED="\e[1m\e[31m"
-BLUE="\e[1m\e[34m"
+RC="\e[0m"
+GREEN="\e[32m"
+RED="\e[31m"
+BLUE="\e[34m"
 
 CWD=$(pwd)
 USER_HOME="/home/lespink"
