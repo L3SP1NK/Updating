@@ -72,7 +72,6 @@ updateGit()
 	GIT_REPO_LOCATION="/"
 	cd ${GIT_REPO_LOCATION} || exit 1
 	## Search for GIT repos and update them.
-	## (Need to find a better way to exclude /mnt)
 #	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null | grep -v /mnt/)
 	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -path "/mnt" -prune -type d -name ".git" 2>/dev/null)
 		do
