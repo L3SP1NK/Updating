@@ -45,7 +45,7 @@ makeLink()
 	ln -svf ${REPOS_DIR}/Configs/dot-files/.* ${HOME} 2>/dev/null
 
 	## Rofi config
-	[[ -f ${REPOS_DIR}/Configs/rofi/config.rasi ]] && ln -svf ${REPOS_DIR}/Configs/rofi/config.rasi ${USER_HOME}/.config/rofi/
+	[[ -d ${REPOS_DIR}/Configs/rofi/ ]] && ln -svf ${REPOS_DIR}/Configs/rofi/* ${USER_HOME}/.config/rofi/
 
 	## Custom GTK CSS.
 	[[ -f ${REPOS_DIR}/Configs/gtk.css ]] && ln -svf ${REPOS_DIR}/Configs/gtk.css ${USER_HOME}/.config/gtk-3.0/
