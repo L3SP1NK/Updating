@@ -45,10 +45,16 @@ makeLink()
 	ln -svf ${REPOS_DIR}/Configs/dot-files/.* ${HOME} 2>/dev/null
 
 	## Rofi config
-	[[ -d ${REPOS_DIR}/Configs/rofi/ ]] && ln -svf ${REPOS_DIR}/Configs/rofi/* ${USER_HOME}/.config/rofi/
+	if [[ -d ${REPOS_DIR}/Configs/rofi/ && -d ${USER_HOME}/.config/rofi ]]
+	    then
+	        ln -svf ${REPOS_DIR}/Configs/rofi/* ${USER_HOME}/.config/rofi/
+	fi
 
 	## Custom GTK CSS.
-	[[ -f ${REPOS_DIR}/Configs/gtk.css ]] && ln -svf ${REPOS_DIR}/Configs/gtk.css ${USER_HOME}/.config/gtk-3.0/
+	if [[ -f ${REPOS_DIR}/Configs/gtk.css &&  -d ${USER_HOME}/.config/gtk-3.0 ]]
+	    then
+	        ln -svf ${REPOS_DIR}/Configs/gtk.css ${USER_HOME}/.config/gtk-3.0/
+    fi
 
 	## Link scripts.
 	[[ -d ${REPOS_DIR}/Updating/ ]] && ln -svf ${REPOS_DIR}/Updating/* /usr/local/bin
