@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## This script is only made for Debian based distros, it will update:
 ## - apt packages
 ## - git repositories
