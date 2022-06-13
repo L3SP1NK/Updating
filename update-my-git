@@ -13,75 +13,75 @@ REPOS_DIR="/opt/mygit"
 
 updateGit()
 {
-	## Search for GIT repos.
-	for GIT_PATH in $(find ${REPOS_DIR}/ -type d -name ".git" 2>/dev/null)
-		do
-			CURRENT_GIT="$(echo ${GIT_PATH}|cut -d '/' -f 4 )"
-			cd ${GIT_PATH} || exit 1
-			cd ..
-			echo -e "\n${BLUE}→ ${CURRENT_GIT}${RC}"
-			## Pull change:
-			git pull ## Will return error if changes have been made.
-			## Config:
-			git config pull.rebase true
-			git config --global --add safe.directory ${GIT_PATH} ## Add exceptions for use with multiple github accounts.
-			## Add files to the repo:
-			git add -v .* 2>/dev/null ## Dismiss error due to ".."
-			git add -v * 2>/dev/null ## ``
-			## Commit changes:
-			git commit -a
-			git push -v
-			## Pull change:
-			git pull
-			echo -e "\n${GREEN}ø ${CURRENT_GIT} Updated.${RC}"
-	done
+    ## Search for GIT repos.
+    for GIT_PATH in $(find ${REPOS_DIR}/ -type d -name ".git" 2>/dev/null)
+        do
+            CURRENT_GIT="$(echo ${GIT_PATH}|cut -d '/' -f 4 )"
+            cd ${GIT_PATH} || exit 1
+            cd ..
+            echo -e "\n${BLUE}→ ${CURRENT_GIT}${RC}"
+            ## Pull change:
+            git pull ## Will return error if changes have been made.
+            ## Config:
+            git config pull.rebase true
+            git config --global --add safe.directory ${GIT_PATH} ## Add exceptions for use with multiple github accounts.
+            ## Add files to the repo:
+            git add -v .* 2>/dev/null ## Dismiss error due to ".."
+            git add -v * 2>/dev/null ## ``
+            ## Commit changes:
+            git commit -a
+            git push -v
+            ## Pull change:
+            git pull
+            echo -e "\n${GREEN}ø ${CURRENT_GIT} Updated.${RC}"
+    done
 }
 
 makeLink()
 {
-	cd ${REPOS_DIR}/
-	## Dot-files.
-	ln -svf ${REPOS_DIR}/Configs/dot-files/.* ${USER_HOME} 2>/dev/null
-	ln -svf ${REPOS_DIR}/Configs/dot-files/.* ${HOME} 2>/dev/null
+    cd ${REPOS_DIR}/
+    ## Dot-files.
+    ln -svf ${REPOS_DIR}/Configs/dot-files/.* ${USER_HOME} 2>/dev/null
+    ln -svf ${REPOS_DIR}/Configs/dot-files/.* ${HOME} 2>/dev/null
 
-	## Rofi config
-	if [[ -d ${REPOS_DIR}/Configs/rofi/ && -d ${USER_HOME}/.config/rofi ]]
-	    then
-	        ln -svf ${REPOS_DIR}/Configs/rofi/* ${USER_HOME}/.config/rofi/
-	fi
-
-	## Custom GTK CSS.
-	if [[ -f ${REPOS_DIR}/Configs/gtk.css &&  -d ${USER_HOME}/.config/gtk-3.0 ]]
-	    then
-	        ln -svf ${REPOS_DIR}/Configs/gtk.css ${USER_HOME}/.config/gtk-3.0/
+    ## Rofi config
+    if [[ -d ${REPOS_DIR}/Configs/rofi/ && -d ${USER_HOME}/.config/rofi ]]
+        then
+            ln -svf ${REPOS_DIR}/Configs/rofi/* ${USER_HOME}/.config/rofi/
     fi
 
-	## Link scripts.
-	[[ -d ${REPOS_DIR}/Updating/ ]] && ln -svf ${REPOS_DIR}/Updating/* /usr/local/bin
-	[[ -d ${REPOS_DIR}/Utilities/ ]] && ln -svf ${REPOS_DIR}/Utilities/* /usr/local/bin
-	[[ -d ${REPOS_DIR}/Telebash/ ]] && ln -svf ${REPOS_DIR}/Telebash/* /usr/local/bin
-	[[ -d ${REPOS_DIR}/Crypto/ ]] && ln -svf ${REPOS_DIR}/Crypto/* /usr/local/bin
+    ## Custom GTK CSS.
+    if [[ -f ${REPOS_DIR}/Configs/gtk.css &&  -d ${USER_HOME}/.config/gtk-3.0 ]]
+        then
+            ln -svf ${REPOS_DIR}/Configs/gtk.css ${USER_HOME}/.config/gtk-3.0/
+    fi
+
+    ## Link scripts.
+    [[ -d ${REPOS_DIR}/Updating/ ]] && ln -svf ${REPOS_DIR}/Updating/* /usr/local/bin
+    [[ -d ${REPOS_DIR}/Utilities/ ]] && ln -svf ${REPOS_DIR}/Utilities/* /usr/local/bin
+    [[ -d ${REPOS_DIR}/Telebash/ ]] && ln -svf ${REPOS_DIR}/Telebash/* /usr/local/bin
+    [[ -d ${REPOS_DIR}/Crypto/ ]] && ln -svf ${REPOS_DIR}/Crypto/* /usr/local/bin
 }
 
 checkEnv()
 {
-	if ! which git>/dev/null
-		then
-			echo "${RED}× Git is not installed on this system!${RC}"
-			exit 1
-	fi
+    if ! which git>/dev/null
+        then
+            echo "${RED}× Git is not installed on this system!${RC}"
+            exit 1
+    fi
 
-	if [[ ${EUID} -ne "0" ]]
-		then
-			echo -e "\n${RED}× Run me as root!${RC}"
-			exit 1
-	fi
+    if [[ ${EUID} -ne "0" ]]
+        then
+            echo -e "\n${RED}× Run me as root!${RC}"
+            exit 1
+    fi
 
-	if [[ ! -f ${HOME}/.git-credentials ]]
-		then
-			echo -e "\n${RED}× Git credentials not found!${RC}"
-			exit 1
-	fi
+    if [[ ! -f ${HOME}/.git-credentials ]]
+        then
+            echo -e "\n${RED}× Git credentials not found!${RC}"
+            exit 1
+    fi
 }
 
 checkEnv
@@ -89,9 +89,9 @@ updateGit
 makeLink 1>/dev/null
 
 if [[ ${?} -eq "0" ]]
-	then
-		echo -e "\n${GREEN}ø Symbolic links have been made successfully${RC}"
-	else
-		echo -e "\n${RED}× Something went wrong during symbolic link creation!${RC}"
-		exit 1
+    then
+        echo -e "\n${GREEN}ø Symbolic links have been made successfully${RC}"
+    else
+        echo -e "\n${RED}× Something went wrong during symbolic link creation!${RC}"
+        exit 1
 fi

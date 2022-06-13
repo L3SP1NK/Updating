@@ -14,165 +14,152 @@ YELLOW="\e[33m"
 
 updateApt()
 {
-	echo -e "\n${RC}${YELLOW}→ Configuring/fixing possibly broken packages...${RC}"
-	apt-get -f -y install
-	dpkg --configure -a
+    echo -e "\n${RC}${YELLOW}→ Configuring/fixing possibly broken packages...${RC}"
+    apt-get -f -y install
+    dpkg --configure -a
 
-	echo -e "\n${RC}${YELLOW}→ Retrieving new lists of packages...${RC}"
-	apt-get update
+    echo -e "\n${RC}${YELLOW}→ Retrieving new lists of packages...${RC}"
+    apt-get update
 
-	echo -e "\n${RC}${YELLOW}→ Installing packages upgrades...${RC}"
-	apt-get -f -y upgrade
-	apt-get -f -y dist-upgrade
-	apt-get -f -y full-upgrade
+    echo -e "\n${RC}${YELLOW}→ Installing packages upgrades...${RC}"
+    apt-get -f -y upgrade
+    apt-get -f -y dist-upgrade
+    apt-get -f -y full-upgrade
 
-	echo -e "\n${RC}${YELLOW}→ Configuring/fixing possibly broken packages...${RC}"
-	apt-get -f -y install
-	dpkg --configure -a
+    echo -e "\n${RC}${YELLOW}→ Configuring/fixing possibly broken packages...${RC}"
+    apt-get -f -y install
+    dpkg --configure -a
 
-	echo -e "\n${RC}${YELLOW}→ Removing downloaded archive files and unused packages...${RC}"
-	apt-get -y clean
-	apt-get -y autoclean
-	apt-get -y autoremove --purge
+    echo -e "\n${RC}${YELLOW}→ Removing downloaded archive files and unused packages...${RC}"
+    apt-get -y clean
+    apt-get -y autoclean
+    apt-get -y autoremove --purge
 }
 
 updateNpm()
 {
-	echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages...${RC}"
-	npm update
-	echo -e "\n${RC}${YELLOW}→ Checking NPM installation...${RC}"
-	npm doctor
-	echo -e "\n${RC}${YELLOW}→ Auditing NPM packages...${RC}"
-	npm audit
-	echo -e "\n${RC}${YELLOW}→ Fixing NPM packages...${RC}"
-	npm audit fix
+    echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages...${RC}"
+    npm update
+    echo -e "\n${RC}${YELLOW}→ Checking NPM installation...${RC}"
+    npm doctor
+    echo -e "\n${RC}${YELLOW}→ Auditing NPM packages...${RC}"
+    npm audit
+    echo -e "\n${RC}${YELLOW}→ Fixing NPM packages...${RC}"
+    npm audit fix
 }
 
 updateFlatpak()
 {
-	echo -e "\n${RC}${YELLOW}→ Flatpak applications installed...${RC}"
-	flatpak list
-	echo -e "\n${RC}${YELLOW}→ Checking flatpak applications...${RC}"
-	flatpak repair -v
-	echo -e "\n${RC}${YELLOW}${INV}→ Updating flatpak...${RC}"
-	flatpak update -vy
+    echo -e "\n${RC}${YELLOW}→ Flatpak applications installed...${RC}"
+    flatpak list
+    echo -e "\n${RC}${YELLOW}→ Checking flatpak applications...${RC}"
+    flatpak repair -v
+    echo -e "\n${RC}${YELLOW}${INV}→ Updating flatpak...${RC}"
+    flatpak update -vy
 }
 
 updateGit()
 {
-	GIT_REPO_LOCATION="/"
-	cd ${GIT_REPO_LOCATION}||exit 1
-	## Search for GIT repos and update them.
-	for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null|grep -v /mnt/)
-		do
-			cd "${GIT_PATH}"||exit 1
-			echo -e "\n${RC}${YELLOW}→ Updating ${GIT_PATH}...${RC}"
-			cd ..||exit 1
-			git config pull.rebase true
-			git stash
-			git pull
-			cd ${GIT_REPO_LOCATION}||exit 1
-		done
+    GIT_REPO_LOCATION="/"
+    cd ${GIT_REPO_LOCATION}||exit 1
+    ## Search for GIT repos and update them.
+    for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null|grep -v /mnt/)
+        do
+            cd "${GIT_PATH}"||exit 1
+            echo -e "\n${RC}${YELLOW}→ Updating ${GIT_PATH}...${RC}"
+            cd ..||exit 1
+            git config pull.rebase true
+            git stash
+            git pull
+            cd ${GIT_REPO_LOCATION}||exit 1
+        done
 }
 
 updateKernel()
 {
-	FIRMWARE_PATH="/opt/FIRMWARE/"
-	FIRMWARE_PKGS="firmware-linux firmware-linux-free firmware-linux-nonfree firmware-amd-graphics firmware-ast firmware-ath9k-htc firmware-atheros firmware-cavium firmware-intel-sound firmware-intelwimax firmware-ipw2x00 firmware-ivtv firmware-iwlwifi firmware-linux firmware-linux-free firmware-linux-nonfree firmware-misc-nonfree firmware-mod-kit firmware-mod-kit-dbgsym firmware-qcom-media firmware-qcom-soc firmware-realtek firmware-samsung firmware-ti-connectivity"
-	apt-get -f -y install ${FIRMWARE_PKGS}
+    FIRMWARE_PATH="/opt/FIRMWARE/"
+    FIRMWARE_PKGS="firmware-linux firmware-linux-free firmware-linux-nonfree firmware-amd-graphics firmware-ast firmware-ath9k-htc firmware-atheros firmware-cavium firmware-intel-sound firmware-intelwimax firmware-ipw2x00 firmware-ivtv firmware-iwlwifi firmware-linux firmware-linux-free firmware-linux-nonfree firmware-misc-nonfree firmware-mod-kit firmware-mod-kit-dbgsym firmware-qcom-media firmware-qcom-soc firmware-realtek firmware-samsung firmware-ti-connectivity"
+    apt-get -f -y install ${FIRMWARE_PKGS}
 
-	mkdir -p ${FIRMWARE_PATH}
-	cd ${FIRMWARE_PATH}||exit 1
-	git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" --depth=8 2>/dev/null
-	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware/ 2>/dev/null
-	update-initramfs -u
+    mkdir -p ${FIRMWARE_PATH}
+    cd ${FIRMWARE_PATH}||exit 1
+    git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" --depth=8 2>/dev/null
+    cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware/ 2>/dev/null
+    update-initramfs -u
 }
 
 
+checkDone()
+{
+    if [[ ${?} -eq '0' ]]
+        then
+            echo -e "${RC}${GREEN}ø Done.${RC}"
+        else
+            echo -e "${RED}× Something went wrong!${RC}"
+            exit 1
+    fi
+}
+
 main()
 {
-	## Update apt packages.
-	if which apt-get>/dev/null
-		then
-			SECONDS="0"
-			echo -e "\n${RC}${YELLOW}${INV}→ Updating APT packages:${RC}"
-			updateApt
-			if [[ ${?} -eq "0" ]]
-				then
-					echo -e "${RC}${GREEN}ø APT packages updated in ${SECONDS} seconds.${RC}"
-				else
-					echo -e "${RED}× Something went wrong!${RC}"
-					exit 1
-			fi
-	fi
+    ## Update apt packages.
+    if which apt-get>/dev/null
+        then
+            SECONDS="0"
+            echo -e "\n${RC}${YELLOW}${INV}→ Updating APT packages:${RC}"
+            updateApt
+            checkDone
+            echo -e "${RC}${GREEN}ø APT packages updated in ${SECONDS} seconds.${RC}"
+    fi
 
-	## Update flatpak applications.
-	if which flatpak>/dev/null
-		then
-			SECONDS="0"
-			echo -e "\n${RC}${YELLOW}${INV}→ Updating Flatpak:${RC}"
-			updateFlatpak
-			if [[ ${?} -eq "0" ]]
-				then
-					echo -e "${RC}${GREEN}ø Flatpak updated in ${SECONDS} seconds.${RC}"
-				else
-					echo -e "${RED}× Something went wrong!${RC}"
-					exit 1
-			fi
-	fi
+    ## Update flatpak applications.
+    if which flatpak>/dev/null
+        then
+            SECONDS="0"
+            echo -e "\n${RC}${YELLOW}${INV}→ Updating Flatpak:${RC}"
+            updateFlatpak
+            checkDone
+            echo -e "${RC}${GREEN}ø Flatpak updated in ${SECONDS} seconds.${RC}"
+    fi
 
-	## Update NPM applications.
-	if which npm>/dev/null
-		then
-			SECONDS="0"
-			## echo You are using $(npm -V)
-			echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}"
-			updateNpm
-			if [[ ${?} -eq "0" ]]
-				then
-					echo -e "${RC}${GREEN}ø NPM updated in ${SECONDS} seconds.${RC}"
-				else
-					echo -e "${RED}× Something went wrong!${RC}"
-					exit 1
-			fi
-	fi
+    ## Update NPM applications.
+    if which npm>/dev/null
+        then
+            SECONDS="0"
+            ## echo You are using $(npm -V)
+            echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}"
+            updateNpm
+            checkDone
+            echo -e "${RC}${GREEN}ø NPM updated in ${SECONDS} seconds.${RC}"
+    fi
 
-	## Pull git repos.
-	if which git>/dev/null
-		then
-			SECONDS="0"
-			echo -e "\n${RC}${YELLOW}${INV}→ Updating Git repositories:${RC}"
-			## /!\ This function can't be ran in the background,
-			## you must pull the git repo containing the linux firmware before updating the kernel.
-			updateGit
-			if [[ ${?} -eq "0" ]]
-				then
-					echo -e "${RC}${GREEN}ø Git repositories updated in ${SECONDS} seconds.${RC}"
-				else
-					echo -e "${RED}× Something went wrong!${RC}"
-					exit 1
-			fi
-	fi
+    ## Pull git repos.
+    if which git>/dev/null
+        then
+            SECONDS="0"
+            echo -e "\n${RC}${YELLOW}${INV}→ Updating Git repositories:${RC}"
+            ## /!\ This function can't be ran in the background,
+            ## you must pull the git repo containing the linux firmware before updating the kernel.
+            updateGit
+            checkDone
+            echo -e "${RC}${GREEN}ø Git repositories updated in ${SECONDS} seconds.${RC}"
+    fi
 
-	## Update the linux kernel.
-	SECONDS="0"
-	echo -e "\n${RC}${YELLOW}${INV}→ Updating the linux kernel:${RC}"
-	updateKernel
-	if [[ ${?} -eq "0" ]]
-		then
-			echo -e "${RC}${GREEN}ø Linux kernel updated in ${SECONDS} seconds.${RC}"
-		else
-			echo -e "${RED}× Something went wrong!${RC}"
-			exit 1
-	fi
+    ## Update the linux kernel.
+    SECONDS="0"
+    echo -e "\n${RC}${YELLOW}${INV}→ Updating the linux kernel:${RC}"
+    updateKernel
+    checkDone
+    echo -e "${RC}${GREEN}ø Linux kernel updated in ${SECONDS} seconds.${RC}"
 }
 
 clear
 ## Check privileges and proceed.
 if [[ ${EUID} -ne "0" ]]
-	then
-		echo -e "${RED}× This script must be run as root!${RC}"
-		exit 1
-	else
-		main&&echo -e "${RC}${GREEN}ø Update finished.${RC}"||echo -e "${RED}× Something went wrong during update!${RC}"
+    then
+        echo -e "${RED}× This script must be run as root!${RC}"
+        exit 1
+    else
+        main
+        checkDone
 fi
