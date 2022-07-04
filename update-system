@@ -14,23 +14,23 @@ YELLOW="\e[33m"
 
 updateApt()
 {
-    echo -e "\n${RC}${YELLOW}→ Configuring/fixing possibly broken packages...${RC}"
+    echo -e "\n${RC}${YELLOW} → Configuring/fixing possibly broken packages...${RC}"
     apt-get -f -y install
     dpkg --configure -a
 
-    echo -e "\n${RC}${YELLOW}→ Retrieving new lists of packages...${RC}"
+    echo -e "\n${RC}${YELLOW} → Retrieving new lists of packages...${RC}"
     apt-get update
 
-    echo -e "\n${RC}${YELLOW}→ Installing packages upgrades...${RC}"
+    echo -e "\n${RC}${YELLOW} → Installing packages upgrades...${RC}"
     apt-get -f -y upgrade
     apt-get -f -y dist-upgrade
     apt-get -f -y full-upgrade
 
-    echo -e "\n${RC}${YELLOW}→ Configuring/fixing possibly broken packages...${RC}"
+    echo -e "\n${RC}${YELLOW} → Configuring/fixing possibly broken packages...${RC}"
     apt-get -f -y install
     dpkg --configure -a
 
-    echo -e "\n${RC}${YELLOW}→ Removing downloaded archive files and unused packages...${RC}"
+    echo -e "\n${RC}${YELLOW} → Removing downloaded archive files and unused packages...${RC}"
     apt-get -y clean
     apt-get -y autoclean
     apt-get -y autoremove --purge
@@ -38,23 +38,23 @@ updateApt()
 
 updateNpm()
 {
-    echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages...${RC}"
+    echo -e "\n${RC}${YELLOW}${INV} → Updating NPM packages...${RC}"
     npm update
-    echo -e "\n${RC}${YELLOW}→ Checking NPM installation...${RC}"
+    echo -e "\n${RC}${YELLOW} → Checking NPM installation...${RC}"
     npm doctor
-    echo -e "\n${RC}${YELLOW}→ Auditing NPM packages...${RC}"
+    echo -e "\n${RC}${YELLOW} → Auditing NPM packages...${RC}"
     npm audit
-    echo -e "\n${RC}${YELLOW}→ Fixing NPM packages...${RC}"
+    echo -e "\n${RC}${YELLOW} → Fixing NPM packages...${RC}"
     npm audit fix
 }
 
 updateFlatpak()
 {
-    echo -e "\n${RC}${YELLOW}→ Flatpak applications installed...${RC}"
+    echo -e "\n${RC}${YELLOW} → Flatpak applications installed...${RC}"
     flatpak list
-    echo -e "\n${RC}${YELLOW}→ Checking flatpak applications...${RC}"
+    echo -e "\n${RC}${YELLOW} → Checking flatpak applications...${RC}"
     flatpak repair -v
-    echo -e "\n${RC}${YELLOW}${INV}→ Updating flatpak...${RC}"
+    echo -e "\n${RC}${YELLOW}${INV} → Updating flatpak...${RC}"
     flatpak update -vy
 }
 
@@ -66,7 +66,7 @@ updateGit()
     for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null|grep -v /mnt/)
         do
             cd "${GIT_PATH}"||exit 1
-            echo -e "\n${RC}${YELLOW}→ Updating ${GIT_PATH}...${RC}"
+            echo -e "\n${RC}${YELLOW} → Updating ${GIT_PATH}...${RC}"
             cd ..||exit 1
             git config pull.rebase true
             git stash
@@ -106,7 +106,7 @@ main()
     if which apt-get>/dev/null
         then
             SECONDS="0"
-            echo -e "\n${RC}${YELLOW}${INV}→ Updating APT packages:${RC}"
+            echo -e "\n${RC}${YELLOW}${INV} → Updating APT packages:${RC}"
             updateApt
             checkDone
             echo -e "${RC}${GREEN}ø APT packages updated in ${SECONDS} seconds.${RC}"
@@ -116,7 +116,7 @@ main()
     if which flatpak>/dev/null
         then
             SECONDS="0"
-            echo -e "\n${RC}${YELLOW}${INV}→ Updating Flatpak:${RC}"
+            echo -e "\n${RC}${YELLOW}${INV} → Updating Flatpak:${RC}"
             updateFlatpak
             checkDone
             echo -e "${RC}${GREEN}ø Flatpak updated in ${SECONDS} seconds.${RC}"
@@ -127,7 +127,7 @@ main()
         then
             SECONDS="0"
             ## echo You are using $(npm -V)
-            echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}"
+            echo -e "\n${RC}${YELLOW}${INV} → Updating NPM packages:${RC}"
             updateNpm
             checkDone
             echo -e "${RC}${GREEN}ø NPM updated in ${SECONDS} seconds.${RC}"
@@ -137,9 +137,7 @@ main()
     if which git>/dev/null
         then
             SECONDS="0"
-            echo -e "\n${RC}${YELLOW}${INV}→ Updating Git repositories:${RC}"
-            ## /!\ This function can't be ran in the background,
-            ## you must pull the git repo containing the linux firmware before updating the kernel.
+            echo -e "\n${RC}${YELLOW}${INV} → Updating Git repositories:${RC}"
             updateGit
             checkDone
             echo -e "${RC}${GREEN}ø Git repositories updated in ${SECONDS} seconds.${RC}"
@@ -147,7 +145,7 @@ main()
 
     ## Update the linux kernel.
     SECONDS="0"
-    echo -e "\n${RC}${YELLOW}${INV}→ Updating the linux kernel:${RC}"
+    echo -e "\n${RC}${YELLOW}${INV} → Updating the linux kernel:${RC}"
     updateKernel
     checkDone
     echo -e "${RC}${GREEN}ø Linux kernel updated in ${SECONDS} seconds.${RC}"
