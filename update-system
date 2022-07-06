@@ -60,10 +60,10 @@ updateFlatpak()
 
 updateGit()
 {
-    GIT_REPO_LOCATION="/"
+    GIT_REPO_LOCATION="/opt"
     cd ${GIT_REPO_LOCATION}||exit 1
     ## Search for GIT repos and update them.
-    for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null|grep -v /mnt/)
+    for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null)
         do
             cd "${GIT_PATH}"||exit 1
             echo -e "\n${RC}${YELLOW} → Updating ${GIT_PATH}...${RC}"
