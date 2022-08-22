@@ -1,36 +1,43 @@
 #!/usr/bin/env bash
+
 ## This script is only made for Debian based distros, it will update:
 ## - apt packages
 ## - git repositories
 ## - flatpak applications
 ## - npm packages
-## - the linux firmware and kernel
+## - the linux firmwares and kernel
 
-RC="\e[0m"
-INV="\e[7m"
-GREEN="\e[32m"
-RED="\e[31m"
-YELLOW="\e[33m"
+RC='\e[0m'
+INV='\e[7m'
+LIGHT='\e[2m'
+GREEN='\e[32m'
+RED='\e[31m'
+YELLOW='\e[33m'
+
 
 updateApt()
 {
-    echo -e "\n${RC}${YELLOW} → Configuring/fixing possibly broken packages...${RC}"
-    apt-get -f -y install
+    echo -e "\n${RC}${YELLOW} → Configuring/fixing possibly broken packages...${RC}${LIGHT}"
+    apt-get -fyq install
     dpkg --configure -a
 
-    echo -e "\n${RC}${YELLOW} → Retrieving new lists of packages...${RC}"
-    apt-get update
+    echo -e "\n${RC}${YELLOW} → Retrieving new lists of packages...${RC}${LIGHT}"
+    apt-get update --list-cleanup
 
-    echo -e "\n${RC}${YELLOW} → Installing packages upgrades...${RC}"
-    apt-get -f -y upgrade
-    apt-get -f -y dist-upgrade
-    apt-get -f -y full-upgrade
+    PKG_TO_UPGRADE=$(apt list --upgradable | cut -d '/' -f 1)
+    echo -e "\n${RC}${YELLOW} → The following packages will be updated:${RC}${LIGHT}"
+    echo -e "\n${PKG_TO_UPGRADE}"
 
-    echo -e "\n${RC}${YELLOW} → Configuring/fixing possibly broken packages...${RC}"
-    apt-get -f -y install
+    echo -e "\n${RC}${YELLOW} → Installing packages upgrades...${RC}${LIGHT}"
+    apt-get -fyq upgrade
+    apt-get -fyq dist-upgrade
+    apt-get -fyq full-upgrade
+
+    echo -e "\n${RC}${YELLOW} → Configuring/fixing possibly broken packages...${RC}${LIGHT}"
+    apt-get -fyq install
     dpkg --configure -a
 
-    echo -e "\n${RC}${YELLOW} → Removing downloaded archive files and unused packages...${RC}"
+    echo -e "\n${RC}${YELLOW} → Removing downloaded archive files and unused packages...${RC}${LIGHT}"
     apt-get -y clean
     apt-get -y autoclean
     apt-get -y autoremove --purge
@@ -77,7 +84,7 @@ updateKernel()
 {
     FIRMWARE_PATH="/opt/FIRMWARE/"
     FIRMWARE_PKGS="firmware-linux firmware-linux-free firmware-linux-nonfree firmware-amd-graphics firmware-ast firmware-ath9k-htc firmware-atheros firmware-cavium firmware-intel-sound firmware-intelwimax firmware-ipw2x00 firmware-ivtv firmware-iwlwifi firmware-linux firmware-linux-free firmware-linux-nonfree firmware-misc-nonfree firmware-mod-kit firmware-mod-kit-dbgsym firmware-qcom-media firmware-qcom-soc firmware-realtek firmware-samsung firmware-ti-connectivity"
-    apt-get -f -y install ${FIRMWARE_PKGS}
+    apt-get -fyq install ${FIRMWARE_PKGS}
 
     mkdir -p ${FIRMWARE_PATH}
     cd ${FIRMWARE_PATH}||exit 1
@@ -103,7 +110,7 @@ main()
     ## Update apt packages.
     if which apt-get>/dev/null
         then
-            SECONDS="0"
+            SECONDS='0'
             echo -e "\n${RC}${YELLOW}${INV} → Updating APT packages:${RC}"
             updateApt
             checkDone
@@ -113,7 +120,7 @@ main()
     ## Update flatpak applications.
     if which flatpak>/dev/null
         then
-            SECONDS="0"
+            SECONDS='0'
             echo -e "\n${RC}${YELLOW}${INV} → Updating Flatpak:${RC}"
             updateFlatpak
             checkDone
@@ -123,7 +130,7 @@ main()
     ## Update NPM applications.
     if which npm>/dev/null
         then
-            SECONDS="0"
+            SECONDS='0'
             ## echo You are using $(npm -V)
             echo -e "\n${RC}${YELLOW}${INV} → Updating NPM packages:${RC}"
             updateNpm
@@ -134,7 +141,7 @@ main()
     ## Pull git repos.
     if which git>/dev/null
         then
-            SECONDS="0"
+            SECONDS='0'
             echo -e "\n${RC}${YELLOW}${INV} → Updating Git repositories:${RC}"
             updateGit
             checkDone
@@ -142,7 +149,7 @@ main()
     fi
 
     ## Update the linux kernel.
-    SECONDS="0"
+    SECONDS='0'
     echo -e "\n${RC}${YELLOW}${INV} → Updating the linux kernel:${RC}"
     updateKernel
     checkDone
