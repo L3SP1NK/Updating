@@ -51,7 +51,7 @@ makeLink()
     fi
 
     ## Custom GTK CSS.
-    if [[ -f ${REPOS_DIR}/Configs/gtk.css &&  -d ${USER_HOME}/.config/gtk-3.0 ]]
+    if [[ -f ${REPOS_DIR}/Configs/gtk.css && -d ${USER_HOME}/.config/gtk-3.0 ]]
         then
             ln -svf ${REPOS_DIR}/Configs/gtk.css ${USER_HOME}/.config/gtk-3.0/
     fi
