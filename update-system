@@ -164,5 +164,22 @@ if [[ ${EUID} -ne "0" ]]
         exit 1
     else
         main
-        checkDone
+        if checkDone
+            then
+                if pidof Xorg>/dev/null
+                    then
+                        zenity --no-wrap --ellipsize --question --text "Update done! \n\nReboot now?"
+                    else
+                        echo -e "${GREEN}Reboot? [N/y]"
+                        read -e -n 1
+                        case ${REBOOT} in
+                            "y|Y")
+                                reboot -f --no-wall -d
+                                ;;
+                            *)
+                                exit 0
+                                ;;
+                        esac
+                 fi
+        fi
 fi
