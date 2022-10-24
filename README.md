@@ -1,2 +1,2 @@
 ## Updating
-Script to update/backup your system.
+Script to update/backup a Debian system.
