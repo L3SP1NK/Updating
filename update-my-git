@@ -65,6 +65,10 @@ makeLink()
     [[ -d ${REPOS_DIR}/Utilities ]]&&ln -svf ${REPOS_DIR}/Utilities/* /usr/local/bin
     [[ -d ${REPOS_DIR}/Telebash ]]&&ln -svf ${REPOS_DIR}/Telebash/* /usr/local/bin
     [[ -d ${REPOS_DIR}/Crypto ]]&&ln -svf ${REPOS_DIR}/Crypto/* /usr/local/bin
+
+    ## Xfce4 files.
+    [[ -d ${USER_HOME}/.config/xfce4/xfconf/xfce-perchannel-xml/ && -e /opt/mygit/Configs/xfce/xfce4-keyboard-shortcuts.xml ]]&&ln -svf /opt/mygit/Configs/xfce/xfce4-keyboard-shortcuts.xml ${USER_HOME}/.config/xfce4/xfconf/xfce-perchannel-xml/
+
 }
 
 checkEnv()
