@@ -51,16 +51,10 @@ makeLink()
     ln -svf ${REPOS_DIR}/Configs/dot-files/.* ${HOME} 2>/dev/null
 
     ## Rofi config
-    if [[ -d ${REPOS_DIR}/Configs/rofi/&&-d ${USER_HOME}/.config/rofi ]]
-        then
-            ln -svf ${REPOS_DIR}/Configs/rofi/* ${USER_HOME}/.config/rofi
-    fi
+    [[ -d ${REPOS_DIR}/Configs/rofi/&&-d ${USER_HOME}/.config/rofi ]]&&ln -svf ${REPOS_DIR}/Configs/rofi/* ${USER_HOME}/.config/rofi
 
     ## Custom GTK CSS.
-    if [[ -f ${REPOS_DIR}/Configs/gtk.css&&-d ${USER_HOME}/.config/gtk-3.0 ]]
-        then
-            ln -svf ${REPOS_DIR}/Configs/gtk.css ${USER_HOME}/.config/gtk-3.0
-    fi
+    [[ -f ${REPOS_DIR}/Configs/gtk.css&&-d ${USER_HOME}/.config/gtk-3.0 ]]&&ln -svf ${REPOS_DIR}/Configs/gtk.css ${USER_HOME}/.config/gtk-3.0
 
     ## Nanorc files.
     [[ -d ${REPOS_DIR}/nanorc ]]&&ln -svf ${REPOS_DIR}/nanorc /usr/share/nanorc
@@ -94,14 +88,18 @@ checkEnv()
     fi
 }
 
-checkEnv
-updateGit
-makeLink 1>/dev/null
+main(){
+    checkEnv
+    updateGit
+    makeLink 1>/dev/null
+}
 
-if [[ ${?} -eq "0" ]]
+if main
     then
-        echo -e "\n${GREEN} ø Symbolic links have been made successfully${RC}"
+        echo -e "\n${GREEN}Git repositories have been updated successfully!${RC}"
+        cd ${CWD}
+        exit
     else
-        echo -e "\n${RED} × Something went wrong during symbolic link creation!${RC}"
+        echo -e "\n${RED}Something went wrong!${RC}"
         exit 1
 fi
