@@ -7,8 +7,6 @@
 ## - npm packages
 ## - the linux firmwares and kernel
 
-## This program has only been tested on debian based distros!
-
 RC='\e[0m'
 INV='\e[7m'
 LIGHT='\e[2m'
@@ -19,27 +17,23 @@ YELLOW='\e[33m'
 
 updateApt()
 {
-    echo -e "\n${RC}${YELLOW} → Configuring/fixing possibly broken packages...${RC}${LIGHT}"
+    echo -e "\n${RC}${YELLOW}→ Configuring/fixing possibly broken packages...${RC}${LIGHT}"
     apt-get -fyq install
     dpkg --configure -a
 
-    echo -e "\n${RC}${YELLOW} → Retrieving new lists of packages...${RC}${LIGHT}"
+    echo -e "\n${RC}${YELLOW}→ Retrieving new lists of packages...${RC}${LIGHT}"
     apt-get update --list-cleanup
 
-    PKG_TO_UPGRADE=$(apt list --upgradable | cut -d '/' -f 1)
-    echo -e "\n${RC}${YELLOW} → The following packages will be updated:${RC}${LIGHT}"
-    echo -e "\n${PKG_TO_UPGRADE}"
-
-    echo -e "\n${RC}${YELLOW} → Installing packages upgrades...${RC}${LIGHT}"
+    echo -e "\n${RC}${YELLOW}→ Installing packages upgrades...${RC}${LIGHT}"
     apt-get -fyq upgrade
     apt-get -fyq dist-upgrade
     apt-get -fyq full-upgrade
 
-    echo -e "\n${RC}${YELLOW} → Configuring/fixing possibly broken packages...${RC}${LIGHT}"
+    echo -e "\n${RC}${YELLOW}→ Configuring/fixing possibly broken packages...${RC}${LIGHT}"
     apt-get -fyq install
     dpkg --configure -a
 
-    echo -e "\n${RC}${YELLOW} → Removing downloaded archive files and unused packages...${RC}${LIGHT}"
+    echo -e "\n${RC}${YELLOW}→ Removing downloaded archive files and unused packages...${RC}${LIGHT}"
     apt-get -y clean
     apt-get -y autoclean
     apt-get -y autoremove --purge
@@ -47,23 +41,23 @@ updateApt()
 
 updateNpm()
 {
-    echo -e "\n${RC}${YELLOW}${INV} → Updating NPM packages...${RC}"
+    echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages...${RC}"
     npm update
-    echo -e "\n${RC}${YELLOW} → Checking NPM installation...${RC}"
+    echo -e "\n${RC}${YELLOW}→ Checking NPM installation...${RC}"
     npm doctor
-    echo -e "\n${RC}${YELLOW} → Auditing NPM packages...${RC}"
+    echo -e "\n${RC}${YELLOW}→ Auditing NPM packages...${RC}"
     npm audit
-    echo -e "\n${RC}${YELLOW} → Fixing NPM packages...${RC}"
+    echo -e "\n${RC}${YELLOW}→ Fixing NPM packages...${RC}"
     npm audit fix
 }
 
 updateFlatpak()
 {
-    echo -e "\n${RC}${YELLOW} → Flatpak applications installed...${RC}"
+    echo -e "\n${RC}${YELLOW}→ Flatpak applications installed...${RC}"
     flatpak list
-    echo -e "\n${RC}${YELLOW} → Checking flatpak applications...${RC}"
+    echo -e "\n${RC}${YELLOW}→ Checking flatpak applications...${RC}"
     flatpak repair -v
-    echo -e "\n${RC}${YELLOW}${INV} → Updating flatpak...${RC}"
+    echo -e "\n${RC}${YELLOW}${INV}→ Updating flatpak...${RC}"
     flatpak update -vy
 }
 
@@ -74,7 +68,7 @@ updateGit()
     for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null)
         do
             cd "${GIT_PATH}"||exit 1
-            echo -e "\n${RC}${YELLOW} → Updating ${GIT_PATH}...${RC}"
+            echo -e "\n${RC}${YELLOW}→ Updating ${GIT_PATH}...${RC}"
             cd ..||exit 1
             git config pull.rebase true
             git stash
@@ -113,7 +107,7 @@ main()
     if which apt-get>/dev/null
         then
             SECONDS='0'
-            echo -e "\n${RC}${YELLOW}${INV} → Updating APT packages:${RC}"
+            echo -e "\n${RC}${YELLOW}${INV}→ Updating APT packages:${RC}"
             updateApt
             checkDone
             echo -e "${RC}${GREEN}ø APT packages updated in ${SECONDS} seconds.${RC}"
@@ -123,7 +117,7 @@ main()
     if which flatpak>/dev/null
         then
             SECONDS='0'
-            echo -e "\n${RC}${YELLOW}${INV} → Updating Flatpak:${RC}"
+            echo -e "\n${RC}${YELLOW}${INV}→ Updating Flatpak:${RC}"
             updateFlatpak
             checkDone
             echo -e "${RC}${GREEN}ø Flatpak updated in ${SECONDS} seconds.${RC}"
@@ -134,7 +128,7 @@ main()
         then
             SECONDS='0'
             ## echo You are using $(npm -V)
-            echo -e "\n${RC}${YELLOW}${INV} → Updating NPM packages:${RC}"
+            echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}"
             updateNpm
             checkDone
             echo -e "${RC}${GREEN}ø NPM updated in ${SECONDS} seconds.${RC}"
@@ -144,7 +138,7 @@ main()
     if which git>/dev/null
         then
             SECONDS='0'
-            echo -e "\n${RC}${YELLOW}${INV} → Updating Git repositories:${RC}"
+            echo -e "\n${RC}${YELLOW}${INV}→ Updating Git repositories:${RC}"
             updateGit
             checkDone
             echo -e "${RC}${GREEN}ø Git repositories updated in ${SECONDS} seconds.${RC}"
@@ -152,7 +146,7 @@ main()
 
     ## Update the linux kernel.
     SECONDS='0'
-    echo -e "\n${RC}${YELLOW}${INV} → Updating the linux kernel:${RC}"
+    echo -e "\n${RC}${YELLOW}${INV}→ Updating the linux kernel:${RC}"
     updateKernel
     checkDone
     echo -e "${RC}${GREEN}ø Linux kernel updated in ${SECONDS} seconds.${RC}"
@@ -166,34 +160,4 @@ if [[ ${EUID} -ne "0" ]]
         exit 1
     else
         main
-        if checkDone
-            then
-                if pidof Xorg>/dev/null
-                    then
-                        if ! zenity --no-wrap --ellipsize --question --text "Update done! \n\nReboot now?" 2>/dev/null
-                            then
-                                echo -e "${GREEN}Reboot? [N/y]"
-                                read -e -n 1
-                                case ${REBOOT} in
-                                    "y|Y")
-                                        reboot -f --no-wall -d
-                                        ;;
-                                    *)
-                                        exit 0
-                                        ;;
-                                esac
-                        fi
-                    else
-                        echo -e "${GREEN}Reboot? [N/y]"
-                        read -e -n 1
-                        case ${REBOOT} in
-                            "y|Y")
-                                reboot -f --no-wall -d
-                                ;;
-                            *)
-                                exit 0
-                                ;;
-                        esac
-                 fi
-        fi
 fi
