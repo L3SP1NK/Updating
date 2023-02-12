@@ -7,6 +7,9 @@
 ## - npm packages
 ## - the linux firmwares and kernel
 
+## TODO:
+## run 'dpkg --audit' if apt fail
+
 RC='\e[0m'
 INV='\e[7m'
 LIGHT='\e[2m'
