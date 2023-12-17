@@ -1,11 +1,11 @@
 #!/bin/bash
 
-## Update:
-## - apt packages
-## - git repositories
-## - flatpak applications
-## - npm packages
-## - Linux firmwares+kernel
+##	Update:
+##	- apt packages
+##	- git repositories
+##	- flatpak applications
+##	- npm packages
+##	- Linux firmwares+kernel
 
 RC='\e[0m'
 INV='\e[7m'
@@ -20,6 +20,7 @@ WARN=' '
 
 
 updateApt()
+
 {
 
     echo -e "\n${RC}${YELLOW}${INFO}Configuring/fixing possibly broken packages...${RC}"
@@ -47,6 +48,7 @@ updateApt()
 
 
 updateNpm()
+
 {
 
     echo -e "\n${RC}${YELLOW}${INV}${INFO}Updating NPM packages...${RC}"
@@ -65,6 +67,7 @@ updateNpm()
 
 
 updateFlatpak()
+
 {
 
     echo -e "\n${RC}${YELLOW}${INFO}Flatpak applications installed...${RC}"
@@ -80,6 +83,7 @@ updateFlatpak()
 
 
 updateGit()
+
 {
 
     GIT_REPO_LOCATION="/opt /usr/share/themes /usr/share/icons"
@@ -96,10 +100,12 @@ updateGit()
             git pull
 
         done
+
 }
 
 
 updateKernel()
+
 {
 
     FIRMWARE_PKGS=( "firmware-linux" "firmware-linux-free" "firmware-linux-nonfree" )
@@ -143,6 +149,7 @@ checkDone(){
 main()
 {
     ## Update apt packages.
+
     if which apt-get > /dev/null
         then
 
@@ -158,6 +165,7 @@ main()
 
 
     ## Update flatpak applications.
+
     if which flatpak > /dev/null
         then
 
@@ -173,6 +181,7 @@ main()
 
 
     ## Update NPM applications.
+
     if which npm > /dev/null
         then
 
@@ -187,6 +196,7 @@ main()
 
 
     ## Pull git repos.
+
     if which git > /dev/null
         then
 

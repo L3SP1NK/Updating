@@ -1,109 +1,141 @@
-#!/usr/bin/env bash
-## Update my git repository.
+#!/bin/bash
 
-## Set colors.
+## Update my git REPOitory.
+
 RC="\e[0m"
 GREEN="\e[32m"
 RED="\e[31m"
-BLUE="\e[34m"
+ORANGE="\e[33m"
+BLUE="\e[34m\e[1m"
 
 CWD=$(pwd)
-USER_HOME="/home/lespink"
-REPOS_DIR="/opt/mygit"
+USER_HOME="/home/$( ls /home | head -n 1 )"
+
+FOLDER=' '
+OK=' '
+INFO=' '
+WARN=' '
+
 
 updateGit()
+
 {
-    ## Search for GIT repos.
-    for GIT_PATH in $(find ${REPOS_DIR}/ -type d -name ".git" 2>/dev/null)
+
+	REPO_PATH="/opt/mygit"
+	REPO_FOUND=( $( find "${REPO_PATH}/" -type d -name ".git" 2>/dev/null ) )
+
+	echo -e "\n${ORANGE}${INFO} Looking for git repositories...${RC}"
+
+
+    for REPO in "${REPO_FOUND[@]}"
         do
-            CURRENT_GIT=$(echo ${GIT_PATH}|cut -d '/' -f 4 )
-            cd ${GIT_PATH}||exit 1
-            cd ..||exit 1
-            echo -e "\n${BLUE}→ ${CURRENT_GIT}${RC}"
 
-            ## Pull change:
+            CURRENT_REPO_NAME=$( echo "${REPO}" | cut -d '/' -f 4 )
+
+            echo -e "\n${BLUE}${FOLDER} ${CURRENT_REPO_NAME} ${RC}"
+            cd "${REPO}" && cd ..
+
             git pull ## Will return error if changes have been made.
-
-            ## Config:
             git config pull.rebase true
-            git config --global --add safe.directory ${GIT_PATH} ## Add exceptions for use with multiple github accounts.
 
-            ## Add files to the repo:
-            git add -v .* 2>/dev/null ## Dismiss error due to ".."
+            git add -v .* 2>/dev/null ## Dismiss error due to ".." being added
             git add -v * 2>/dev/null ## ``
 
-            ## Commit changes:
-            git commit -a
-            git push -v
+            git commit -a && git push -v
 
-            ## Pull change:
-            git pull
-            echo -e "\n${GREEN}ø ${CURRENT_GIT} Updated.${RC}"
+            git pull && echo -e "\n${GREEN}${OK} ${CURRENT_REPO_NAME} Updated. ${RC}\n\n"
+
     done
+
 }
 
+
 makeLink()
+
 {
-    cd ${REPOS_DIR}||exit 1
+
+    cd "${REPO_DIR}"
 
     ## Dot-files.
-    ln -svf ${REPOS_DIR}/Configs/dot-files/.* ${USER_HOME} 2>/dev/null
-    ln -svf ${REPOS_DIR}/Configs/dot-files/.* ${HOME} 2>/dev/null
+    ln -svf ${REPO_DIR}/Configs/dot-files/.* ${USER_HOME} 2>/dev/null
 
     ## Rofi config
-    [[ -d ${REPOS_DIR}/Configs/rofi/&&-d ${USER_HOME}/.config/rofi ]]&&ln -svf ${REPOS_DIR}/Configs/rofi/* ${USER_HOME}/.config/rofi
+    [[ -d ${REPO_DIR}/Configs/rofi/&&-d ${USER_HOME}/.config/rofi ]]&&ln -svf ${REPO_DIR}/Configs/rofi/* ${USER_HOME}/.config/rofi
 
     ## Custom GTK CSS.
-    [[ -f ${REPOS_DIR}/Configs/gtk.css&&-d ${USER_HOME}/.config/gtk-3.0 ]]&&ln -svf ${REPOS_DIR}/Configs/gtk.css ${USER_HOME}/.config/gtk-3.0
+    [[ -f ${REPO_DIR}/Configs/gtk.css&&-d ${USER_HOME}/.config/gtk-3.0 ]]&&ln -svf ${REPO_DIR}/Configs/gtk.css ${USER_HOME}/.config/gtk-3.0
 
     ## Nanorc files.
-    [[ -d ${REPOS_DIR}/nanorc ]]&&ln -svf ${REPOS_DIR}/nanorc /usr/share/nanorc
+    [[ -d ${REPO_DIR}/nanorc ]]&&ln -svf ${REPO_DIR}/nanorc /usr/share/nanorc
 
 
     ## Link scripts.
-    [[ -d ${REPOS_DIR}/Updating ]]&&ln -svf ${REPOS_DIR}/Updating/* /usr/local/bin
-    [[ -d ${REPOS_DIR}/Utilities ]]&&ln -svf ${REPOS_DIR}/Utilities/* /usr/local/bin
-    [[ -d ${REPOS_DIR}/Telebash ]]&&ln -svf ${REPOS_DIR}/Telebash/* /usr/local/bin
-    [[ -d ${REPOS_DIR}/Crypto ]]&&ln -svf ${REPOS_DIR}/Crypto/* /usr/local/bin
+    [[ -d ${REPO_DIR}/Updating ]]&&ln -svf ${REPO_DIR}/Updating/* /usr/local/bin
+    [[ -d ${REPO_DIR}/Utilities ]]&&ln -svf ${REPO_DIR}/Utilities/* /usr/local/bin
+    [[ -d ${REPO_DIR}/Telebash ]]&&ln -svf ${REPO_DIR}/Telebash/* /usr/local/bin
+    [[ -d ${REPO_DIR}/Crypto ]]&&ln -svf ${REPO_DIR}/Crypto/* /usr/local/bin
 
     ## Xfce4 files.
     [[ -d ${USER_HOME}/.config/xfce4/xfconf/xfce-perchannel-xml/ && -e /opt/mygit/Configs/xfce/xfce4-keyboard-shortcuts.xml ]]&&ln -svf /opt/mygit/Configs/xfce/xfce4-keyboard-shortcuts.xml ${USER_HOME}/.config/xfce4/xfconf/xfce-perchannel-xml/
 
 }
 
-checkEnv()
+
+checkGitInstall()
+
 {
     if ! which git>/dev/null
         then
-            echo "\n${RED} × Git is not installed on this system!${RC}"
+
+            echo "\n${RED}${WARN} Git is not installed on this system! ${RC}"
             exit 1
+
     fi
 
-    if [[ ${EUID} -ne "0" ]]
-        then
-            echo -e "\n${RED} × Run me as root!${RC}"
-            exit 1
-    fi
 
     if [[ ! -f ${HOME}/.git-credentials ]]
         then
-            echo -e "\n${RED} × Git credentials not found!${RC}"
+
+            echo -e "\n${RED}${WARN} Git credentials not found! ${RC}"
             exit 1
+
     fi
+
+
+
 }
 
-main(){
-    checkEnv
-    updateGit
+
+main()
+
+{
+
+    if [[ ${EUID} -ne "0" ]]
+        then
+
+            echo -e "\n${RED}${WARN} Run me as root! ${RC}"
+            exit 1
+
+    fi
+
+
+    checkGitInstall && updateGit
     makeLink 1>/dev/null
+
 }
+
 
 if main
+
     then
-        echo -e "\n${GREEN}Git repositories have been updated successfully!${RC}"
+
+        echo -e "\n${GREEN}${OK} Git Repositories have been updated successfully! ${RC}"
         cd ${CWD}
         exit
+
     else
-        echo -e "\n${RED}Something went wrong!${RC}"
+
+        echo -e "\n${RED}${WARN} Something went wrong! ${RC}"
         exit 1
+
 fi
