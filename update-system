@@ -1,11 +1,11 @@
 #!/bin/bash
 
-## This program will update:
+## Update:
 ## - apt packages
 ## - git repositories
 ## - flatpak applications
 ## - npm packages
-## - the linux firmwares and kernel
+## - Linux firmwares+kernel
 
 RC='\e[0m'
 INV='\e[7m'
@@ -14,151 +14,214 @@ GREEN='\e[32m'
 RED='\e[31m'
 YELLOW='\e[33m'
 
+OK=' '
+INFO=' '
+WARN=' '
+
 
 updateApt()
 {
-    echo -e "\n${RC}${YELLOW}🔘 Configuring/fixing possibly broken packages...${RC}${LIGHT}"
+
+    echo -e "\n${RC}${YELLOW}${INFO}Configuring/fixing possibly broken packages...${RC}"
     apt-get -fyq install
     dpkg --configure -a
 
-    echo -e "\n${RC}${YELLOW}🔘 Retrieving new lists of packages...${RC}${LIGHT}"
+    echo -e "\n${RC}${YELLOW}${INFO}Retrieving new lists of packages...${RC}"
     apt-get update --list-cleanup
 
-    echo -e "\n${RC}${YELLOW}🔘 Installing packages upgrades...${RC}${LIGHT}"
+    echo -e "\n${RC}${YELLOW}${INFO}Installing packages upgrades...${RC}"
     apt-get -fyq upgrade
     apt-get -fyq dist-upgrade
     apt-get -fyq full-upgrade
 
-    echo -e "\n${RC}${YELLOW}🔘 Configuring/fixing possibly broken packages...${RC}${LIGHT}"
+    echo -e "\n${RC}${YELLOW}${INFO}Configuring/fixing possibly broken packages...${RC}"
     apt-get -fyq install
     dpkg --configure -a
 
-    echo -e "\n${RC}${YELLOW}🔘 Removing downloaded archive files and unused packages...${RC}${LIGHT}"
+    echo -e "\n${RC}${YELLOW}${INFO}Removing downloaded archive files and unused packages...${RC}"
     apt-get -y clean
     apt-get -y autoclean
     apt-get -y autoremove --purge
+
 }
+
 
 updateNpm()
 {
-    echo -e "\n${RC}${YELLOW}${INV}🔘 Updating NPM packages...${RC}"
+
+    echo -e "\n${RC}${YELLOW}${INV}${INFO}Updating NPM packages...${RC}"
     npm update
-    echo -e "\n${RC}${YELLOW}🔘 Checking NPM installation...${RC}"
+
+    echo -e "\n${RC}${YELLOW}${INFO}Checking NPM installation...${RC}"
     npm doctor
-    echo -e "\n${RC}${YELLOW}🔘 Auditing NPM packages...${RC}"
+
+    echo -e "\n${RC}${YELLOW}${INFO}Auditing NPM packages...${RC}"
     npm audit
-    echo -e "\n${RC}${YELLOW}🔘 Fixing NPM packages...${RC}"
+
+    echo -e "\n${RC}${YELLOW}${INFO}Fixing NPM packages...${RC}"
     npm audit fix
+
 }
+
 
 updateFlatpak()
 {
-    echo -e "\n${RC}${YELLOW}🔘 Flatpak applications installed...${RC}"
+
+    echo -e "\n${RC}${YELLOW}${INFO}Flatpak applications installed...${RC}"
     flatpak list
-    echo -e "\n${RC}${YELLOW}🔘 Checking flatpak applications...${RC}"
+
+    echo -e "\n${RC}${YELLOW}${INFO}Checking flatpak applications...${RC}"
     flatpak repair -v
-    echo -e "\n${RC}${YELLOW}${INV}🔘 Updating flatpak...${RC}"
+
+    echo -e "\n${RC}${YELLOW}${INV}${INFO}Updating flatpak...${RC}"
     flatpak update -vy
+
 }
+
 
 updateGit()
 {
+
     GIT_REPO_LOCATION="/opt /usr/share/themes /usr/share/icons"
-    ## Search for GIT repos and update them.
+
     for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null)
-        do
-            cd "${GIT_PATH}"||exit 1
-            echo -e "\n${RC}${YELLOW}🔘 Updating ${GIT_PATH}...${RC}"
-            cd ..||exit 1
+		do
+
+            cd "${GIT_PATH}"
+            echo -e "\n${RC}${YELLOW}${INFO}Updating ${GIT_PATH}...${RC}"
+            cd ..
+
             git config pull.rebase true
             git stash
             git pull
+
         done
 }
 
+
 updateKernel()
 {
-    FIRMWARE_PATH="/opt/FIRMWARE/"
-    FIRMWARE_PKGS="firmware-linux firmware-linux-free firmware-linux-nonfree"
-    apt-get -fyq install "${FIRMWARE_PKGS}"
 
+    FIRMWARE_PKGS=( "firmware-linux" "firmware-linux-free" "firmware-linux-nonfree" )
+
+	for PKG in "${FIRMWARE_PKGS[@]}"
+		do
+
+			apt-get -fyq install "${PKG}"
+
+	done
+
+    FIRMWARE_PATH="/opt/FIRMWARE/"
     mkdir -p ${FIRMWARE_PATH}
-    cd ${FIRMWARE_PATH}||exit 1
+	cd ${FIRMWARE_PATH}
+
     git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" --depth=8 2>/dev/null
     cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware/ 2>/dev/null
+
     update-initramfs -u
+
 }
 
 
-checkDone()
-{
+checkDone(){
+
     if [[ ${?} -eq '0' ]]
-        then
-            echo -e "${RC}${GREEN}✔️ Done.${RC}"
+		then
+
+            echo -e "${RC}${GREEN}${OK}Done.${RC}"
+
         else
-            echo -e "${RED}❌ Something went wrong!${RC}"
+
+            echo -e "${RED}${WARN}Ooops!\nSomething went wrong!${RC}"
             exit 1
+
     fi
+
 }
+
 
 main()
 {
     ## Update apt packages.
-    if which apt-get>/dev/null
+    if which apt-get > /dev/null
         then
+
             SECONDS='0'
-            echo -e "\n${RC}${YELLOW}${INV}🔘 Updating APT packages:${RC}"
+
+            echo -e "\n${RC}${YELLOW}${INV}${INFO}Updating APT packages:${RC}"
             updateApt||dpkg --audit
+
             checkDone
-            echo -e "${RC}${GREEN}✔️ APT packages updated in ${SECONDS} seconds.${RC}"
+            echo -e "${RC}${GREEN}${OK}APT packages updated in ${SECONDS} seconds.${RC}"
+
     fi
+
 
     ## Update flatpak applications.
-    if which flatpak>/dev/null
+    if which flatpak > /dev/null
         then
+
             SECONDS='0'
-            echo -e "\n${RC}${YELLOW}${INV}🔘 Updating Flatpak:${RC}"
+
+            echo -e "\n${RC}${YELLOW}${INV}${INFO}Updating Flatpak:${RC}"
             updateFlatpak
+
             checkDone
-            echo -e "${RC}${GREEN}✔️ Flatpak updated in ${SECONDS} seconds.${RC}"
+            echo -e "${RC}${GREEN}${OK}Flatpak updated in ${SECONDS} seconds.${RC}"
+
     fi
+
 
     ## Update NPM applications.
-    if which npm>/dev/null
+    if which npm > /dev/null
         then
+
             SECONDS='0'
-            ## echo You are using $(npm -V)
-            echo -e "\n${RC}${YELLOW}${INV}🔘 Updating NPM packages:${RC}"
+
+            echo -e "\n${RC}${YELLOW}${INV}${INFO}Updating NPM packages:${RC}"
             updateNpm
+
             checkDone
-            echo -e "${RC}${GREEN}✔️ NPM updated in ${SECONDS} seconds.${RC}"
+            echo -e "${RC}${GREEN}${OK}NPM updated in ${SECONDS} seconds.${RC}"
     fi
+
 
     ## Pull git repos.
-    if which git>/dev/null
+    if which git > /dev/null
         then
+
             SECONDS='0'
-            echo -e "\n${RC}${YELLOW}${INV}🔘 Updating Git repositories:${RC}"
+
+            echo -e "\n${RC}${YELLOW}${INV}${INFO}Updating Git repositories:${RC}"
             updateGit
+
             checkDone
-            echo -e "${RC}${GREEN}✔️ Git repositories updated in ${SECONDS} seconds.${RC}"
+            echo -e "${RC}${GREEN}${OK}Git repositories updated in ${SECONDS} seconds.${RC}"
+
     fi
 
-    ## Update the linux kernel.
+
     SECONDS='0'
-    echo -e "\n${RC}${YELLOW}${INV}🔘 Updating the linux kernel:${RC}"
+
+    echo -e "\n${RC}${YELLOW}${INV}${INFO}Updating the linux kernel:${RC}"
     updateKernel
+
     checkDone
-    echo -e "${RC}${GREEN}✔️ Linux kernel updated in ${SECONDS} seconds.${RC}"
+    echo -e "${RC}${GREEN}${OK}Linux kernel updated in ${SECONDS} seconds.${RC}"
+
 }
 
-clear
-## Check privileges and proceed.
-if [[ ${EUID} -ne "0" ]]
-    then
-        echo -e "${RED}❌ This script must be run as root!${RC}"
-        exit 1
-    else
-        main
-fi
 
+clear
+
+if [[ ${EUID} -ne '0' ]]
+    then
+
+        echo -e "${RED}${WARN}Run me as root!${RC}"
+        exit 1
+
+    else
+
+        main
+
+fi
