@@ -7,39 +7,45 @@
 ##	- npm packages
 ##	- Linux firmwares+kernel
 
-RC='\e[0m'
-INV='\e[7m'
-LIGHT='\e[2m'
-GREEN='\e[32m'
-RED='\e[31m'
-YELLOW='\e[33m'
 
-OK=' '
-INFO=' '
-WARN=' '
+loadColorIcon(){
+
+    RC='\e[0m'
+    LIGHT='\e[2m'
+    GREEN='\e[32m'
+    RED='\e[31m'
+    ORANGE='\e[33m'
+    BLUE='\e[34m\e[3m\e[1m'
+
+    OK=' '
+    INFO=' '
+    WARN=' '
+    FOLDER=' '
+
+}
+
+loadColorIcon
 
 
-updateApt()
+updateApt(){
 
-{
-
-    echo -e "\n${RC}${YELLOW}${INFO}Configuring/fixing possibly broken packages...${RC}"
+    echo -e "\n${RC}${ORANGE}${INFO}Configuring/fixing possibly broken packages...\n${RC}"
     apt-get -fyq install
     dpkg --configure -a
 
-    echo -e "\n${RC}${YELLOW}${INFO}Retrieving new lists of packages...${RC}"
+    echo -e "\n${RC}${ORANGE}${INFO}Retrieving new lists of packages...\n${RC}"
     apt-get update --list-cleanup
 
-    echo -e "\n${RC}${YELLOW}${INFO}Installing packages upgrades...${RC}"
+    echo -e "\n${RC}${ORANGE}${INFO}Installing packages upgrades...\n${RC}"
     apt-get -fyq upgrade
     apt-get -fyq dist-upgrade
     apt-get -fyq full-upgrade
 
-    echo -e "\n${RC}${YELLOW}${INFO}Configuring/fixing possibly broken packages...${RC}"
+    echo -e "\n${RC}${ORANGE}${INFO}Configuring/fixing possibly broken packages...\n${RC}"
     apt-get -fyq install
     dpkg --configure -a
 
-    echo -e "\n${RC}${YELLOW}${INFO}Removing downloaded archive files and unused packages...${RC}"
+    echo -e "\n${RC}${ORANGE}${INFO}Removing downloaded archive files and unused packages...\n${RC}"
     apt-get -y clean
     apt-get -y autoclean
     apt-get -y autoremove --purge
@@ -47,44 +53,38 @@ updateApt()
 }
 
 
-updateNpm()
+updateNpm(){
 
-{
-
-    echo -e "\n${RC}${YELLOW}${INV}${INFO}Updating NPM packages...${RC}"
+    echo -e "\n${RC}${ORANGE}${INFO}Updating NPM packages...\n${RC}"
     npm update
 
-    echo -e "\n${RC}${YELLOW}${INFO}Checking NPM installation...${RC}"
+    echo -e "\n${RC}${ORANGE}${INFO}Checking NPM installation...\n${RC}"
     npm doctor
 
-    echo -e "\n${RC}${YELLOW}${INFO}Auditing NPM packages...${RC}"
+    echo -e "\n${RC}${ORANGE}${INFO}Auditing NPM packages...\n${RC}"
     npm audit
 
-    echo -e "\n${RC}${YELLOW}${INFO}Fixing NPM packages...${RC}"
+    echo -e "\n${RC}${ORANGE}${INFO}Fixing NPM packages...\n${RC}"
     npm audit fix
 
 }
 
 
-updateFlatpak()
+updateFlatpak(){
 
-{
-
-    echo -e "\n${RC}${YELLOW}${INFO}Flatpak applications installed...${RC}"
+    echo -e "\n${RC}${ORANGE}${INFO}Flatpak applications installed...\n${RC}"
     flatpak list
 
-    echo -e "\n${RC}${YELLOW}${INFO}Checking flatpak applications...${RC}"
+    echo -e "\n${RC}${ORANGE}${INFO}Checking flatpak applications...\n${RC}"
     flatpak repair -v
 
-    echo -e "\n${RC}${YELLOW}${INV}${INFO}Updating flatpak...${RC}"
+    echo -e "\n${RC}${ORANGE}${INFO}Updating flatpak...\n${RC}"
     flatpak update -vy
 
 }
 
 
-updateGit()
-
-{
+updateGit(){
 
     GIT_REPO_LOCATION="/opt /usr/share/themes /usr/share/icons"
 
@@ -92,7 +92,7 @@ updateGit()
 		do
 
             cd "${GIT_PATH}"
-            echo -e "\n${RC}${YELLOW}${INFO}Updating ${GIT_PATH}...${RC}"
+            echo -e "\n${RC}${ORANGE}${FOLDER}Updating ${GIT_PATH}...\n${RC}"
             cd ..
 
             git config pull.rebase true
@@ -104,9 +104,7 @@ updateGit()
 }
 
 
-updateKernel()
-
-{
+updateKernel(){
 
     FIRMWARE_PKGS=( "firmware-linux" "firmware-linux-free" "firmware-linux-nonfree" )
 
@@ -129,16 +127,27 @@ updateKernel()
 }
 
 
+checkRoot(){
+    if [[ ${EUID} -ne '0' ]]
+        then
+
+            echo -e "${RED}${WARN}Run me as root!\n${RC}"
+            exit 1
+
+    fi
+}
+
+
 checkDone(){
 
     if [[ ${?} -eq '0' ]]
 		then
 
-            echo -e "${RC}${GREEN}${OK}Done.${RC}"
+            echo -e "\n${RC}${GREEN}${OK}Done.\n${RC}"
 
         else
 
-            echo -e "${RED}${WARN}Ooops!\nSomething went wrong!${RC}"
+            echo -e "${RED}${WARN}Ooops!\nSomething went wrong!\n${RC}"
             exit 1
 
     fi
@@ -146,8 +155,7 @@ checkDone(){
 }
 
 
-main()
-{
+main(){
     ## Update apt packages.
 
     if which apt-get > /dev/null
@@ -155,11 +163,11 @@ main()
 
             SECONDS='0'
 
-            echo -e "\n${RC}${YELLOW}${INV}${INFO}Updating APT packages:${RC}"
-            updateApt||dpkg --audit
+            echo -e "\n${RC}${BLUE}󰏖 Updating APT packages:\n${RC}"
+            updateApt || dpkg --audit
 
             checkDone
-            echo -e "${RC}${GREEN}${OK}APT packages updated in ${SECONDS} seconds.${RC}"
+            echo -e "\n${RC}${GREEN}${OK}APT packages updated in ${SECONDS} seconds.\n${RC}"
 
     fi
 
@@ -171,11 +179,11 @@ main()
 
             SECONDS='0'
 
-            echo -e "\n${RC}${YELLOW}${INV}${INFO}Updating Flatpak:${RC}"
+            echo -e "\n${RC}${BLUE} Updating Flatpak:\n${RC}"
             updateFlatpak
 
             checkDone
-            echo -e "${RC}${GREEN}${OK}Flatpak updated in ${SECONDS} seconds.${RC}"
+            echo -e "\n${RC}${GREEN}${OK}Flatpak updated in ${SECONDS} seconds.\n${RC}"
 
     fi
 
@@ -187,11 +195,11 @@ main()
 
             SECONDS='0'
 
-            echo -e "\n${RC}${YELLOW}${INV}${INFO}Updating NPM packages:${RC}"
+            echo -e "\n${RC}${BLUE} Updating NPM packages:\n${RC}"
             updateNpm
 
             checkDone
-            echo -e "${RC}${GREEN}${OK}NPM updated in ${SECONDS} seconds.${RC}"
+            echo -e "\n${RC}${GREEN}${OK}NPM updated in ${SECONDS} seconds.\n${RC}"
     fi
 
 
@@ -202,36 +210,25 @@ main()
 
             SECONDS='0'
 
-            echo -e "\n${RC}${YELLOW}${INV}${INFO}Updating Git repositories:${RC}"
+            echo -e "\n${RC}${BLUE} Updating Git repositories:\n${RC}"
             updateGit
 
             checkDone
-            echo -e "${RC}${GREEN}${OK}Git repositories updated in ${SECONDS} seconds.${RC}"
+            echo -e "\n${RC}${GREEN}${OK}Git repositories updated in ${SECONDS} seconds.\n${RC}"
 
     fi
 
 
     SECONDS='0'
 
-    echo -e "\n${RC}${YELLOW}${INV}${INFO}Updating the linux kernel:${RC}"
+    echo -e "\n${RC}${BLUE}${INFO}󰌽 Updating the linux kernel:\n${RC}"
     updateKernel
 
     checkDone
-    echo -e "${RC}${GREEN}${OK}Linux kernel updated in ${SECONDS} seconds.${RC}"
+    echo -e "\n${RC}${GREEN}${OK}Linux kernel updated in ${SECONDS} seconds.\n${RC}"
 
 }
 
 
-clear
 
-if [[ ${EUID} -ne '0' ]]
-    then
-
-        echo -e "${RED}${WARN}Run me as root!${RC}"
-        exit 1
-
-    else
-
-        main
-
-fi
+clear && checkRoot && main

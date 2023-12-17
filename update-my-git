@@ -11,10 +11,10 @@ BLUE="\e[34m\e[1m"
 CWD=$(pwd)
 USER_HOME="/home/$( ls /home | head -n 1 )"
 
-FOLDER=' '
 OK=' '
 INFO=' '
 WARN=' '
+FOLDER=' '
 
 
 updateGit()
