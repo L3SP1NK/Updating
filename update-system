@@ -17,23 +17,23 @@ YELLOW='\e[33m'
 
 updateApt()
 {
-    echo -e "\n${RC}${YELLOW}→ Configuring/fixing possibly broken packages...${RC}${LIGHT}"
+    echo -e "\n${RC}${YELLOW}🔘 Configuring/fixing possibly broken packages...${RC}${LIGHT}"
     apt-get -fyq install
     dpkg --configure -a
 
-    echo -e "\n${RC}${YELLOW}→ Retrieving new lists of packages...${RC}${LIGHT}"
+    echo -e "\n${RC}${YELLOW}🔘 Retrieving new lists of packages...${RC}${LIGHT}"
     apt-get update --list-cleanup
 
-    echo -e "\n${RC}${YELLOW}→ Installing packages upgrades...${RC}${LIGHT}"
+    echo -e "\n${RC}${YELLOW}🔘 Installing packages upgrades...${RC}${LIGHT}"
     apt-get -fyq upgrade
     apt-get -fyq dist-upgrade
     apt-get -fyq full-upgrade
 
-    echo -e "\n${RC}${YELLOW}→ Configuring/fixing possibly broken packages...${RC}${LIGHT}"
+    echo -e "\n${RC}${YELLOW}🔘 Configuring/fixing possibly broken packages...${RC}${LIGHT}"
     apt-get -fyq install
     dpkg --configure -a
 
-    echo -e "\n${RC}${YELLOW}→ Removing downloaded archive files and unused packages...${RC}${LIGHT}"
+    echo -e "\n${RC}${YELLOW}🔘 Removing downloaded archive files and unused packages...${RC}${LIGHT}"
     apt-get -y clean
     apt-get -y autoclean
     apt-get -y autoremove --purge
@@ -41,23 +41,23 @@ updateApt()
 
 updateNpm()
 {
-    echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages...${RC}"
+    echo -e "\n${RC}${YELLOW}${INV}🔘 Updating NPM packages...${RC}"
     npm update
-    echo -e "\n${RC}${YELLOW}→ Checking NPM installation...${RC}"
+    echo -e "\n${RC}${YELLOW}🔘 Checking NPM installation...${RC}"
     npm doctor
-    echo -e "\n${RC}${YELLOW}→ Auditing NPM packages...${RC}"
+    echo -e "\n${RC}${YELLOW}🔘 Auditing NPM packages...${RC}"
     npm audit
-    echo -e "\n${RC}${YELLOW}→ Fixing NPM packages...${RC}"
+    echo -e "\n${RC}${YELLOW}🔘 Fixing NPM packages...${RC}"
     npm audit fix
 }
 
 updateFlatpak()
 {
-    echo -e "\n${RC}${YELLOW}→ Flatpak applications installed...${RC}"
+    echo -e "\n${RC}${YELLOW}🔘 Flatpak applications installed...${RC}"
     flatpak list
-    echo -e "\n${RC}${YELLOW}→ Checking flatpak applications...${RC}"
+    echo -e "\n${RC}${YELLOW}🔘 Checking flatpak applications...${RC}"
     flatpak repair -v
-    echo -e "\n${RC}${YELLOW}${INV}→ Updating flatpak...${RC}"
+    echo -e "\n${RC}${YELLOW}${INV}🔘 Updating flatpak...${RC}"
     flatpak update -vy
 }
 
@@ -68,7 +68,7 @@ updateGit()
     for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null)
         do
             cd "${GIT_PATH}"||exit 1
-            echo -e "\n${RC}${YELLOW}→ Updating ${GIT_PATH}...${RC}"
+            echo -e "\n${RC}${YELLOW}🔘 Updating ${GIT_PATH}...${RC}"
             cd ..||exit 1
             git config pull.rebase true
             git stash
@@ -79,7 +79,7 @@ updateGit()
 updateKernel()
 {
     FIRMWARE_PATH="/opt/FIRMWARE/"
-    FIRMWARE_PKGS="firmware-linux firmware-linux-free firmware-linux-nonfree firmware-amd-graphics firmware-ast firmware-ath9k-htc firmware-atheros firmware-cavium firmware-intel-sound firmware-intelwimax firmware-ipw2x00 firmware-ivtv firmware-iwlwifi firmware-linux firmware-linux-free firmware-linux-nonfree firmware-misc-nonfree firmware-mod-kit firmware-mod-kit-dbgsym firmware-qcom-media firmware-qcom-soc firmware-realtek firmware-samsung firmware-ti-connectivity"
+    FIRMWARE_PKGS="firmware-linux firmware-linux-free firmware-linux-nonfree"
     apt-get -fyq install "${FIRMWARE_PKGS}"
 
     mkdir -p ${FIRMWARE_PATH}
@@ -94,9 +94,9 @@ checkDone()
 {
     if [[ ${?} -eq '0' ]]
         then
-            echo -e "${RC}${GREEN}ø Done.${RC}"
+            echo -e "${RC}${GREEN}✔️ Done.${RC}"
         else
-            echo -e "${RED}× Something went wrong!${RC}"
+            echo -e "${RED}❌ Something went wrong!${RC}"
             exit 1
     fi
 }
@@ -107,20 +107,20 @@ main()
     if which apt-get>/dev/null
         then
             SECONDS='0'
-            echo -e "\n${RC}${YELLOW}${INV}→ Updating APT packages:${RC}"
+            echo -e "\n${RC}${YELLOW}${INV}🔘 Updating APT packages:${RC}"
             updateApt||dpkg --audit
             checkDone
-            echo -e "${RC}${GREEN}ø APT packages updated in ${SECONDS} seconds.${RC}"
+            echo -e "${RC}${GREEN}✔️ APT packages updated in ${SECONDS} seconds.${RC}"
     fi
 
     ## Update flatpak applications.
     if which flatpak>/dev/null
         then
             SECONDS='0'
-            echo -e "\n${RC}${YELLOW}${INV}→ Updating Flatpak:${RC}"
+            echo -e "\n${RC}${YELLOW}${INV}🔘 Updating Flatpak:${RC}"
             updateFlatpak
             checkDone
-            echo -e "${RC}${GREEN}ø Flatpak updated in ${SECONDS} seconds.${RC}"
+            echo -e "${RC}${GREEN}✔️ Flatpak updated in ${SECONDS} seconds.${RC}"
     fi
 
     ## Update NPM applications.
@@ -128,35 +128,35 @@ main()
         then
             SECONDS='0'
             ## echo You are using $(npm -V)
-            echo -e "\n${RC}${YELLOW}${INV}→ Updating NPM packages:${RC}"
+            echo -e "\n${RC}${YELLOW}${INV}🔘 Updating NPM packages:${RC}"
             updateNpm
             checkDone
-            echo -e "${RC}${GREEN}ø NPM updated in ${SECONDS} seconds.${RC}"
+            echo -e "${RC}${GREEN}✔️ NPM updated in ${SECONDS} seconds.${RC}"
     fi
 
     ## Pull git repos.
     if which git>/dev/null
         then
             SECONDS='0'
-            echo -e "\n${RC}${YELLOW}${INV}→ Updating Git repositories:${RC}"
+            echo -e "\n${RC}${YELLOW}${INV}🔘 Updating Git repositories:${RC}"
             updateGit
             checkDone
-            echo -e "${RC}${GREEN}ø Git repositories updated in ${SECONDS} seconds.${RC}"
+            echo -e "${RC}${GREEN}✔️ Git repositories updated in ${SECONDS} seconds.${RC}"
     fi
 
     ## Update the linux kernel.
     SECONDS='0'
-    echo -e "\n${RC}${YELLOW}${INV}→ Updating the linux kernel:${RC}"
+    echo -e "\n${RC}${YELLOW}${INV}🔘 Updating the linux kernel:${RC}"
     updateKernel
     checkDone
-    echo -e "${RC}${GREEN}ø Linux kernel updated in ${SECONDS} seconds.${RC}"
+    echo -e "${RC}${GREEN}✔️ Linux kernel updated in ${SECONDS} seconds.${RC}"
 }
 
 clear
 ## Check privileges and proceed.
 if [[ ${EUID} -ne "0" ]]
     then
-        echo -e "${RED}× This script must be run as root!${RC}"
+        echo -e "${RED}❌ This script must be run as root!${RC}"
         exit 1
     else
         main
