@@ -1,20 +1,22 @@
 #!/bin/bash
 
-##	Update:
-##	- apt packages
-##	- git repositories
-##	- flatpak applications
-##	- npm packages
-##	- Linux firmwares+kernel
-
+##	Update: apt packages, git repositories, flatpak applications, npm packages, linux firmwares+kernel
 
 loadColorIcon(){
+
     RC='\e[0m'
     LIGHT='\e[2m'
     GREEN='\e[32m'
     RED='\e[31m'
     ORANGE='\e[33m'
     BLUE='\e[34m\e[3m\e[1m'
+
+}
+
+[[ ${TERM} == *256* ]] && loadColorIcon
+
+
+loadNerdIcon(){
 
     OK=' '
     INFO=' '
@@ -23,11 +25,20 @@ loadColorIcon(){
 
 }
 
-if [[ ${TERM} == *'256' ]]; then
 
-	loadColorIcon
+FONT_PATH='/usr/share/fonts/'
+
+if [[ -d "${FONTS_PATH}" ]]; then
+
+	if find ${FONTS_PATH} -iname "*nerd*">/dev/null; then
+
+		NERDFONT_FOUND='true'
+
+	fi
 
 fi
+
+[[ ${NERDFONT_FOUND} == 'true' ]] && loadNerdIcon
 
 
 updateApt(){
@@ -40,53 +51,62 @@ updateApt(){
 
 		UPDATER='apt-get'
 
+	else
+
+		echo -e "${WARN}${RED}No updater found!${RC}"
+		exit 1
+
 	fi
 
-    echo -e "\n${RC}${ORANGE}${INFO}Configuring/fixing possibly broken packages...\n${RC}"
-    ${UPDATER} install
     dpkg --configure -a
 
-    echo -e "\n${RC}${ORANGE}${INFO}Retrieving new lists of packages...\n${RC}"
-    ${UPDATER} update
+	ACTIONS=( 'install' 'update' 'upgrade' 'dist-upgrade' 'full-upgrade' )
 
-    echo -e "\n${RC}${ORANGE}${INFO}Installing packages upgrades...\n${RC}"
-    ${UPDATER} upgrade
-    ${UPDATER} dist-upgrade
-    ${UPDATER} full-upgrade
+	for ACTION in "${ACTIONS[@]}"; do
 
-    echo -e "\n${RC}${ORANGE}${INFO}Configuring/fixing possibly broken packages...\n${RC}"
-    ${UPDATER} install
-    dpkg --configure -a
+		if [[ ${ACTION} == 'update' ]]; then
 
-    echo -e "\n${RC}${ORANGE}${INFO}Removing downloaded archive files and unused packages...\n${RC}"
-    ${UPDATER} clean -y
-    ${UPDATER} autoclean -y
-    ${UPDATER} autoremove --purge -y
+			${UPDATER} ${ACTION}
+
+		else
+
+			${UPDATER} ${ACTION} -y
+
+		fi
+
+	done
+
+	ACTIONS=( 'clean' 'autoclean' 'autoremove' )
+
+    if [[ ${UPDATER} == 'nala' ]]; then
+
+		${UPDATER} ${ACTIONS}
+
+	elif [[ ${UPDATER} == 'apt-get' ]]; then
+
+		for ACTION in "${ACTIONS[@]}"; do
+
+			${UPDATER} ${ACTION} -y
+
+		done
+
+	fi
 
 }
-
 
 updateNpm(){
 
-    echo -e "\n${RC}${ORANGE}${INFO}Updating NPM packages...\n${RC}"
-    npm update
+	ACTIONS=( 'update' 'doctor' 'audit' 'audit fix' )
 
-    echo -e "\n${RC}${ORANGE}${INFO}Checking NPM installation...\n${RC}"
-    npm doctor
+	for ACTION in "${ACTIONS[@]}"; do
 
-    echo -e "\n${RC}${ORANGE}${INFO}Auditing NPM packages...\n${RC}"
-    npm audit
+		npm ${ACTION}
 
-    echo -e "\n${RC}${ORANGE}${INFO}Fixing NPM packages...\n${RC}"
-    npm audit fix
+	done
 
 }
 
-
 updateFlatpak(){
-
-    echo -e "\n${RC}${ORANGE}${INFO}Flatpak applications installed...\n${RC}"
-    flatpak list
 
     echo -e "\n${RC}${ORANGE}${INFO}Checking flatpak applications...\n${RC}"
     flatpak repair -v
@@ -96,7 +116,6 @@ updateFlatpak(){
 
 }
 
-
 updateGit(){
 
     GIT_REPO_PATH=( '/opt' '/usr/share/themes' '/usr/share/icons' )
@@ -105,7 +124,7 @@ updateGit(){
     for GIT_PATH in "${GIT_REPO_DIR[@]}"
 		do
 
-            cd "${GIT_PATH}"
+            cd ${GIT_PATH}
 			echo -e "\n${RC}${ORANGE}${FOLDER}Updating ${GIT_PATH}...\n${RC}"
             cd ..
 
@@ -117,33 +136,27 @@ updateGit(){
 
 }
 
-
 updateKernel(){
 
-    FIRMWARE_PKGS=( "firmware-linux" "firmware-linux-free" "firmware-linux-nonfree" )
+    FIRMWARE_PKGS=( 'firmware-linux' 'firmware-linux-free' 'firmware-linux-nonfree' )
 
-	for PKG in "${FIRMWARE_PKGS[@]}"
-		do
+	for PKG in "${FIRMWARE_PKGS[@]}"; do
 
-			${UPDATER} install "${PKG}"
+			${UPDATER} install ${PKG} -y
 
 	done
 
-    FIRMWARE_PATH="/opt/FIRMWARE/"
-    mkdir -p ${FIRMWARE_PATH}
-	cd ${FIRMWARE_PATH}
-
-    git clone "https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git" --depth=8 2>/dev/null
+    FIRMWARE_PATH='/opt/FIRMWARE/'; mkdir -p ${FIRMWARE_PATH}; cd ${FIRMWARE_PATH}
+    git clone 'https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git' 2>/dev/null
     cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware/ 2>/dev/null
 
     update-initramfs -u
 
 }
 
+checkPriv(){
 
-checkRoot(){
-    if [[ ${EUID} -ne '0' ]]
-        then
+    if [[ ${EUID} -ne '0' ]]; then
 
             echo -e "${RED}${WARN}Run me as root!\n${RC}"
             exit 1
@@ -151,98 +164,44 @@ checkRoot(){
     fi
 }
 
+okMsg(){
 
-checkDone(){
-
-    if [[ ${?} -eq '0' ]]
-		then
-
-            echo -e "\n${RC}${GREEN}${OK}Done.\n${RC}"
-
-        else
-
-            echo -e "${RED}${WARN}Ooops!\nSomething went wrong!\n${RC}"
-            exit 1
-
-    fi
+	echo -e "\n${RC}${GREEN}${OK}Done in ${SECONDS} seconds!\n${RC}"
 
 }
 
+failMsg(){
+
+	echo -e "${RED}${WARN}Ooops!\nSomething went wrong!\n${RC}"
+	exit 1
+
+}
 
 main(){
-    ## Update apt packages.
 
-    if which apt-get > /dev/null
-        then
+	clear
 
-            SECONDS='0'
+	CMDS=( 'apt' 'flatpak' 'npm' 'git' )
 
-            echo -e "\n${RC}${BLUE}󰏖 Updating APT packages:\n${RC}"
-            updateApt || dpkg --audit
+	for CMD in "${CMDS[@]}"; do
 
-            checkDone
-            echo -e "\n${RC}${GREEN}${OK}APT packages updated in ${SECONDS} seconds.\n${RC}"
-
-    fi
-
-
-    ## Update flatpak applications.
-
-    if which flatpak > /dev/null
-        then
+	    if command -v ${CMD}>/dev/null; then
 
             SECONDS='0'
+            CMD=${CMD^}
 
-            echo -e "\n${RC}${BLUE} Updating Flatpak:\n${RC}"
-            updateFlatpak
+            echo -e "\n${RC}${BLUE}󰏖 Updating ${CMD}\n${RC}"
+            update${CMD} && okMsg || { failMsg; dpkg --audit; }
 
-            checkDone
-            echo -e "\n${RC}${GREEN}${OK}Flatpak updated in ${SECONDS} seconds.\n${RC}"
+	    fi
 
-    fi
-
-
-    ## Update NPM applications.
-
-    if which npm > /dev/null
-        then
-
-            SECONDS='0'
-
-            echo -e "\n${RC}${BLUE} Updating NPM packages:\n${RC}"
-            updateNpm
-
-            checkDone
-            echo -e "\n${RC}${GREEN}${OK}NPM updated in ${SECONDS} seconds.\n${RC}"
-    fi
-
-
-    ## Pull git repos.
-
-    if which git > /dev/null
-        then
-
-            SECONDS='0'
-
-            echo -e "\n${RC}${BLUE} Updating Git repositories:\n${RC}"
-            updateGit
-
-            checkDone
-            echo -e "\n${RC}${GREEN}${OK}Git repositories updated in ${SECONDS} seconds.\n${RC}"
-
-    fi
-
+	done
 
     SECONDS='0'
 
     echo -e "\n${RC}${BLUE}${INFO}󰌽 Updating the linux kernel:\n${RC}"
-    updateKernel
-
-    checkDone
-    echo -e "\n${RC}${GREEN}${OK}Linux kernel updated in ${SECONDS} seconds.\n${RC}"
+    updateKernel && okMsg || failMsg
 
 }
 
-
-
-clear && checkRoot && main
+checkPriv&&main
