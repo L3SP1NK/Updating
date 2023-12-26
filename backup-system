@@ -6,10 +6,12 @@ YELLOW="\e[33m"
 
 REQUIREMENTS="rsync zstd"
 
-backupDir()
-{
+backupDir() {
+
     clear
+
     echo -e "${YELLOW} → Starting backup...${RC}"
+
     rsync\
         --archive\
         --verbose\
@@ -36,36 +38,23 @@ backupDir()
         --ipv4\
         --exclude-from=${HOME}/.exclude_from_backup\
         / ${BACKUP_DEST}/
+
 }
 
-if [[ ${EUID} -ne "0" ]]
-    then
-        echo -e "${RED} × Run me as root!${RC}"
-        exit 1
-fi
+[[ ${EUID} -ne "0" ]] && { echo -e "${RED} × Run me as root!${RC}"; exit 1; }
 
-if ! which ${REQUIREMENTS}>/dev/null
-    then
-        echo -e "${RED} × To run this program, you need ${REQUIREMENTS}${RC}"
-fi
+for R in "${REQUIREMENTS[@]}"; do
 
-if [[ ! -f ${HOME}/.exclude_from_backup ]]
-    then
-        echo -e "${RED}The file containing the directories to exclude is not present!${RC}"
-        exit 1
-fi
+	if ! command -v ${R}>/dev/null; then
 
-if [[ -d ${1} ]]
-    then
-        BACKUP_DEST="${1}"
-    else
-        echo -e "${RED} × Specify the backup destination.${RC}"
-        exit 1
-fi
+        echo -e "${RED} × To run this program, you need ${R}${RC}"
 
-if backupDir
-    then
-        echo -e "${GREEN} ø Done${RC}"
-    else
-        echo -e "${RED} × Something went wrong!${RC}"
-fi
+	fi
+
+done
+
+[[ ! -e ${HOME}/.exclude_from_backup ]] && { echo -e "${RED}The file containing the directories to exclude is not present!${RC}"; exit 1; }
+
+[[ -d "${1}" ]] && BACKUP_DEST="${1}" || { echo -e "${RED} × Specify the backup destination.${RC}"; exit 1; }
+
+backupDir|| echo -e "${RED} × Something went wrong!${RC}"

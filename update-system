@@ -4,12 +4,12 @@
 
 loadColorIcon(){
 
-    RC='\e[0m'
-    LIGHT='\e[2m'
-    GREEN='\e[32m'
-    RED='\e[31m'
-    ORANGE='\e[33m'
-    BLUE='\e[34m\e[3m\e[1m'
+	RC='\e[0m'
+	LIGHT='\e[2m'
+	GREEN='\e[32m'
+	RED='\e[31m'
+	ORANGE='\e[33m'
+	BLUE='\e[34m\e[3m\e[1m'
 
 }
 
@@ -18,10 +18,10 @@ loadColorIcon(){
 
 loadNerdIcon(){
 
-    OK=' '
-    INFO=' '
-    WARN=' '
-    FOLDER=' '
+	OK=' '
+	INFO=' '
+	WARN=' '
+	FOLDER=' '
 
 }
 
@@ -43,24 +43,10 @@ fi
 
 updateApt(){
 
-	if command -v nala>/dev/null; then
-
-		UPDATER='nala'
-
-	elif command -v apt-get>/dev/null; then
-
-		UPDATER='apt-get'
-
-	else
-
-		echo -e "${WARN}${RED}No updater found!${RC}"
-		exit 1
-
-	fi
-
-    dpkg --configure -a
-
+	UPDATER=$(command -v nala || command -v apt-get) || { echo -e "${WARN}${RED}No updater found!${RC}"; exit 1; }
 	ACTIONS=( 'install' 'update' 'upgrade' 'dist-upgrade' 'full-upgrade' )
+
+	dpkg --configure -a
 
 	for ACTION in "${ACTIONS[@]}"; do
 
@@ -78,7 +64,7 @@ updateApt(){
 
 	ACTIONS=( 'clean' 'autoclean' 'autoremove' )
 
-    if [[ ${UPDATER} == 'nala' ]]; then
+	if [[ ${UPDATER} == 'nala' ]]; then
 
 		${UPDATER} ${ACTIONS}
 
@@ -108,37 +94,37 @@ updateNpm(){
 
 updateFlatpak(){
 
-    echo -e "\n${RC}${ORANGE}${INFO}Checking flatpak applications...\n${RC}"
-    flatpak repair -v
+	echo -e "\n${RC}${ORANGE}${INFO}Checking flatpak applications...\n${RC}"
+	flatpak repair -v
 
-    echo -e "\n${RC}${ORANGE}${INFO}Updating flatpak...\n${RC}"
-    flatpak update -vy
+	echo -e "\n${RC}${ORANGE}${INFO}Updating flatpak...\n${RC}"
+	flatpak update -vy
 
 }
 
 updateGit(){
 
-    GIT_REPO_PATH=( '/opt' '/usr/share/themes' '/usr/share/icons' )
+	GIT_REPO_PATH=( '/opt' '/usr/share/themes' '/usr/share/icons' )
 	GIT_REPO_DIR=( $(find "${GIT_REPO_PATH[@]}" -type d -name ".git" 2>/dev/null) )
 
-    for GIT_PATH in "${GIT_REPO_DIR[@]}"
+	for GIT_PATH in "${GIT_REPO_DIR[@]}"
 		do
 
-            cd ${GIT_PATH}
+			cd ${GIT_PATH}
 			echo -e "\n${RC}${ORANGE}${FOLDER}Updating ${GIT_PATH}...\n${RC}"
-            cd ..
+			cd ..
 
-            git config pull.rebase true
-            git stash
-            git pull
+			git config pull.rebase true
+			git stash
+			git pull
 
-        done
+		done
 
 }
 
 updateKernel(){
 
-    FIRMWARE_PKGS=( 'firmware-linux' 'firmware-linux-free' 'firmware-linux-nonfree' )
+	FIRMWARE_PKGS=( 'firmware-linux' 'firmware-linux-free' 'firmware-linux-nonfree' )
 
 	for PKG in "${FIRMWARE_PKGS[@]}"; do
 
@@ -146,22 +132,22 @@ updateKernel(){
 
 	done
 
-    FIRMWARE_PATH='/opt/FIRMWARE/'; mkdir -p ${FIRMWARE_PATH}; cd ${FIRMWARE_PATH}
-    git clone 'https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git' 2>/dev/null
-    cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware/ 2>/dev/null
+	FIRMWARE_PATH='/opt/FIRMWARE/'; mkdir -p ${FIRMWARE_PATH}; cd ${FIRMWARE_PATH}
+	git clone 'https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git' 2>/dev/null
+	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware/ 2>/dev/null
 
-    update-initramfs -u
+	update-initramfs -u
 
 }
 
 checkPriv(){
 
-    if [[ ${EUID} -ne '0' ]]; then
+	if [[ ${EUID} -ne '0' ]]; then
 
-            echo -e "${RED}${WARN}Run me as root!\n${RC}"
-            exit 1
+			echo -e "${RED}${WARN}Run me as root!\n${RC}"
+			exit 1
 
-    fi
+	fi
 }
 
 okMsg(){
@@ -185,22 +171,22 @@ main(){
 
 	for CMD in "${CMDS[@]}"; do
 
-	    if command -v ${CMD}>/dev/null; then
+		if command -v ${CMD}>/dev/null; then
 
-            SECONDS='0'
-            CMD=${CMD^}
+			SECONDS='0'
+			CMD=${CMD^}
 
-            echo -e "\n${RC}${BLUE}󰏖 Updating ${CMD}\n${RC}"
-            update${CMD} && okMsg || { failMsg; dpkg --audit; }
+			echo -e "\n${RC}${BLUE}󰏖 Updating ${CMD}\n${RC}"
+			update${CMD} && okMsg || { failMsg; dpkg --audit; }
 
-	    fi
+		fi
 
 	done
 
-    SECONDS='0'
+	SECONDS='0'
 
-    echo -e "\n${RC}${BLUE}${INFO}󰌽 Updating the linux kernel:\n${RC}"
-    updateKernel && okMsg || failMsg
+	echo -e "\n${RC}${BLUE}${INFO}󰌽 Updating the linux kernel:\n${RC}"
+	updateKernel && okMsg || failMsg
 
 }
 
