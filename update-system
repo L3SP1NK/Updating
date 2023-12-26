@@ -9,7 +9,6 @@
 
 
 loadColorIcon(){
-
     RC='\e[0m'
     LIGHT='\e[2m'
     GREEN='\e[32m'
@@ -24,31 +23,45 @@ loadColorIcon(){
 
 }
 
-loadColorIcon
+if [[ ${TERM} == *'256' ]]; then
+
+	loadColorIcon
+
+fi
 
 
 updateApt(){
 
+	if command -v nala>/dev/null; then
+
+		UPDATER='nala'
+
+	elif command -v apt-get>/dev/null; then
+
+		UPDATER='apt-get'
+
+	fi
+
     echo -e "\n${RC}${ORANGE}${INFO}Configuring/fixing possibly broken packages...\n${RC}"
-    apt-get -fyq install
+    ${UPDATER} install
     dpkg --configure -a
 
     echo -e "\n${RC}${ORANGE}${INFO}Retrieving new lists of packages...\n${RC}"
-    apt-get update --list-cleanup
+    ${UPDATER} update
 
     echo -e "\n${RC}${ORANGE}${INFO}Installing packages upgrades...\n${RC}"
-    apt-get -fyq upgrade
-    apt-get -fyq dist-upgrade
-    apt-get -fyq full-upgrade
+    ${UPDATER} upgrade
+    ${UPDATER} dist-upgrade
+    ${UPDATER} full-upgrade
 
     echo -e "\n${RC}${ORANGE}${INFO}Configuring/fixing possibly broken packages...\n${RC}"
-    apt-get -fyq install
+    ${UPDATER} install
     dpkg --configure -a
 
     echo -e "\n${RC}${ORANGE}${INFO}Removing downloaded archive files and unused packages...\n${RC}"
-    apt-get -y clean
-    apt-get -y autoclean
-    apt-get -y autoremove --purge
+    ${UPDATER} clean -y
+    ${UPDATER} autoclean -y
+    ${UPDATER} autoremove --purge -y
 
 }
 
@@ -86,13 +99,14 @@ updateFlatpak(){
 
 updateGit(){
 
-    GIT_REPO_LOCATION="/opt /usr/share/themes /usr/share/icons"
+    GIT_REPO_PATH=( '/opt' '/usr/share/themes' '/usr/share/icons' )
+	GIT_REPO_DIR=( $(find "${GIT_REPO_PATH[@]}" -type d -name ".git" 2>/dev/null) )
 
-    for GIT_PATH in $(find ${GIT_REPO_LOCATION} -type d -name ".git" 2>/dev/null)
+    for GIT_PATH in "${GIT_REPO_DIR[@]}"
 		do
 
             cd "${GIT_PATH}"
-            echo -e "\n${RC}${ORANGE}${FOLDER}Updating ${GIT_PATH}...\n${RC}"
+			echo -e "\n${RC}${ORANGE}${FOLDER}Updating ${GIT_PATH}...\n${RC}"
             cd ..
 
             git config pull.rebase true
@@ -111,7 +125,7 @@ updateKernel(){
 	for PKG in "${FIRMWARE_PKGS[@]}"
 		do
 
-			apt-get -fyq install "${PKG}"
+			${UPDATER} install "${PKG}"
 
 	done
 
