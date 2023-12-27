@@ -74,15 +74,4 @@ main() {
 
 CWD="$(pwd)"
 
-if main; then
-
-	printf "${OK}Git Repositories have been updated successfully! ${RC}"
-	cd ${CWD}
-	exit
-
-else
-
-    printf "${WARN}Something went wrong! ${RC}"
-    exit 1
-
-fi
+main
