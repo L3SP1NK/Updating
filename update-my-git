@@ -19,20 +19,20 @@ updateGit() {
 	REPO_PATH="/opt/mygit"
 	REPO_FOUND=( $( find "${REPO_PATH}/" -type d -name ".git" 2>/dev/null ) )
 
-	echo -e "\n${ORANGE}${INFO} Looking for git repositories...${RC}"
+	printf "${ORANGE}${INFO} Looking for git repositories...${RC}\n\n"
 
     for REPO in "${REPO_FOUND[@]}"; do
 
         CURRENT_REPO_NAME=$( echo "${REPO}" | cut -d '/' -f 4 )
 
-        echo -e "\n${BLUE}${FOLDER} ${CURRENT_REPO_NAME} ${RC}"
+        printf "${BLUE}${FOLDER} ${CURRENT_REPO_NAME} ${RC}"
         cd "${REPO}" && cd .. || return
 
         git config pull.rebase true
         git pull						## Will return error if changes have been made.
         git add -v .* * 2>/dev/null		## Dismiss error due to ".." being added.
         git commit -a && git push -v
-        git pull && echo -e "\n${OK}${CURRENT_REPO_NAME} Updated. ${RC}\n"
+        git pull && printf "${OK}${CURRENT_REPO_NAME} Updated. ${RC}\n\n"
 
     done
 
@@ -41,17 +41,17 @@ updateGit() {
 
 checkGitInstall() {
 
-    if ! which git>/dev/null; then
+    if ! command -v git>/dev/null; then
 
-        echo "\n${WARN}Git is not installed on this system! ${RC}"
+        printf "${WARN}Git is not installed on this system! ${RC}"
         exit 1
 
     fi
 
 
-    if [[ ! -f ${HOME}/.git-credentials ]]; then
+    if [[ ! -e ${HOME}/.git-credentials || ! -e ${HOME}/.gitconfig ]]; then
 
-        echo -e "\n${WARN}Git credentials not found! ${RC}"
+        printf "${WARN}Git credentials not found! ${RC}"
         exit 1
 
     fi
@@ -63,13 +63,12 @@ main() {
 
     if [[ ${EUID} -ne "0" ]]; then
 
-        echo -e "\n${WARN}Run me as root! ${RC}"
+        printf "${WARN}Run me as root! ${RC}"
         exit 1
 
     fi
 
     checkGitInstall && updateGit
-    makeLink 1>/dev/null
 
 }
 
@@ -78,13 +77,13 @@ CWD="$(pwd)"
 
 if main; then
 
-	echo -e "\n${OK}Git Repositories have been updated successfully! ${RC}"
+	printf "${OK}Git Repositories have been updated successfully! ${RC}"
 	cd ${CWD}
 	exit
 
 else
 
-    echo -e "\n${WARN}Something went wrong! ${RC}"
+    printf "${WARN}Something went wrong! ${RC}"
     exit 1
 
 fi
