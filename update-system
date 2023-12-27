@@ -2,62 +2,36 @@
 
 ##	Update: apt packages, git repositories, flatpak applications, npm packages, linux firmwares+kernel
 
-loadColorIcon(){
+RC='\e[0m'
+GREEN='\e[32m'
+RED='\e[31m'
+ORANGE='\e[33m'
+BLUE='\e[34m\e[1m'
 
-	RC='\e[0m'
-	GREEN='\e[32m'
-	RED='\e[31m'
-	ORANGE='\e[33m'
-	BLUE='\e[34m\e[3m\e[1m'
-
-}
-
-[[ ${TERM} == *256* ]] && loadColorIcon
-
-
-loadNerdIcon(){
-
-	OK=' '
-	INFO=' '
-	WARN=' '
-	FOLDER=' '
-
-}
-
-
-FONTS_PATH='/usr/share/fonts/'
-
-if [[ -d "${FONTS_PATH}" ]]; then
-
-	if find ${FONTS_PATH} -iname '*nerd*'>/dev/null; then
-
-		NERDFONT_FOUND='true'
-
-	fi
-
-fi
-
-[[ ${NERDFONT_FOUND} == 'true' ]] && loadNerdIcon
+OK="${GREEN} "
+INFO="${ORANGE} "
+WARN="${RED} "
+FOLDER="${BLUE} "
 
 
 updateApt(){
 
-	UPDATER=$( command -v nala || command -v apt-get ) || { echo -e "${WARN}${RED}No updater found!${RC}"; exit 1; }
-	ACTIONS=( 'install' 'update' 'upgrade' 'dist-upgrade' 'full-upgrade' )
+	UPDATER=$( command -v nala || command -v apt-get ) || { printf "${WARN}No updater found!${RC}"; exit 1; }
+
+	if ! dpkg --audit; then
+
+		printf "${WARN}There is problems with your packages manager, fix them and come back later!${RC}"
+		exit 1
+
+	fi
 
 	dpkg --configure -a
 
+	ACTIONS=( 'install' 'update' 'upgrade' 'dist-upgrade' 'full-upgrade' )
+
 	for ACTION in "${ACTIONS[@]}"; do
 
-		if [[ ${ACTION} == 'update' ]]; then
-
-			${UPDATER} ${ACTION}
-
-		else
-
-			${UPDATER} ${ACTION} -y
-
-		fi
+		[[ ${ACTION} == 'update' ]] && ${UPDATER} ${ACTION} || ${UPDATER} ${ACTION} -y
 
 	done
 
@@ -97,24 +71,22 @@ updateNpm(){
 
 updateFlatpak(){
 
-	echo -e "\n${RC}${ORANGE}${INFO}Checking flatpak applications...\n${RC}"
 	flatpak repair -v
-
-	echo -e "\n${RC}${ORANGE}${INFO}Updating flatpak...\n${RC}"
 	flatpak update -vy
 
 }
 
 updateGit(){
 
+	SECONDS='0'
+
 	GIT_REPO_PATH=( '/opt' '/usr/share/themes' '/usr/share/icons' )
-	#GIT_REPO_DIR=( $(find "${GIT_REPO_PATH[@]}" -type d -name ".git" 2>/dev/null) )
-	mapfile -t GIT_REPO_DIR <(find "${GIT_REPO_PATH[@]}" -type d -name ".git" 2>/dev/null)
+	GIT_REPO_DIR=( $(find "${GIT_REPO_PATH[@]}" -type d -name ".git" 2>/dev/null) )
 
 	for GIT_PATH in "${GIT_REPO_DIR[@]}"; do
 
 			cd ${GIT_PATH} || return
-			echo -e "\n${RC}${ORANGE}${FOLDER}Updating ${GIT_PATH}...\n${RC}"
+			printf "\n${FOLDER}Updating ${GIT_PATH}\n${RC}"
 			cd .. || return
 
 			git config pull.rebase true
@@ -126,6 +98,7 @@ updateGit(){
 }
 
 updateKernel(){
+
 
 	FIRMWARE_PKGS=( 'firmware-linux' 'firmware-linux-free' 'firmware-linux-nonfree' )
 
@@ -147,21 +120,22 @@ checkPriv(){
 
 	if [[ ${EUID} -ne '0' ]]; then
 
-			echo -e "${RED}${WARN}Run me as root!\n${RC}"
+			printf "${WARN}Run me as root!\n${RC}"
 			exit 1
 
 	fi
+
 }
 
 okMsg(){
 
-	echo -e "\n${RC}${GREEN}${OK}Done in ${SECONDS} seconds!\n${RC}"
+	printf "\n${OK}Done in ${SECONDS} seconds!\n${RC}"
 
 }
 
 failMsg(){
 
-	echo -e "${RED}${WARN}Ooops!\nSomething went wrong!\n${RC}"
+	printf "${WARN}Ooops!\nSomething went wrong!\n${RC}"
 	exit 1
 
 }
@@ -174,21 +148,38 @@ main(){
 
 	for CMD in "${CMDS[@]}"; do
 
+
+		case ${CMD} in
+
+			'apt')
+				LOGO='󰏔 '
+			;;
+			'flatpak')
+				LOGO=' '
+			;;
+			'npm')
+				LOGO=' '
+			;;
+			'git')
+				LOGO='󰊢 '
+			;;
+		esac
+
+
+
 		if command -v ${CMD}>/dev/null; then
 
 			SECONDS='0'
 			CMD=${CMD^}
 
-			echo -e "\n${RC}${BLUE}󰏖 Updating ${CMD}\n${RC}"
+			printf "\n${INFO}Updating ${CMD} ${LOGO}\n${RC}"
 			update${CMD} && okMsg || { failMsg; dpkg --audit; }
 
 		fi
 
 	done
 
-	SECONDS='0'
-
-	echo -e "\n${RC}${BLUE}${INFO}󰌽 Updating the linux kernel:\n${RC}"
+	printf "\n${INFO}󰌽 Updating the linux kernel...\n${RC}"
 	updateKernel && okMsg || failMsg
 
 }
