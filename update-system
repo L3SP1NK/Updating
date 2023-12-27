@@ -5,7 +5,6 @@
 loadColorIcon(){
 
 	RC='\e[0m'
-	LIGHT='\e[2m'
 	GREEN='\e[32m'
 	RED='\e[31m'
 	ORANGE='\e[33m'
@@ -26,11 +25,11 @@ loadNerdIcon(){
 }
 
 
-FONT_PATH='/usr/share/fonts/'
+FONTS_PATH='/usr/share/fonts/'
 
 if [[ -d "${FONTS_PATH}" ]]; then
 
-	if find ${FONTS_PATH} -iname "*nerd*">/dev/null; then
+	if find ${FONTS_PATH} -iname '*nerd*'>/dev/null; then
 
 		NERDFONT_FOUND='true'
 
@@ -43,7 +42,7 @@ fi
 
 updateApt(){
 
-	UPDATER=$(command -v nala || command -v apt-get) || { echo -e "${WARN}${RED}No updater found!${RC}"; exit 1; }
+	UPDATER=$( command -v nala || command -v apt-get ) || { echo -e "${WARN}${RED}No updater found!${RC}"; exit 1; }
 	ACTIONS=( 'install' 'update' 'upgrade' 'dist-upgrade' 'full-upgrade' )
 
 	dpkg --configure -a
@@ -64,19 +63,23 @@ updateApt(){
 
 	ACTIONS=( 'clean' 'autoclean' 'autoremove' )
 
-	if [[ ${UPDATER} == 'nala' ]]; then
+	for ACTION in "${ACTIONS[@]}"; do
 
-		${UPDATER} ${ACTIONS}
+		if [[ ${UPDATER} == 'nala' ]]; then
 
-	elif [[ ${UPDATER} == 'apt-get' ]]; then
+			${UPDATER} ${ACTION}
 
-		for ACTION in "${ACTIONS[@]}"; do
+		elif [[ ${UPDATER} == 'apt-get' ]]; then
 
-			${UPDATER} ${ACTION} -y
+			for ACTION in "${ACTIONS[@]}"; do
 
-		done
+				${UPDATER} ${ACTION} -y
 
-	fi
+			done
+
+		fi
+
+	done
 
 }
 
@@ -105,14 +108,14 @@ updateFlatpak(){
 updateGit(){
 
 	GIT_REPO_PATH=( '/opt' '/usr/share/themes' '/usr/share/icons' )
-	GIT_REPO_DIR=( $(find "${GIT_REPO_PATH[@]}" -type d -name ".git" 2>/dev/null) )
+	#GIT_REPO_DIR=( $(find "${GIT_REPO_PATH[@]}" -type d -name ".git" 2>/dev/null) )
+	mapfile -t GIT_REPO_DIR <(find "${GIT_REPO_PATH[@]}" -type d -name ".git" 2>/dev/null)
 
-	for GIT_PATH in "${GIT_REPO_DIR[@]}"
-		do
+	for GIT_PATH in "${GIT_REPO_DIR[@]}"; do
 
-			cd ${GIT_PATH}
+			cd ${GIT_PATH} || return
 			echo -e "\n${RC}${ORANGE}${FOLDER}Updating ${GIT_PATH}...\n${RC}"
-			cd ..
+			cd .. || return
 
 			git config pull.rebase true
 			git stash
@@ -132,7 +135,7 @@ updateKernel(){
 
 	done
 
-	FIRMWARE_PATH='/opt/FIRMWARE/'; mkdir -p ${FIRMWARE_PATH}; cd ${FIRMWARE_PATH}
+	FIRMWARE_PATH='/opt/FIRMWARE/'; mkdir -p ${FIRMWARE_PATH}; cd ${FIRMWARE_PATH} || return
 	git clone 'https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git' 2>/dev/null
 	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware/ 2>/dev/null
 
