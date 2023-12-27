@@ -2,12 +2,10 @@
 ## Update my git repositories.
 
 RC="\e[0m"
-GREEN="\e[32m"
 RED="\e[31m"
 ORANGE="\e[33m"
 BLUE="\e[34m\e[1m"
 
-OK="${GREEN} "
 INFO="${ORANGE} "
 WARN="${RED} "
 FOLDER="${BLUE} "
@@ -15,7 +13,6 @@ FOLDER="${BLUE} "
 
 updateGit() {
 
-	USER_HOME="/home/$( ls /home|head -n 1)"
 	REPO_PATH="/opt/mygit"
 	REPO_FOUND=($(find "${REPO_PATH}/" -type d -name '.git' 2>/dev/null))
 
@@ -70,8 +67,5 @@ main() {
     checkGitInstall && updateGit
 
 }
-
-
-CWD="$(pwd)"
 
 main
