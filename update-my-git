@@ -19,13 +19,13 @@ updateGit() {
 	REPO_PATH="/opt/mygit"
 	REPO_FOUND=($(find "${REPO_PATH}/" -type d -name '.git' 2>/dev/null))
 
-	printf "${ORANGE}${INFO} Looking for git repositories...${RC}\n"
+	printf "${ORANGE}${INFO}Looking for git repositories...${RC}\n"
 
     for REPO in "${REPO_FOUND[@]}"; do
 
         CURRENT_REPO_NAME=$(printf "${REPO}"|cut -d '/' -f 4)
 
-        printf "\n${BLUE}${FOLDER} ${CURRENT_REPO_NAME} ${RC}"
+        printf "\n${FOLDER}${CURRENT_REPO_NAME}:${RC} "
         cd "${REPO}" && cd .. || return
 
         git config pull.rebase true
