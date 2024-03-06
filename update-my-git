@@ -45,7 +45,8 @@ checkGitInstall() {
     fi
 
 
-    if [[ ! -e ${HOME}/.git-credentials || ! -e ${HOME}/.gitconfig ]]; then
+#    if [[ ! -e ${HOME}/.git-credentials || ! -e ${HOME}/.gitconfig ]]; then
+    if [[ ! -e ${HOME}/.gitconfig ]]; then
 
         printf "${WARN}Git credentials not found! ${RC}"
         exit 1
