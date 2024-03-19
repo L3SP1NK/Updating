@@ -16,11 +16,11 @@ FOLDER="${BLUE} "
 
 updateApt(){
 
-	UPDATER=$( command -v nala || command -v apt-get ) || { printf "${WARN}No updater found!${RC}"; exit 1; }
+	UPDATER=$( command -v nala || command -v apt-get ) || { echo -e "${WARN}No updater found!${RC}"; exit 1; }
 
 	if ! dpkg --audit; then
 
-		printf "${WARN}There is problems with your packages manager, fix them and come back later!${RC}"
+		echo -e "${WARN}There is problems with your packages manager, fix them and come back later!${RC}"
 		exit 1
 
 	fi
@@ -85,13 +85,17 @@ updateGit(){
 
 	for GIT_PATH in "${GIT_REPO_DIR[@]}"; do
 
-			cd ${GIT_PATH} || return
-			printf "\n${FOLDER}Updating ${GIT_PATH}\n${RC}"
+			cd "${GIT_PATH}" || return
+			echo -e "\n${FOLDER}Updating ${GIT_PATH}\n${RC}"
 			cd .. || return
 
-			git config pull.rebase true
-			git stash
-			git pull
+			ACTIONS=( 'config pull.rebase true' 'stash' 'pull' )
+
+			for ACTION in "${ACTIONS[@]}"; do
+
+				git "${ACTION}"
+
+			done
 
 		done
 
@@ -109,6 +113,7 @@ updateKernel(){
 	done
 
 	FIRMWARE_PATH='/opt/FIRMWARE/'; mkdir -p ${FIRMWARE_PATH}; cd ${FIRMWARE_PATH} || return
+	echo -e "${INFO}Cloning the linux firmware git repository...\n${RC}"
 	git clone 'https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git' 2>/dev/null
 	cp -vur ${FIRMWARE_PATH}/linux-firmware/* /lib/firmware/ 2>/dev/null
 
@@ -120,7 +125,7 @@ checkPriv(){
 
 	if [[ ${EUID} -ne '0' ]]; then
 
-			printf "${WARN}Run me as root!\n${RC}"
+			echo -e "${WARN}Run me as root!\n${RC}"
 			exit 1
 
 	fi
@@ -129,13 +134,13 @@ checkPriv(){
 
 okMsg(){
 
-	printf "\n${OK}Done in ${SECONDS} seconds!\n${RC}"
+	echo -e "\n${OK}Done in ${SECONDS} seconds!\n${RC}"
 
 }
 
 failMsg(){
 
-	printf "${WARN}Ooops!\nSomething went wrong!\n${RC}"
+	echo -e "${WARN}Ooops!\nSomething went wrong!\n${RC}"
 	exit 1
 
 }
@@ -148,38 +153,19 @@ main(){
 
 	for CMD in "${CMDS[@]}"; do
 
-
-		case ${CMD} in
-
-			'apt')
-				LOGO='󰏔 '
-			;;
-			'flatpak')
-				LOGO=' '
-			;;
-			'npm')
-				LOGO=' '
-			;;
-			'git')
-				LOGO='󰊢 '
-			;;
-		esac
-
-
-
 		if command -v ${CMD}>/dev/null; then
 
 			SECONDS='0'
 			CMD=${CMD^}
 
-			printf "\n${INFO}Updating ${CMD} ${LOGO}\n${RC}"
+			echo -e "\n${INFO}Updating ${CMD}...\n${RC}"
 			update${CMD} && okMsg || { failMsg; dpkg --audit; }
 
 		fi
 
 	done
 
-	printf "\n${INFO}󰌽 Updating the linux kernel...\n${RC}"
+	echo -e "\n${INFO}Updating the linux kernel...\n${RC}"
 	updateKernel && okMsg || failMsg
 
 }
