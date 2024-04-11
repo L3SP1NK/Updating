@@ -58,13 +58,13 @@ checkGitInstall() {
 
 main() {
 
-    if [[ ${EUID} -ne "0" ]]; then
-
-        printf "${WARN}Run me as root! ${RC}"
-        exit 1
-
-    fi
-
+#    if [[ ${EUID} -ne "0" ]]; then
+#
+#        printf "${WARN}Run me as root! ${RC}"
+#        exit 1
+#
+#    fi
+#
     checkGitInstall && updateGit
 
 }
