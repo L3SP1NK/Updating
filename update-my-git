@@ -16,15 +16,16 @@ updateGit() {
 	REPO_PATH="/opt/mygit"
 	REPO_FOUND=($(find "${REPO_PATH}/" -type d -name '.git' 2>/dev/null))
 
-	printf "${ORANGE}${INFO}Looking for git repositories...${RC}\n"
+	echo -e "${ORANGE}${INFO}Looking for git repositories...${RC}\n"
 
     for REPO in "${REPO_FOUND[@]}"; do
 
-        CURRENT_REPO_NAME=$(printf "${REPO}"|cut -d '/' -f 4)
+        CURRENT_REPO_NAME=$(echo -e "${REPO}"|cut -d '/' -f 4)
 
-        printf "\n${FOLDER}${CURRENT_REPO_NAME}:${RC} "
+        echo -e "\n${FOLDER}${CURRENT_REPO_NAME}:${RC} "
         cd "${REPO}" && cd .. || return
 
+		git commit --amend --reset-author
         git config pull.rebase true
         git pull						## Will return error if changes have been made.
         git add -v .* * 2>/dev/null		## Dismiss error due to ".." being added.
@@ -39,7 +40,7 @@ checkGitInstall() {
 
     if ! command -v git>/dev/null; then
 
-        printf "${WARN}Git is not installed on this system! ${RC}"
+        echo -e "${WARN}Git is not installed on this system! ${RC}"
         exit 1
 
     fi
@@ -48,7 +49,7 @@ checkGitInstall() {
 #    if [[ ! -e ${HOME}/.git-credentials || ! -e ${HOME}/.gitconfig ]]; then
     if [[ ! -e ${HOME}/.gitconfig ]]; then
 
-        printf "${WARN}Git credentials not found! ${RC}"
+        echo -e "${WARN}Git credentials not found! ${RC}"
         exit 1
 
     fi
@@ -56,15 +57,19 @@ checkGitInstall() {
 }
 
 
+checkRoot(){
+
+    if [[ ${EUID} -ne "0" ]]; then
+
+        echo -e "${WARN}Run me as root! ${RC}"
+        exit 1
+
+    fi
+
+}
+
 main() {
 
-#    if [[ ${EUID} -ne "0" ]]; then
-#
-#        printf "${WARN}Run me as root! ${RC}"
-#        exit 1
-#
-#    fi
-#
     checkGitInstall && updateGit
 
 }
