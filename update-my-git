@@ -25,10 +25,10 @@ updateGit() {
         echo -e "\n${FOLDER}${CURRENT_REPO_NAME}:${RC} "
         cd "${REPO}" && cd .. || return
 
-		git commit --amend --reset-author
+#		git commit --amend --reset-author
         git config pull.rebase true
         git pull						## Will return error if changes have been made.
-        git add -v .* * 2>/dev/null		## Dismiss error due to ".." being added.
+        git add -v .* * 2>/dev/null		## Dismiss error due to "." and ".." being added.
         git commit -a && git push -v
 
     done
