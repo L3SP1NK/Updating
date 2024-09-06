@@ -7,36 +7,36 @@ REQUIREMENTS="rsync zstd"
 
 backupDir() {
 
-    clear
+	clear
 
-    echo -e "${YELLOW} → Starting backup...${RC}"
+	echo -e "${YELLOW} → Starting backup...${RC}"
 
-    rsync\
-        --archive\
-        --verbose\
-        --recursive\
-        --update\
-        --links\
-        --perms\
-        --executability\
-        --acls\
-        --xattrs\
-        --owner\
-        --group\
-        --devices\
-        --specials\
-        --times\
-        --atimes\
-        --delete-before\
-        --ignore-errors\
-        --compress\
-        --compress-choice=zstd\
-        --compress-level=9\
-        --human-readable\
-        --progress\
-        --ipv4\
-        --exclude-from=${HOME}/.exclude_from_backup\
-        / ${BACKUP_DEST}/
+	rsync\
+		--archive\
+		--verbose\
+		--recursive\
+		--update\
+		--links\
+		--perms\
+		--executability\
+		--acls\
+		--xattrs\
+		--owner\
+		--group\
+		--devices\
+		--specials\
+		--times\
+		--atimes\
+		--delete-before\
+		--ignore-errors\
+		--compress\
+		--compress-choice=zstd\
+		--compress-level=9\
+		--human-readable\
+		--progress\
+		--ipv4\
+		--exclude-from=${HOME}/.exclude_from_backup\
+		/ ${BACKUP_DEST}/
 
 }
 
@@ -46,7 +46,7 @@ for R in "${REQUIREMENTS[@]}"; do
 
 	if ! command -v ${R}>/dev/null; then
 
-        echo -e "${RED} × To run this program, you need ${R}${RC}"
+		echo -e "${RED} × To run this program, you need ${R}${RC}"
 
 	fi
 
