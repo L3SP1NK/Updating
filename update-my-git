@@ -28,7 +28,7 @@ updateGit() {
 #		git commit --amend --reset-author
         git config pull.rebase true
         git pull						## Will return error if changes have been made.
-        git add -v .* * 2>/dev/null		## Dismiss error due to "." and ".." being added.
+        git add -v .
         git commit -a && git push -v
 
     done
